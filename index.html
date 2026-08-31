@@ -1949,6 +1949,7 @@
             <div>
                 <h4 style="color:var(--route-color); font-weight:900;">DIAGNÓSTICO: MODO RUTA</h4>
                 <p style="font-size: 11px; color: var(--text-muted);">Detalle de cada escaneo que hoy está sumando al contador "MODO RUTA", para la jornada filtrada.</p>
+                <p style="font-size: 10px; color: var(--text-muted); margin-top:2px;">Nota: el KPI en pantalla ahora muestra 0 cuando el Modo Ruta está apagado; esta lista es solo para auditoría y sigue mostrando lo escaneado en Ruta durante la jornada, esté o no el modo activo en este momento.</p>
             </div>
         </div>
 
@@ -1964,13 +1965,16 @@
                         <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Hora</th>
                         <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Usuario</th>
                         <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Motivo por el que se cuenta</th>
+                        <th style="padding:6px 8px; text-align:center; border-bottom:1px solid var(--border);">¿Existe HOY en Base General?</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Ruta en Base General (hoy)</th>
                     </tr>
                 </thead>
                 <tbody id="filasDiagnosticoRuta"></tbody>
             </table>
         </div>
-        <p style="font-size:10px; color:var(--text-muted); margin-top:8px;">Se muestran hasta 200 registros de ejemplo. El resumen de arriba sí considera todos los escaneos filtrados.</p>
+        <p style="font-size:10px; color:var(--text-muted); margin-top:8px;">Se muestran hasta 200 registros de ejemplo en pantalla. El resumen de arriba y el Excel sí consideran todos los escaneos filtrados.</p>
 
+        <button onclick="exportarDiagnosticoRutaExcel()" style="width:100%; padding:10px; border-radius:8px; border:none; background:var(--success); color:white; font-weight:800; cursor:pointer; margin-top:10px;">📥 Descargar Excel</button>
         <button onclick="cerrarModalDiagnosticoRuta()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-weight:800; cursor:pointer; margin-top:10px;">Cerrar</button>
     </div>
 </div>
@@ -3347,6 +3351,9 @@
         if(document.body.classList.contains('mode-desktop-active')) { inpDesk.focus(); } else { inp.focus(); }
         actualizarPanelDerechoVisual();
         sincronizarOpcionesCatSegunModo();
+        // Refresca de inmediato el KPI "MODO RUTA" (debe pasar a 0 apenas se
+        // apaga el Modo Ruta, sin esperar al próximo escaneo).
+        actualizarDashboardKPI();
     }
 
     function toggleModoImprimirLocal() {
@@ -5997,6 +6004,8 @@
     // Usa EXACTAMENTE el mismo criterio "esRuta" que actualizarDashboardKPI(),
     // para que lo que se ve acá coincida siempre con el número del KPI.
     // ======================================
+    let ultimoDiagnosticoRutaFilas = []; // guarda TODAS las filas (no solo las 200 mostradas) para el export a Excel
+
     function abrirDiagnosticoRuta() {
         let jornadasFiltro = leerJornadasSeleccionadas('menuJornadaDesk');
 
@@ -6028,25 +6037,73 @@
             </div>`).join('')}
         `;
 
-        let filasHtml = candidatos.slice(0, 200).map(s => {
+        // Para cada candidato, además del motivo, se busca si esa guía existe
+        // HOY en la Base General (base de datos central) — igual que hace el
+        // modal "Diagnóstico Forzados" — para poder exportarlo también.
+        ultimoDiagnosticoRutaFilas = candidatos.map(s => {
             const clase = claseEscaneo(s);
             const motivo = clase === "ruta"
                 ? "Modo Ruta real (modo=VALIDAR_RUTA)"
                 : "Registro antiguo sin \"modo\" guardado, con categoría RUTEO IL";
-            return `
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:6px 8px;">${s.guia || "-"}</td>
-                    <td style="padding:6px 8px; ${s.modo ? '' : 'color:var(--warning); font-weight:800;'}">${s.modo || "(sin modo)"}</td>
-                    <td style="padding:6px 8px;">${s.cat || "-"}</td>
-                    <td style="padding:6px 8px;">${s.hora || "-"}</td>
-                    <td style="padding:6px 8px;">${s.usuario || "-"}</td>
-                    <td style="padding:6px 8px;">${motivo}</td>
-                </tr>
-            `;
-        }).join('');
 
-        document.getElementById('filasDiagnosticoRuta').innerHTML = filasHtml || '<tr><td colspan="6" style="padding:12px; text-align:center; color:var(--text-muted);">No hay escaneos para la jornada seleccionada.</td></tr>';
+            const guiaLimpia = limpiarCodigo(String(s.guia || ""));
+            const encontradoEnBase = db.find(i => {
+                const guiaBase = buscarColumna(i, ["GUIA", "SEGUIMIENTO", "TRACKING"]);
+                return limpiarTexto(guiaBase) === guiaLimpia;
+            });
+            const rutaEnBase = encontradoEnBase ? (buscarColumna(encontradoEnBase, ["RUTA"]) || "(columna RUTA vacía)") : "-";
+
+            return {
+                guia: s.guia || "-",
+                modo: s.modo || "(sin modo)",
+                cat: s.cat || "-",
+                hora: s.hora || "-",
+                usuario: s.usuario || "-",
+                motivo: motivo,
+                existeEnBase: !!encontradoEnBase,
+                rutaEnBase: rutaEnBase
+            };
+        });
+
+        let filasHtml = ultimoDiagnosticoRutaFilas.slice(0, 200).map(f => `
+                <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:6px 8px;">${f.guia}</td>
+                    <td style="padding:6px 8px; ${f.modo === '(sin modo)' ? 'color:var(--warning); font-weight:800;' : ''}">${f.modo}</td>
+                    <td style="padding:6px 8px;">${f.cat}</td>
+                    <td style="padding:6px 8px;">${f.hora}</td>
+                    <td style="padding:6px 8px;">${f.usuario}</td>
+                    <td style="padding:6px 8px;">${f.motivo}</td>
+                    <td style="padding:6px 8px; text-align:center; ${f.existeEnBase ? 'color:var(--success); font-weight:800;' : 'color:var(--text-muted);'}">${f.existeEnBase ? "SÍ" : "NO"}</td>
+                    <td style="padding:6px 8px;">${f.rutaEnBase}</td>
+                </tr>
+        `).join('');
+
+        document.getElementById('filasDiagnosticoRuta').innerHTML = filasHtml || '<tr><td colspan="8" style="padding:12px; text-align:center; color:var(--text-muted);">No hay escaneos para la jornada seleccionada.</td></tr>';
         document.getElementById('modalDiagnosticoRuta').style.display = 'flex';
+    }
+
+    // Exporta TODAS las filas del diagnóstico (no solo las 200 mostradas en pantalla) a un Excel
+    function exportarDiagnosticoRutaExcel() {
+        if (!ultimoDiagnosticoRutaFilas || ultimoDiagnosticoRutaFilas.length === 0) {
+            alert("No hay datos para exportar. Abrí el diagnóstico primero.");
+            return;
+        }
+        const filasExport = ultimoDiagnosticoRutaFilas.map(f => ({
+            "GUÍA": f.guia,
+            "MODO GUARDADO": f.modo,
+            "CATEGORÍA": f.cat,
+            "HORA": f.hora,
+            "USUARIO": f.usuario,
+            "MOTIVO POR EL QUE SE CUENTA": f.motivo,
+            "¿EXISTE HOY EN BASE GENERAL?": f.existeEnBase ? "SÍ" : "NO",
+            "RUTA EN BASE GENERAL (HOY)": f.rutaEnBase
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(filasExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Diagnostico Modo Ruta");
+        const fechaLimpia = new Date().toLocaleDateString().replace(/\//g, '-');
+        XLSX.writeFile(wb, `Diagnostico_Modo_Ruta_${fechaLimpia}.xlsx`);
     }
 
     function cerrarModalDiagnosticoRuta() {
@@ -9611,10 +9668,14 @@
         let totalBaseRuta = baseDatosRutaNube.length;
         let totalBaseGen = db.length;
 
-        // MODO RUTA está regido por la Base de Ruta: si no hay ninguna base
-        // cargada actualmente, no tiene sentido mostrar un conteo histórico
-        // de escaneos en Modo Ruta (quedaría "sano" pero fuera de contexto).
-        let countRutaMostrado = totalBaseRuta > 0 ? countRuta : 0;
+        // MODO RUTA está regido por la Base de Ruta Y por si el Modo Ruta está
+        // ACTIVO en este momento: si no hay base cargada, o si el operario ya
+        // no está en Modo Ruta (lo apagó / cambió de modo), mostrar un conteo
+        // histórico acá confunde, porque parece "avance actual" contra una
+        // Base de Ruta que puede ni estar vigente. Por eso se muestra en 0
+        // apenas se sale de Modo Ruta, aunque haya habido escaneos de Ruta
+        // antes en la misma jornada.
+        let countRutaMostrado = (modoValidarRutaActivo && totalBaseRuta > 0) ? countRuta : 0;
 
         document.getElementById('kpiDeskImpTotal').textContent = countImp;
         document.getElementById('kpiDeskRutaTotal').textContent = countRutaMostrado;
@@ -9622,7 +9683,7 @@
         // (siguen disponibles en el modal "Diagnóstico Forzados").
 
         let pctImp = totalBaseRuta > 0 ? (countImp / totalBaseRuta) * 100 : 0;
-        let pctRuta = totalBaseRuta > 0 ? (countRuta / totalBaseRuta) * 100 : 0;
+        let pctRuta = (modoValidarRutaActivo && totalBaseRuta > 0) ? (countRuta / totalBaseRuta) * 100 : 0;
 
         // Límite máximo del 100% para evitar desbordes visuales
         document.getElementById('kpiDeskImpPct').textContent = (pctImp > 100 ? 100 : pctImp).toFixed(1) + '%';

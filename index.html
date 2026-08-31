@@ -9668,14 +9668,17 @@
         let totalBaseRuta = baseDatosRutaNube.length;
         let totalBaseGen = db.length;
 
-        // MODO RUTA está regido por la Base de Ruta Y por si el Modo Ruta está
-        // ACTIVO en este momento: si no hay base cargada, o si el operario ya
-        // no está en Modo Ruta (lo apagó / cambió de modo), mostrar un conteo
-        // histórico acá confunde, porque parece "avance actual" contra una
-        // Base de Ruta que puede ni estar vigente. Por eso se muestra en 0
-        // apenas se sale de Modo Ruta, aunque haya habido escaneos de Ruta
-        // antes en la misma jornada.
-        let countRutaMostrado = (modoValidarRutaActivo && totalBaseRuta > 0) ? countRuta : 0;
+        // MODO RUTA está regido por la Base de Ruta y, SOLO cuando la jornada
+        // filtrada es "HOY", también por si el Modo Ruta está activo en este
+        // momento: mostrar el conteo de HOY con el modo apagado confunde,
+        // porque parece "avance en vivo" contra una Base de Ruta que puede ni
+        // estar vigente. Pero si el operario filtra un día ANTERIOR, sí se
+        // debe mostrar el conteo real de esa jornada (es historial, no un
+        // "avance en vivo"), esté o no el Modo Ruta activo ahora.
+        let jornadaHoy = obtenerJornadaLogica(new Date());
+        let filtroEsSoloHoy = jornadasFiltro.length === 1 && jornadasFiltro[0] === jornadaHoy;
+        let debeOcultarRutaHoy = filtroEsSoloHoy && !modoValidarRutaActivo;
+        let countRutaMostrado = (!debeOcultarRutaHoy && totalBaseRuta > 0) ? countRuta : 0;
 
         document.getElementById('kpiDeskImpTotal').textContent = countImp;
         document.getElementById('kpiDeskRutaTotal').textContent = countRutaMostrado;
@@ -9683,7 +9686,7 @@
         // (siguen disponibles en el modal "Diagnóstico Forzados").
 
         let pctImp = totalBaseRuta > 0 ? (countImp / totalBaseRuta) * 100 : 0;
-        let pctRuta = (modoValidarRutaActivo && totalBaseRuta > 0) ? (countRuta / totalBaseRuta) * 100 : 0;
+        let pctRuta = (!debeOcultarRutaHoy && totalBaseRuta > 0) ? (countRuta / totalBaseRuta) * 100 : 0;
 
         // Límite máximo del 100% para evitar desbordes visuales
         document.getElementById('kpiDeskImpPct').textContent = (pctImp > 100 ? 100 : pctImp).toFixed(1) + '%';

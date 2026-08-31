@@ -1171,7 +1171,10 @@
                         <!-- RUTA -->
                         <div style="background: rgba(68,119,161,0.05); border: 1px solid var(--route-color); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <div style="font-size: 10px; font-weight: 800; color: var(--route-color);">🚚 MODO RUTA</div>
+                                <div style="font-size: 10px; font-weight: 800; color: var(--route-color); display:flex; align-items:center; gap:5px;">
+                                    🚚 MODO RUTA
+                                    <button type="button" onclick="abrirDiagnosticoRuta()" title="Ver detalle de qué escaneos se están contando aquí" style="background:none; border:none; cursor:pointer; font-size:11px; padding:0; line-height:1;">🔍</button>
+                                </div>
                                 <div id="kpiDeskRutaTotal" style="font-size: 20px; font-weight: 900; color: var(--text-main); margin-top: 2px;">0</div>
                             </div>
                             <div style="text-align: right; background: var(--card-bg); padding: 4px 8px; border-radius: 6px; border: 1px dashed var(--route-color);">
@@ -1935,6 +1938,40 @@
         <p id="resultadoReparacion" style="font-size:11px; font-weight:700; margin-top:6px; text-align:center; min-height:14px;"></p>
 
         <button onclick="cerrarModalDiagnosticoForzados()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-weight:800; cursor:pointer; margin-top:10px;">Cerrar</button>
+    </div>
+</div>
+
+<!-- DIAGNÓSTICO: qué escaneos está sumando el KPI "MODO RUTA" y por qué -->
+<div id="modalDiagnosticoRuta" class="modal" style="z-index: 9300;">
+    <div class="modal-content" style="max-width: 900px; width: 95%;">
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px;">🚚</span>
+            <div>
+                <h4 style="color:var(--route-color); font-weight:900;">DIAGNÓSTICO: MODO RUTA</h4>
+                <p style="font-size: 11px; color: var(--text-muted);">Detalle de cada escaneo que hoy está sumando al contador "MODO RUTA", para la jornada filtrada.</p>
+            </div>
+        </div>
+
+        <div id="resumenDiagnosticoRuta" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:8px; margin-bottom: 12px;"></div>
+
+        <div style="max-height: 55vh; overflow:auto; border:1px solid var(--border); border-radius:8px;">
+            <table style="width:100%; border-collapse: collapse; font-size: 11px;">
+                <thead style="position: sticky; top:0; background: var(--card-bg); z-index: 1;">
+                    <tr>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Guía</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Modo guardado</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Categoría</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Hora</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Usuario</th>
+                        <th style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border);">Motivo por el que se cuenta</th>
+                    </tr>
+                </thead>
+                <tbody id="filasDiagnosticoRuta"></tbody>
+            </table>
+        </div>
+        <p style="font-size:10px; color:var(--text-muted); margin-top:8px;">Se muestran hasta 200 registros de ejemplo. El resumen de arriba sí considera todos los escaneos filtrados.</p>
+
+        <button onclick="cerrarModalDiagnosticoRuta()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-weight:800; cursor:pointer; margin-top:10px;">Cerrar</button>
     </div>
 </div>
 
@@ -5953,6 +5990,67 @@
 
     function cerrarModalDiagnosticoForzados() {
         document.getElementById('modalDiagnosticoForzados').style.display = 'none';
+    }
+
+    // ======================================
+    // DIAGNÓSTICO: qué escaneos está sumando el KPI "MODO RUTA" y por qué.
+    // Usa EXACTAMENTE el mismo criterio "esRuta" que actualizarDashboardKPI(),
+    // para que lo que se ve acá coincida siempre con el número del KPI.
+    // ======================================
+    function abrirDiagnosticoRuta() {
+        let jornadasFiltro = leerJornadasSeleccionadas('menuJornadaDesk');
+
+        let candidatos = scans.filter(s => {
+            if (!s.hora || !jornadasFiltro.includes(obtenerJornadaLogica(parsearHoraAObj(s.hora)))) return false;
+            const clase = claseEscaneo(s);
+            const catUpper = String(s.cat || "").toUpperCase();
+            const esRutaPorCategoria = catUpper === "RUTEO IL" || catUpper === "RUTEO IL (MULTIFOLIOS)";
+            const esRuta = clase === "ruta" || (!s.modo && esRutaPorCategoria);
+            return esRuta;
+        });
+
+        let porModo = {};
+        candidatos.forEach(s => {
+            const clave = s.modo || "(sin modo)";
+            porModo[clave] = (porModo[clave] || 0) + 1;
+        });
+
+        const resumen = document.getElementById('resumenDiagnosticoRuta');
+        resumen.innerHTML = `
+            <div style="background:rgba(68,119,161,0.08); border:1px solid var(--border); border-radius:8px; padding:8px;">
+                <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Total contado como Ruta</div>
+                <div style="font-size:18px; font-weight:900; color:var(--route-color);">${candidatos.length}</div>
+            </div>
+            ${Object.keys(porModo).map(modo => `
+            <div style="background:rgba(100,116,139,0.08); border:1px solid var(--border); border-radius:8px; padding:8px;">
+                <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Modo: ${modo}</div>
+                <div style="font-size:18px; font-weight:900;">${porModo[modo]}</div>
+            </div>`).join('')}
+        `;
+
+        let filasHtml = candidatos.slice(0, 200).map(s => {
+            const clase = claseEscaneo(s);
+            const motivo = clase === "ruta"
+                ? "Modo Ruta real (modo=VALIDAR_RUTA)"
+                : "Registro antiguo sin \"modo\" guardado, con categoría RUTEO IL";
+            return `
+                <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:6px 8px;">${s.guia || "-"}</td>
+                    <td style="padding:6px 8px; ${s.modo ? '' : 'color:var(--warning); font-weight:800;'}">${s.modo || "(sin modo)"}</td>
+                    <td style="padding:6px 8px;">${s.cat || "-"}</td>
+                    <td style="padding:6px 8px;">${s.hora || "-"}</td>
+                    <td style="padding:6px 8px;">${s.usuario || "-"}</td>
+                    <td style="padding:6px 8px;">${motivo}</td>
+                </tr>
+            `;
+        }).join('');
+
+        document.getElementById('filasDiagnosticoRuta').innerHTML = filasHtml || '<tr><td colspan="6" style="padding:12px; text-align:center; color:var(--text-muted);">No hay escaneos para la jornada seleccionada.</td></tr>';
+        document.getElementById('modalDiagnosticoRuta').style.display = 'flex';
+    }
+
+    function cerrarModalDiagnosticoRuta() {
+        document.getElementById('modalDiagnosticoRuta').style.display = 'none';
     }
 
     // Reparación retroactiva: para escaneos SIMPLE/DOFFA ya guardados que quedaron

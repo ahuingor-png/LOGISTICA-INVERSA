@@ -9675,8 +9675,12 @@
         // estar vigente. Pero si el operario filtra un día ANTERIOR, sí se
         // debe mostrar el conteo real de esa jornada (es historial, no un
         // "avance en vivo"), esté o no el Modo Ruta activo ahora.
-        let jornadaHoy = obtenerJornadaLogica(new Date());
-        let filtroEsSoloHoy = jornadasFiltro.length === 1 && jornadasFiltro[0] === jornadaHoy;
+        // NOTA: la jornada es "fecha_TURNO" (DIA/NOCHE). Acá comparamos SOLO
+        // la fecha (ignorando el turno) para que no falle si la página quedó
+        // abierta y el reloj cruzó el límite de turno (08:00 / 22:00) entre
+        // que se marcó el filtro y este recálculo.
+        let fechaHoy = obtenerJornadaLogica(new Date()).split('_')[0];
+        let filtroEsSoloHoy = jornadasFiltro.length === 1 && jornadasFiltro[0].split('_')[0] === fechaHoy;
         let debeOcultarRutaHoy = filtroEsSoloHoy && !modoValidarRutaActivo;
         let countRutaMostrado = (!debeOcultarRutaHoy && totalBaseRuta > 0) ? countRuta : 0;
 

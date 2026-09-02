@@ -1207,7 +1207,10 @@
                 <div style="background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow: hidden;">
                     <div style="background: rgba(22,163,74,0.1); border-bottom: 2px solid #16a34a; padding: 10px 14px; font-weight: 900; color: #16a34a; font-size: 13px; display:flex; justify-content:space-between; align-items:center;">
                         <span>🌐 AVANCE GENERAL DE RUTAS</span>
-                        <button class="btn-header" style="background: #16a34a; color:white; display:inline-flex; width:auto; padding: 6px 12px; font-size: 10px;" onclick="abrirModalVistaGlobal();">Ver detalle y exportar ▸</button>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-header" style="background:#0ea5e9; color:white; display:inline-flex; width:auto; padding: 6px 12px; font-size: 10px;" onclick="abrirModalAvanceTabla();">📋 Vista por Día ▸</button>
+                            <button class="btn-header" style="background: #16a34a; color:white; display:inline-flex; width:auto; padding: 6px 12px; font-size: 10px;" onclick="abrirModalVistaGlobal();">Ver detalle y exportar ▸</button>
+                        </div>
                     </div>
                     <div style="padding: 14px;">
                         <div id="filtrosGlobalRutasOuterSlot">
@@ -1308,6 +1311,31 @@
             <div id="contenedorVistaGlobalRutas" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start;">
                 <div class="resumen-vacio">Cargando...</div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VISTA POR DÍA (tabla): cruce en tiempo real entre la Base de Ruta y los
+     escaneos validados, agrupado por Día, con filtros de texto simples y un
+     botón "Ver Faltantes" por ruta que despliega la lista de seguimientos
+     pendientes. Reutiliza los mismos datos que "Vista Global de Rutas"
+     (obtenerDatosVistaGlobal), pero en formato tabla por día. ===== -->
+<div id="modalAvanceTabla" class="modal" style="z-index: 8500;">
+    <div class="modal-content" style="max-width: 1100px; width: 96%; height: 92vh;">
+        <div class="table-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <h4 style="font-weight:900; color:#0ea5e9; margin:0;">📋 AVANCE DE RUTAS POR DÍA</h4>
+                <button onclick="cerrarModalAvanceTabla()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Cruce en tiempo real entre la Base de Datos y los escaneos validados.</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-top:10px;">
+                <input type="text" id="inpAvanceTablaDia" oninput="renderizarAvanceTabla()" placeholder="Filtrar Día..." style="padding:9px; font-size:11px; border:1px solid var(--border); border-radius:6px; font-weight:700; text-transform:uppercase; background:var(--bg); color:var(--text-main); box-sizing:border-box;">
+                <input type="text" id="inpAvanceTablaRuta" oninput="renderizarAvanceTabla()" placeholder="Filtrar Ruta..." style="padding:9px; font-size:11px; border:1px solid var(--border); border-radius:6px; font-weight:700; text-transform:uppercase; background:var(--bg); color:var(--text-main); box-sizing:border-box;">
+                <input type="text" id="inpAvanceTablaSec" oninput="renderizarAvanceTabla()" placeholder="Filtrar Sec..." style="padding:9px; font-size:11px; border:1px solid var(--border); border-radius:6px; font-weight:700; text-transform:uppercase; background:var(--bg); color:var(--text-main); box-sizing:border-box;">
+            </div>
+        </div>
+        <div style="overflow-y:auto; flex:1; padding: 10px 4px 4px 0;">
+            <div id="contenedorAvanceTabla"></div>
         </div>
     </div>
 </div>
@@ -7242,8 +7270,16 @@
 
         const totalAprobados = items.filter(({ t }) => t.aprobado).length;
         const totalZonaIncorrecta = items.filter(({ t }) => t.zonaCorrecta === false).length;
+        const totalEtiquetados = items.filter(({ t }) => t.etiquetado).length;
+        const totalFaltanEtiquetar = items.length - totalEtiquetados;
+        const totalEscaneadosZona = items.filter(({ t }) => t.escaneadoZona).length;
+        const totalFaltanEscanear = items.length - totalEscaneadosZona;
         document.getElementById('resumenTrazabilidad').innerHTML = `
             <span class="traza-pill total">${items.length} folios</span>
+            <span class="traza-pill ok">${totalEtiquetados} etiquetados</span>
+            <span class="traza-pill warn">${totalFaltanEtiquetar} faltan por etiquetar</span>
+            <span class="traza-pill ok">${totalEscaneadosZona} escaneados en zona</span>
+            <span class="traza-pill warn">${totalFaltanEscanear} faltan por escanear en zona</span>
             <span class="traza-pill ok">${totalAprobados} aprobados</span>
             <span class="traza-pill warn">${totalZonaIncorrecta} zona incorrecta</span>
         `;
@@ -9064,6 +9100,16 @@
             if (!progPorRutaDia[key]) delete grupos[key];
         });
 
+        // Cruce con ETIQUETADO: guías cuyo último registro quedó como
+        // "IMPRESO COLD" (mismo criterio ya validado en otras vistas de
+        // etiquetado de la app), sin importar día/ruta/zona del filtro actual.
+        let guiasEtiquetadas = new Set();
+        scans.forEach(s => {
+            if (s.cat === "IMPRESO COLD" && s.guia) {
+                guiasEtiquetadas.add(limpiarTexto(s.guia));
+            }
+        });
+
         Object.keys(grupos).forEach(key => {
             const listaProgramados = progPorRutaDia[key] || [];
             grupos[key].programado = listaProgramados.length;
@@ -9076,6 +9122,11 @@
             const faltantesGuias = listaProgramados.filter(seg => seg && !escaneadasNormalizadas.has(limpiarTexto(seg)));
             grupos[key].faltante = faltantesGuias.length;
             grupos[key].faltantesGuias = faltantesGuias;
+
+            const faltantesEtiquetado = listaProgramados.filter(seg => seg && !guiasEtiquetadas.has(limpiarTexto(seg)));
+            grupos[key].etiquetado = listaProgramados.length - faltantesEtiquetado.length;
+            grupos[key].faltanteEtiquetado = faltantesEtiquetado.length;
+            grupos[key].faltantesEtiquetadoGuias = faltantesEtiquetado;
         });
 
         return grupos;
@@ -9251,6 +9302,123 @@
             }
 
             html += `</div>`;
+        });
+
+        cont.innerHTML = html;
+    }
+
+    // ===== VISTA POR DÍA (tabla) =====
+    // Reutiliza obtenerDatosVistaGlobal() (mismo cruce Base de Ruta vs escaneos
+    // validados que ya usa "Vista Global de Rutas"), pero agrupa por Día y
+    // pinta filas de tabla por Ruta: Total Base / Escaneados / Faltantes /
+    // Acción (Ver Faltantes o "Ruta Completa" si no falta nada).
+    function abrirModalAvanceTabla() {
+        document.getElementById('inpAvanceTablaDia').value = "";
+        document.getElementById('inpAvanceTablaRuta').value = "";
+        document.getElementById('inpAvanceTablaSec').value = "";
+        document.getElementById('modalAvanceTabla').style.display = 'flex';
+        renderizarAvanceTabla();
+    }
+
+    function cerrarModalAvanceTabla() {
+        document.getElementById('modalAvanceTabla').style.display = 'none';
+        if (document.body.classList.contains('mode-desktop-active')) {
+            document.getElementById('inpScanDesk').focus();
+        } else {
+            document.getElementById('inpScan').focus();
+        }
+    }
+
+    function renderizarAvanceTabla() {
+        const cont = document.getElementById('contenedorAvanceTabla');
+        const qDia = document.getElementById('inpAvanceTablaDia').value.trim().toUpperCase();
+        const qRuta = document.getElementById('inpAvanceTablaRuta').value.trim().toUpperCase();
+        const qSec = document.getElementById('inpAvanceTablaSec').value.trim().toUpperCase();
+
+        const grupos = obtenerDatosVistaGlobal();
+        let claves = Object.keys(grupos);
+
+        if (qDia) claves = claves.filter(k => grupos[k].dia.toUpperCase().includes(qDia));
+        if (qRuta) claves = claves.filter(k => grupos[k].ruta.toUpperCase().includes(qRuta));
+        if (qSec) claves = claves.filter(k => Array.from(grupos[k].secuencias).some(s => String(s).toUpperCase().includes(qSec)));
+
+        if (claves.length === 0) {
+            cont.innerHTML = '<div class="resumen-vacio" style="margin-top:20px;">No hay rutas para los filtros seleccionados.</div>';
+            return;
+        }
+
+        // Agrupar por Día
+        let porDia = {};
+        claves.forEach(k => {
+            const g = grupos[k];
+            if (!porDia[g.dia]) porDia[g.dia] = [];
+            porDia[g.dia].push(g);
+        });
+
+        const diasOrdenados = Object.keys(porDia).sort();
+
+        let html = '';
+        diasOrdenados.forEach(dia => {
+            const rutasDelDia = porDia[dia].sort((a, b) => a.ruta.localeCompare(b.ruta, undefined, { numeric: true }));
+            html += `
+            <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px;">
+                <div style="background:#0ea5e9; color:white; padding:10px 14px; font-weight:900; font-size:13px;">📅 DÍA: ${dia}</div>
+                <table class="resumen-tabla" style="margin-top:0; width:100%;">
+                    <thead style="background:var(--bg);">
+                        <tr>
+                            <th style="padding:8px 12px;">📍 RUTA</th>
+                            <th style="text-align:center;">📋 TOTAL BASE</th>
+                            <th style="text-align:center;">🏷️ ETIQUETADOS</th>
+                            <th style="text-align:center;">🏷️❌ FALTAN ETIQ.</th>
+                            <th style="text-align:center;">✅ ESCANEADOS</th>
+                            <th style="text-align:center;">❌ FALTANTES</th>
+                            <th style="text-align:center;">ACCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            rutasDelDia.forEach(g => {
+                const idFaltantes = `avtabla_falt_${dia}_${g.ruta}`.replace(/[^a-zA-Z0-9_]/g, '_');
+                const idFaltantesEtiq = `avtabla_faltetiq_${dia}_${g.ruta}`.replace(/[^a-zA-Z0-9_]/g, '_');
+                const accion = g.faltante > 0
+                    ? `<button type="button" onclick="document.getElementById('${idFaltantes}').style.display = document.getElementById('${idFaltantes}').style.display === 'none' ? 'block' : 'none';" style="background:rgba(239,68,68,0.1); color:var(--danger); border:1px solid rgba(239,68,68,0.3); padding:5px 10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; white-space:nowrap;">VER FALTANTES ▾</button>`
+                    : `<span style="color:#16a34a; font-weight:800; font-size:11px;">Ruta Completa</span>`;
+                const accionEtiq = g.faltanteEtiquetado > 0
+                    ? `<button type="button" onclick="document.getElementById('${idFaltantesEtiq}').style.display = document.getElementById('${idFaltantesEtiq}').style.display === 'none' ? 'block' : 'none';" style="background:rgba(249,115,22,0.1); color:#f97316; border:1px solid rgba(249,115,22,0.3); padding:3px 8px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer; white-space:nowrap;">VER ▾</button>`
+                    : '';
+
+                html += `
+                        <tr style="border-bottom:1px solid var(--border);">
+                            <td style="padding:8px 12px; font-weight:900; font-size:12px;">${g.ruta}</td>
+                            <td style="text-align:center; font-weight:900; color:var(--text-main);">${g.programado}</td>
+                            <td style="text-align:center; font-weight:900; color:#16a34a;">${g.etiquetado}</td>
+                            <td style="text-align:center; font-weight:900; color:${g.faltanteEtiquetado > 0 ? '#f97316' : 'var(--text-main)'};">${g.faltanteEtiquetado} ${accionEtiq}</td>
+                            <td style="text-align:center; font-weight:900; color:#16a34a;">${g.totalFolios}</td>
+                            <td style="text-align:center; font-weight:900; color:${g.faltante > 0 ? 'var(--danger)' : 'var(--text-main)'};">${g.faltante}</td>
+                            <td style="text-align:center;">${accion}</td>
+                        </tr>`;
+
+                if (g.faltanteEtiquetado > 0) {
+                    const listaFaltantesEtiq = g.faltantesEtiquetadoGuias.join(', ');
+                    html += `
+                        <tr id="${idFaltantesEtiq}" style="display:none;">
+                            <td colspan="7" style="padding:8px 12px 12px; font-size:10px; font-family:monospace; color:#f97316; word-break:break-all; background:rgba(249,115,22,0.05);">🏷️ Faltan por etiquetar: ${listaFaltantesEtiq}</td>
+                        </tr>`;
+                }
+
+                if (g.faltante > 0) {
+                    const listaFaltantes = g.faltantesGuias.join(', ');
+                    html += `
+                        <tr id="${idFaltantes}" style="display:none;">
+                            <td colspan="7" style="padding:8px 12px 12px; font-size:10px; font-family:monospace; color:var(--danger); word-break:break-all; background:rgba(239,68,68,0.05);">📡 Faltan por escanear en ruta: ${listaFaltantes}</td>
+                        </tr>`;
+                }
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            </div>`;
         });
 
         cont.innerHTML = html;
@@ -9607,19 +9775,15 @@
             let esImpresoReal = clase === "cold" && s.cat === "IMPRESO COLD";
             // Se escaneó en modo impresión pero NO coincidió con la base de ruta -> cuenta como Sin Programación, no como impresa.
             let esImpresoSinProg = clase === "cold" && !esImpresoReal;
-            // MODO RUTA: usa el MISMO criterio que el panel "Avance General de
-            // Rutas" (claseEscaneo), para que ambos paneles siempre coincidan.
-            // Además, como respaldo adicional, también cuenta los registros MUY
-            // ANTIGUOS que no tienen campo "modo" guardado, cuya Categoría haya
-            // quedado marcada como "RUTEO IL" o "RUTEO IL (MULTIFOLIOS)".
-            // FIX: este respaldo NO debe aplicarse si el registro sí tiene un
-            // "modo" explícito (SIMPLE, DOFFA, etc.), porque eso contaba como
-            // "Modo Ruta" escaneos reales de otros modos cuya Categoría quedó en
-            // "RUTEO IL" por otra vía (p.ej. al editar el registro desde el modal
-            // de duplicado), aunque nunca se escanearon con el Modo Ruta activo.
-            let catUpper = String(s.cat || "").toUpperCase();
-            let esRutaPorCategoria = catUpper === "RUTEO IL" || catUpper === "RUTEO IL (MULTIFOLIOS)";
-            let esRuta = clase === "ruta" || (!s.modo && esRutaPorCategoria);
+            // MODO RUTA: cuenta ÚNICAMENTE los escaneos hechos con el Modo
+            // Validación de Ruta activo (s.modo === "VALIDAR_RUTA"). Se quitó
+            // el respaldo por Categoría ("RUTEO IL" / "RUTEO IL (MULTIFOLIOS)")
+            // porque metía en este KPI escaneos que NUNCA se hicieron con el
+            // Modo Ruta activo (p.ej. registros viejos o editados por otra vía
+            // cuya Categoría quedó en "RUTEO IL"), inflando el conteo y el
+            // porcentaje de avance con datos que no corresponden al trabajo
+            // real de validación de ruta.
+            let esRuta = s.modo === "VALIDAR_RUTA";
             // ESCANEO SIMPLE (PRINCIPAL) vs SIN PROGRAMACIÓN vs FORZADO: se decide
             // PRIMERO por si hubo coincidencia real con la BASE GENERAL (campo "ruta"),
             // no por el estado del checkbox "Forzar". Esto es clave porque el checkbox

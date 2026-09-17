@@ -3403,7 +3403,7 @@
                 // Solo se cuentan rutas que existen en la Base de Ruta cargada actualmente.
                 if (!rutasValidasSet.has(r)) return;
                 let z = (s.zona || "SIN ZONA").toUpperCase();
-                let diaRuta = (s.dia || "SIN ASIGNAR").toUpperCase();
+                let diaRuta = String(s.dia || "SIN ASIGNAR").toUpperCase();
                 let sec = String(s.sec || "S/S").toUpperCase();
 
                 if (fDia.length && !fDia.includes(diaRuta)) return;
@@ -9606,7 +9606,7 @@
 
         scans.forEach(s => {
             if (esRegistroDeRutaValido(s) && rutasValidasSet.has(String(s.ruta).toUpperCase())) {
-                dias.add((s.dia || "SIN ASIGNAR").toUpperCase());
+                dias.add(String(s.dia || "SIN ASIGNAR").toUpperCase());
                 rutas.add(String(s.ruta).toUpperCase());
                 secs.add(String(s.sec || "S/S").toUpperCase());
                 zonas.add((s.zona || "SIN ZONA").toUpperCase());
@@ -9636,7 +9636,7 @@
         scans.forEach(s => {
             if (!esRegistroDeRutaValido(s)) return;
 
-            let dia = (s.dia || "SIN ASIGNAR").toUpperCase();
+            let dia = String(s.dia || "SIN ASIGNAR").toUpperCase();
             let ruta = String(s.ruta).toUpperCase();
             let sec = String(s.sec || "S/S").toUpperCase();
             let zona = (s.zona || "SIN ZONA").toUpperCase();
@@ -9661,7 +9661,7 @@
 
         let progPorRutaDia = {};
         baseDatosRutaNube.forEach(b => {
-            let dia = (b.dia || "SIN ASIGNAR").toUpperCase();
+            let dia = String(b.dia || "SIN ASIGNAR").toUpperCase();
             let ruta = (b.ruta || "").toUpperCase();
             if (!ruta) return;
             if (fDia.length && !fDia.includes(dia)) return;

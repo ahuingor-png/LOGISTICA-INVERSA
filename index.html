@@ -40,9 +40,9 @@
             --border: #e2e8f0;
             --radius-lg: 12px;
             --radius-md: 8px;
-            --route-color: #4477a1;
-            --print-color: #8c4a6e;
-            --doffa-color: #6c5b9e;
+            --route-color: #0f766e;
+            --print-color: #2d3f5c;
+            --doffa-color: #3d5a80;
         }
 
         [data-theme="dark"] {
@@ -54,6 +54,7 @@
             --border: #334155;
         }
 
+        .admin-group-label { font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; padding: 10px 4px 2px; opacity: 0.75; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -1123,10 +1124,12 @@
             <span class="admin-online-badge"><span class="admin-online-dot"></span>En línea</span>
         </div>
         <div class="desktop-panel-body" style="gap: 8px;">
+            <div class="admin-group-label">Operación</div>
             <button class="btn-header btn-consola-pc" id="btnConsolaPCDesk" onclick="abrirModalConsolaPC();" style="display:flex; padding: 12px; font-size: 11px;">🕹️ Consola de Control</button>
 
             <button class="btn-header btn-view-records" onclick="abrirModalRegistros();" style="display:flex; padding: 12px; font-size: 11px;">📋 Historial de Escaneos</button>
 
+            <div class="admin-group-label">Visualización</div>
             <button class="btn-header btn-db-view" id="btnGrupoVerBasesDesk" onclick="toggleGrupoAdmin('grupoVerBasesDesk', this)" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;">📊 Ver Bases <span class="flecha-grupo">▾</span></button>
             <div id="grupoVerBasesDesk" class="admin-grupo-desplegable">
                 <button class="btn-header btn-db-view" id="btnVerBaseAdminDesk" onclick="abrirModalBaseAdmin();" style="display:flex; padding: 12px; font-size: 11px;">📊 Ver Base General</button>
@@ -1134,12 +1137,14 @@
             </div>
 
             <button class="btn-header" id="btnVistaGlobalDesk" style="display:flex; padding: 12px; font-size: 11px;" onclick="abrirModalVistaGlobal();">🌐 Vista Global de Rutas</button>
+            <div class="admin-group-label">Herramientas</div>
             <button class="btn-header" id="btnUsuariosOnlineDesk" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;" onclick="abrirModalUsuariosOnline();">👥 Usuarios en Línea <span id="badgeOnlineCount" style="background:rgba(255,255,255,0.25); padding:1px 7px; border-radius:10px; font-size:10px;">0</span></button>
             <button class="btn-header btn-search-admin" id="btnConsultarAdminDesk" onclick="abrirModalConsulta();" style="display:flex; padding: 12px; font-size: 11px;">🔍 Consultar Registros</button>
             <button class="btn-header" id="btnTrazabilidadDesk" onclick="abrirModalTrazabilidad();" style="display:flex; padding: 12px; font-size: 11px;">🧭 Trazabilidad de Ruta</button>
             <button class="btn-header" id="btnCruceILDesk" onclick="abrirModalCruceIL();" style="display:flex; padding: 12px; font-size: 11px;">🔀 Cruce de Datos IL</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 12px; font-size: 11px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
+            <div class="admin-group-label">Paneles</div>
             <button class="btn-header btn-admin-panel" id="btnAdminPanelDesk" onclick="abrirModalAdmin();" style="display:flex; padding: 12px; font-size: 11px;">⚙️ Panel de Control</button>
             <button class="btn-header btn-db-view" id="btnGrupoPanelesDesk" onclick="toggleGrupoAdmin('grupoPanelesDesk', this)" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;">📊 Paneles y Reportes <span class="flecha-grupo">▾</span></button>
             <div id="grupoPanelesDesk" class="admin-grupo-desplegable">
@@ -1149,6 +1154,7 @@
                 <button class="btn-header btn-db-view" id="btnDashboardGeneralMenuDesk" onclick="abrirModalDashboardGeneral();" style="display:none; padding: 12px; font-size: 11px; background:#111827; color:#fff;">🗂️ Dashboard General</button>
             </div>
 
+            <div class="admin-group-label">Administración de datos</div>
             <button class="btn-header btn-upload" id="btnGrupoCargarBasesDesk" onclick="toggleGrupoAdmin('grupoCargarBasesDesk', this)" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;">+ Cargar Bases <span class="flecha-grupo">▾</span></button>
             <div id="grupoCargarBasesDesk" class="admin-grupo-desplegable">
                 <button class="btn-header btn-upload" id="btnCargarBaseDesk" onclick="document.getElementById('excelFile').click();" style="display:flex; padding: 12px; font-size: 11px;">+ Cargar Base RF</button>
@@ -1166,8 +1172,8 @@
     </div>
 
     <!-- 2. PANEL DASHBOARD CENTRAL (COLUMNAS) -->
-    <div class="desktop-panel" style="border-top: 4px solid #6c5b9e;">
-        <div class="desktop-panel-title" style="color: #6c5b9e; display: flex; justify-content: space-between; align-items: center;">
+    <div class="desktop-panel" style="border-top: 4px solid var(--doffa-color);">
+        <div class="desktop-panel-title" style="color: var(--doffa-color); display: flex; justify-content: space-between; align-items: center;">
             <span>🏆 RANKING Y RENDIMIENTO POR MODO</span>
             
             <div style="display:flex; align-items:center; gap:8px;">
@@ -1186,21 +1192,21 @@
                 <!-- Métricas por Modo de Operación -->
                 <div>
                     <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom: 8px;">Métricas por Modo de Operación:</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
                         <!-- IMPRESIÓN -->
-                        <div style="background: rgba(140,74,110,0.05); border: 1px solid var(--print-color); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex:1; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 10px; font-weight: 800; color: var(--print-color);">🖨️ MODO IMPRESIÓN</div>
                                 <div id="kpiDeskImpTotal" style="font-size: 20px; font-weight: 900; color: var(--text-main); margin-top: 2px;">0</div>
                             </div>
-                            <div style="text-align: right; background: var(--card-bg); padding: 4px 8px; border-radius: 6px; border: 1px dashed var(--print-color);">
+                            <div style="text-align: right;">
                                 <div style="font-size: 9px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Base Ruta</div>
                                 <div id="kpiDeskImpPct" style="font-size: 14px; font-weight: 900; color: var(--print-color);">0%</div>
                             </div>
                         </div>
 
                         <!-- RUTA -->
-                        <div style="background: rgba(68,119,161,0.05); border: 1px solid var(--route-color); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex:1; padding: 10px 12px; border-left: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-size: 10px; font-weight: 800; color: var(--route-color); display:flex; align-items:center; gap:5px;">
                                     🚚 MODO RUTA
@@ -1209,7 +1215,7 @@
                                 </div>
                                 <div id="kpiDeskRutaTotal" style="font-size: 20px; font-weight: 900; color: var(--text-main); margin-top: 2px;">0</div>
                             </div>
-                            <div style="text-align: right; background: var(--card-bg); padding: 4px 8px; border-radius: 6px; border: 1px dashed var(--route-color);">
+                            <div style="text-align: right;">
                                 <div style="font-size: 9px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Base Ruta</div>
                                 <div id="kpiDeskRutaPct" style="font-size: 14px; font-weight: 900; color: var(--route-color);">0%</div>
                             </div>
@@ -1218,7 +1224,7 @@
                 </div>
 
                 <!-- Ranking de Operarios -->
-                <div style="background: var(--bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;">
+                <div style="background: var(--card-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;">
                     <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom: 8px; text-align: center;">Ranking de Operarios</div>
                     <div style="flex: 1; position: relative; min-height: 220px;">
                         <canvas id="rankingChartDesk"></canvas>
@@ -9787,22 +9793,27 @@
         const pctGlobal = totalProgramado > 0 ? Math.min(100, (totalEscaneado / totalProgramado) * 100) : (totalEscaneado > 0 ? 100 : 0);
 
         if (contKPIs) {
+            contKPIs.style.display = 'flex';
+            contKPIs.style.border = '1px solid var(--border)';
+            contKPIs.style.borderRadius = '8px';
+            contKPIs.style.overflow = 'hidden';
+            contKPIs.style.gridTemplateColumns = '';
             contKPIs.innerHTML = `
-                <div style="background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.25); border-radius:8px; padding:10px; text-align:center;">
+                <div style="flex:1; padding:10px; text-align:center;">
                     <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Rutas Activas</div>
-                    <div style="font-size:20px; font-weight:900; color:#16a34a;">${totalRutas}</div>
+                    <div style="font-size:20px; font-weight:900; color:var(--text-main);">${totalRutas}</div>
                 </div>
-                <div style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.25); border-radius:8px; padding:10px; text-align:center;">
+                <div style="flex:1; padding:10px; text-align:center; border-left:1px solid var(--border);">
                     <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Escaneados / Bultos</div>
-                    <div style="font-size:20px; font-weight:900; color:#0ea5e9;">${totalEscaneado} <span style="font-size:12px; color:var(--text-muted);">/ ${totalBultosGlobal}</span></div>
+                    <div style="font-size:20px; font-weight:900; color:var(--text-main);">${totalEscaneado} <span style="font-size:12px; color:var(--text-muted);">/ ${totalBultosGlobal}</span></div>
                 </div>
-                <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:10px; text-align:center;">
+                <div style="flex:1; padding:10px; text-align:center; border-left:1px solid var(--border);">
                     <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Faltantes</div>
                     <div style="font-size:20px; font-weight:900; color:var(--danger);">${totalFaltante}</div>
                 </div>
-                <div style="background:rgba(61,90,128,0.08); border:1px solid rgba(61,90,128,0.25); border-radius:8px; padding:10px; text-align:center;">
+                <div style="flex:1; padding:10px; text-align:center; border-left:1px solid var(--border);">
                     <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Avance Global</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--primary);">${pctGlobal.toFixed(0)}%</div>
+                    <div style="font-size:20px; font-weight:900; color:var(--success);">${pctGlobal.toFixed(0)}%</div>
                 </div>`;
         }
 

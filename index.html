@@ -8776,8 +8776,15 @@
 
     function esRegistroDeRutaValido(s) {
         const esImpreso = s.cat && String(s.cat).startsWith("IMPRESO");
-        const esRuta = claseEscaneo(s) === "ruta";
-        return esRuta && !esImpreso;
+        // Antes se usaba claseEscaneo(s) === "ruta", que también clasificaba como
+        // "ruta" a escaneos SIN campo "modo" (o de Escaneo General) cuya guía
+        // coincidía por casualidad con una ruta de la Base cargada. Eso hacía que
+        // esta vista (Vista Global: filtros de Día/Ruta/Sec/Zona y % de avance)
+        // mostrara valores ajenos a la Validación de Ruta, como días sueltos sin
+        // normalizar (ej. "M"). Ahora solo cuenta lo escaneado explícitamente con
+        // el Modo Validación de Ruta activo.
+        const esValidacionRuta = s.modo === "VALIDAR_RUTA";
+        return esValidacionRuta && !esImpreso;
     }
 
     // Ruta del archivo del módulo "Cruce de Datos IL". Debe estar en la misma
@@ -9672,10 +9679,18 @@
             if (!ruta) return;
             if (fDia.length && !fDia.includes(dia)) return;
             if (fRuta.length && !fRuta.includes(ruta)) return;
-            if (fSec.length && !fSec.includes(String(b.secuencia || "S/S").toUpperCase())) return;
+            let secBase = String(b.secuencia || "S/S").toUpperCase();
+            if (fSec.length && !fSec.includes(secBase)) return;
             let key = dia + "|||" + ruta;
             if (!progPorRutaDia[key]) progPorRutaDia[key] = [];
             progPorRutaDia[key].push(b.seguimiento || "");
+            // La secuencia también se agrega acá (no solo desde "scans"), porque
+            // antes el filtro de texto "Filtrar Sec..." (Avance de Rutas por Día)
+            // solo encontraba rutas que ya tenían escaneos válidos: una ruta con
+            // 0 escaneados quedaba con "secuencias" vacío y nunca aparecía al
+            // filtrar, aunque su secuencia sí estuviera en la Base cargada.
+            if (!grupos[key]) grupos[key] = { dia, ruta, secuencias: new Set(), zonas: {}, totalFolios: 0, totalBultos: 0 };
+            grupos[key].secuencias.add(secBase);
         });
 
         // Incluir rutas programadas que aún no tienen ningún escaneo

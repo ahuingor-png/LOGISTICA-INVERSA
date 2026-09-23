@@ -1365,6 +1365,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                 <h4 style="font-weight:900; color:#0ea5e9; margin:0;">📋 AVANCE DE RUTAS POR DÍA</h4>
                 <div style="display:flex; align-items:center; gap:6px;">
+                    <button onclick="exportarFaltantesAvanceTabla();" style="background:#f97316; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:10.5px; font-weight:800; cursor:pointer; white-space:nowrap;">⬇️ Descargar Faltantes</button>
                     <button onclick="abrirModalDashboardAvance();" style="background:#0ea5e9; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:10.5px; font-weight:800; cursor:pointer; white-space:nowrap;">📊 Ver Dashboard ▸</button>
                     <button onclick="cerrarModalAvanceTabla()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
                 </div>
@@ -10073,6 +10074,52 @@
         });
 
         cont.innerHTML = html;
+    }
+
+    // Descarga en Excel de los faltantes de "Avance de Rutas por Día": una hoja
+    // con los seguimientos que faltan por etiquetar y otra con los que faltan
+    // por escanear, respetando los filtros de texto (Día/Ruta/Sec) activos en
+    // ese momento en la tabla. Reutiliza el mismo cruce de datos
+    // (obtenerDatosVistaGlobal) que ya usa la tabla y las exportaciones de
+    // "Vista Global de Rutas".
+    function exportarFaltantesAvanceTabla() {
+        const qDia = document.getElementById('inpAvanceTablaDia').value.trim().toUpperCase();
+        const qRuta = document.getElementById('inpAvanceTablaRuta').value.trim().toUpperCase();
+        const qSec = document.getElementById('inpAvanceTablaSec').value.trim().toUpperCase();
+
+        const grupos = obtenerDatosVistaGlobal();
+        let claves = Object.keys(grupos);
+        if (qDia) claves = claves.filter(k => grupos[k].dia.toUpperCase().includes(qDia));
+        if (qRuta) claves = claves.filter(k => grupos[k].ruta.toUpperCase().includes(qRuta));
+        if (qSec) claves = claves.filter(k => Array.from(grupos[k].secuencias).some(s => String(s).toUpperCase().includes(qSec)));
+
+        claves.sort((a, b) => {
+            const ga = grupos[a], gb = grupos[b];
+            return ga.dia.localeCompare(gb.dia) || ga.ruta.localeCompare(gb.ruta, undefined, { numeric: true });
+        });
+
+        let filasEtiq = [];
+        let filasEsc = [];
+        claves.forEach(key => {
+            const g = grupos[key];
+            (g.faltantesEtiquetadoGuias || []).slice().sort().forEach(seg => {
+                filasEtiq.push({ "Día": g.dia, "Ruta": g.ruta, "Seguimiento": seg });
+            });
+            (g.faltantesGuias || []).slice().sort().forEach(seg => {
+                filasEsc.push({ "Día": g.dia, "Ruta": g.ruta, "Seguimiento": seg });
+            });
+        });
+
+        if (filasEtiq.length === 0 && filasEsc.length === 0) {
+            return alert("No hay faltantes de etiquetado ni de escaneo para los filtros actuales.");
+        }
+
+        const wb = XLSX.utils.book_new();
+        const wsEtiq = XLSX.utils.json_to_sheet(filasEtiq.length ? filasEtiq : [{ "Día": "-", "Ruta": "-", "Seguimiento": "Sin faltantes" }]);
+        XLSX.utils.book_append_sheet(wb, wsEtiq, "Faltan Etiquetar");
+        const wsEsc = XLSX.utils.json_to_sheet(filasEsc.length ? filasEsc : [{ "Día": "-", "Ruta": "-", "Seguimiento": "Sin faltantes" }]);
+        XLSX.utils.book_append_sheet(wb, wsEsc, "Faltan Escanear");
+        XLSX.writeFile(wb, `Faltantes_Rutas_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
     }
 
     // ===== DASHBOARD DE AVANCE (dona + pie + barras + KPIs + filtros ocultables) =====

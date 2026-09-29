@@ -8697,6 +8697,54 @@
 
     function borrarUsuarioSistema(key) { if(confirm("¿Dar de baja?")) rtdb.ref("usuarios_sistema/" + key).remove(); }
 
+    // Catálogo único de permisos (clave en Firebase, etiqueta, si es peligroso)
+    const PERMISOS_CATALOGO = [
+        ['historial', '📋 Historial'], ['avance', '📈 Avance'], ['base', '📊 Ver Base'], ['consultar', '🔍 Consultar'],
+        ['cargar', '+ Base RF'], ['cargar_ruta', '📂 +Base Ruta'], ['panel', '⚙️ Panel'], ['base_ruta_admin', '🚚 Mant. Base Ruta'],
+        ['respaldos_nube', '☁️ Respaldos Nube'], ['ver_respaldos', '📂 Ver Respaldos'], ['consola_pc', '🕹️ Consola de Control'],
+        ['trazabilidad', '🧭 Trazabilidad'], ['cruce_il', '🔀 Cruce IL'], ['vista_global', '🌐 Vista Global'],
+        ['usuarios_online', '👥 Usuarios en Línea'], ['detalle_hora', '🕐 Detalle por Hora'], ['productividad_pausas', '⏱️ Productividad y Pausas'],
+        ['limpiar_historial', '🗑️ Limpiar Historial', true], ['borrar_base', '🗑️ Borrar Base', true], ['borrar_base_ruta', '🗑️ Borrar Base de Ruta', true]
+    ];
+    let permisosEditorAbierto = {};
+
+    function toggleEditorPermisos(key) {
+        permisosEditorAbierto[key] = !permisosEditorAbierto[key];
+        renderizarListaUsuariosAdmin();
+    }
+
+    function cambiarPermisoUsuario(key, permiso, valor) {
+        const u = usuariosPermitidos[key];
+        const cat = PERMISOS_CATALOGO.find(x => x[0] === permiso);
+        if (valor && cat && cat[2] && !confirm('⚠️ ¿Dar el permiso "' + cat[1] + '" a ' + (u ? u.nombre : 'este usuario') + '? Es una acción destructiva.')) {
+            renderizarListaUsuariosAdmin();
+            return;
+        }
+        rtdb.ref("usuarios_sistema/" + key + "/permisos/" + permiso).set(!!valor).then(() => showToast());
+    }
+
+    function htmlPermisosUsuario(k, u) {
+        const p = u.permisos || {};
+        const esMaestra = !!p.admin_total;
+        const concedidos = PERMISOS_CATALOGO.filter(x => p[x[0]]);
+        const abierto = !!permisosEditorAbierto[k];
+        const chips = esMaestra
+            ? '<span style="font-size:9px; font-weight:800; padding:2px 6px; border-radius:10px; background:rgba(245,158,11,0.15); color:#b45309;">🔑 Acceso total (todos los permisos)</span>'
+            : (concedidos.length
+                ? concedidos.map(x => '<span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; background:' + (x[2] ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)') + '; color:' + (x[2] ? 'var(--danger)' : 'var(--primary)') + ';">' + x[1] + '</span>').join('')
+                : '<span style="font-size:9px; font-weight:700; color:var(--text-muted);">Sin permisos asignados</span>');
+        const grid = abierto ? '<div class="perm-grid-box" style="grid-template-columns:1fr 1fr;">' + PERMISOS_CATALOGO.map(x =>
+            '<label class="perm-item-check"' + (x[2] ? ' style="color:var(--danger); font-weight:800;"' : '') + '><input type="checkbox" ' + (p[x[0]] ? 'checked' : '') + ' onchange="cambiarPermisoUsuario(\'' + k + '\', \'' + x[0] + '\', this.checked)"> ' + x[1] + '</label>'
+        ).join('') + '</div>' : '';
+        return '<div style="width:100%; margin-top:6px;">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">' +
+                '<span style="font-size:10px; font-weight:800; color:var(--text-muted);">🔐 PERMISOS (' + concedidos.length + '/' + PERMISOS_CATALOGO.length + ')</span>' +
+                '<button onclick="toggleEditorPermisos(\'' + k + '\')" style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:4px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); cursor:pointer;">' + (abierto ? '▲ Cerrar' : '✏️ Editar') + '</button>' +
+            '</div>' +
+            '<div style="display:flex; flex-wrap:wrap; gap:3px;">' + chips + '</div>' + grid +
+        '</div>';
+    }
+
     function renderizarListaUsuariosAdmin() {
         const container = document.getElementById('adminUsersList');
         if(!container) return;
@@ -8728,6 +8776,7 @@
                             <button class="btn-del-user" onclick="borrarUsuarioSistema('${k}')">Baja</button>
                         </div>
                     </div>
+                    ${htmlPermisosUsuario(k, u)}
                 </div>
             `;
         }).join('');

@@ -748,6 +748,32 @@
     </div>
 </div>
 
+<div id="modalLiberarZonasCS" class="modal" style="z-index: 6650;">
+    <div class="modal-content" style="max-width: 640px; width: 96%; max-height: 92vh; display:flex; flex-direction:column;">
+        <div class="desktop-panel-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--primary); padding-bottom:8px; margin-bottom:10px;">
+            <span style="color:var(--primary);">🔓 LIBERAR ZONAS (PL)</span>
+            <button onclick="cerrarModalLiberarZonasCS()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Usa esto cuando el <b>despacho ya fue realizado</b>. Al liberar una zona se quita su cierre y sus folios aprobados dejan de bloquear el Control de Seguridad, así el mismo PL se puede volver a usar en otro día. El historial y la trazabilidad se conservan.</p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+            <input type="text" id="filtroLiberarRutaCS" placeholder="Filtrar ruta" oninput="renderizarLiberarZonasCS()" style="flex:1; min-width:110px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
+            <input type="text" id="filtroLiberarFechaCS" placeholder="Fecha (dd/mm/aaaa)" oninput="renderizarLiberarZonasCS()" style="flex:1; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
+            <select id="filtroLiberarEstadoCS" onchange="renderizarLiberarZonasCS()" style="flex:1; min-width:120px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
+                <option value="">Todas</option>
+                <option value="cerrada">🔒 Solo cerradas</option>
+                <option value="aprobados">✅ Solo con aprobados (sin cerrar)</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+            <button onclick="seleccionarVisiblesLiberarCS(true)" style="flex:1; background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:8px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">☑️ Seleccionar visibles</button>
+            <button onclick="seleccionarVisiblesLiberarCS(false)" style="flex:1; background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:8px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">⬜ Quitar selección</button>
+            <button id="btnEjecutarLiberarCS" onclick="ejecutarLiberarZonasCS()" style="flex:1.4; background:var(--danger); color:#fff; border:none; padding:8px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">🔓 LIBERAR SELECCIONADAS (0)</button>
+        </div>
+        <div id="estadoLiberarZonasCS" style="font-size:11px; font-weight:700; margin-bottom:6px; min-height:14px;"></div>
+        <div id="listaLiberarZonasCS" style="display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; min-height:120px;"></div>
+    </div>
+</div>
+
 <div id="modalCierreZonaCS" class="modal" style="z-index: 6600;">
     <div class="modal-content" style="max-width: 420px;">
         <div class="desktop-panel-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--danger); padding-bottom:8px; margin-bottom:10px;">
@@ -849,6 +875,7 @@
                 </div>
             </div>
             <button class="btn-header" style="display:flex; margin-top:10px; width:100%; background:rgba(16,185,129,0.08); color:#3f8862; justify-content:center; border:1px dashed #3f8862;" onclick="cerrarZonaControlSeguridad()">🔒 CERRAR ZONA (PL)</button>
+            <button class="btn-header btnLiberarZonasCS" style="display:none; margin-top:6px; width:100%; background:rgba(185,69,63,0.08); color:var(--danger); justify-content:center; border:1px dashed var(--danger);" onclick="abrirModalLiberarZonasCS()">🔓 LIBERAR ZONAS (PL)</button>
             <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:10px 0 4px;">📋 Folios de la zona</div>
             <div id="listaFoliosZonaCSDesk" style="display:flex; flex-direction:column; gap:6px; max-height: 40vh; overflow-y:auto;">
                 <div class="resumen-vacio">Indica Ruta (Ubicación) y Zona (PL) para ver los folios pendientes.</div>
@@ -1094,6 +1121,7 @@
             </div>
         </div>
         <button class="btn-header" style="display:flex; margin-top:10px; width:100%; background:rgba(16,185,129,0.08); color:#3f8862; justify-content:center; border:1px dashed #3f8862;" onclick="cerrarZonaControlSeguridad()">🔒 CERRAR ZONA (PL)</button>
+            <button class="btn-header btnLiberarZonasCS" style="display:none; margin-top:6px; width:100%; background:rgba(185,69,63,0.08); color:var(--danger); justify-content:center; border:1px dashed var(--danger);" onclick="abrirModalLiberarZonasCS()">🔓 LIBERAR ZONAS (PL)</button>
         <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:10px 0 4px;">📋 Folios de la zona</div>
         <div id="listaFoliosZonaCS" style="display:flex; flex-direction:column; gap:6px; max-height: 50vh; overflow-y:auto;">
             <div class="resumen-vacio">Indica Ruta (Ubicación) y Zona (PL) para ver los folios pendientes.</div>
@@ -3670,6 +3698,8 @@
     const CATS_PENDIENTES_CS = ["RUTEO IL", "RUTEO IL (MULTIFOLIOS)"];
     const CATS_APROBADAS_CS = ["APROBADO", "APROBADO MULTIFOLIOS"];
     const CATS_TOTAL_CS = CATS_PENDIENTES_CS.concat(CATS_APROBADAS_CS);
+    // Registros de Control de Seguridad vigentes (excluye los ya liberados tras el despacho)
+    const scansCS = () => scans.filter(s => !s.liberado);
 
     function toggleControlSeguridad() {
         modoControlSeguridadActivo = document.getElementById('chkControlSeguridad').checked;
@@ -3714,6 +3744,7 @@
     }
 
     function actualizarPanelControlSeguridad() {
+        actualizarBotonesLiberarZonasCS();
         const rutaActiva = document.getElementById('inpUbic').value.toUpperCase().trim();
         const zonaActiva = document.getElementById('inpZona').value.toUpperCase().trim() || 'SIN ZONA';
         const listaCont = document.getElementById('listaFoliosZonaCS');
@@ -3778,7 +3809,7 @@
         if (inpScan) inpScan.disabled = false;
         if (inpScanDesk) inpScanDesk.disabled = false;
 
-        const registrosRuta = scans.filter(s => s.ubic === rutaActiva && CATS_TOTAL_CS.includes(s.cat));
+        const registrosRuta = scansCS().filter(s => s.ubic === rutaActiva && CATS_TOTAL_CS.includes(s.cat));
         const aprobadosRuta = registrosRuta.filter(s => CATS_APROBADAS_CS.includes(s.cat));
         document.getElementById('csRutaTotal').textContent = registrosRuta.length;
         document.getElementById('csRutaAprobados').textContent = aprobadosRuta.length;
@@ -3852,7 +3883,7 @@
             return;
         }
 
-        const pendiente = scans.find(s => s.guia === val && s.ubic === rutaActiva && s.zona === zonaActiva && CATS_PENDIENTES_CS.includes(s.cat));
+        const pendiente = scansCS().find(s => s.guia === val && s.ubic === rutaActiva && s.zona === zonaActiva && CATS_PENDIENTES_CS.includes(s.cat));
 
         if (pendiente) {
             const { total, escaneados } = leerProgresoBultosCS(pendiente);
@@ -3869,7 +3900,7 @@
                 document.getElementById('dispLast').textContent = val;
                 if (document.getElementById('dispLastDesk')) document.getElementById('dispLastDesk').textContent = val;
 
-                const registrosZona = scans.filter(s => s.ubic === rutaActiva && s.zona === zonaActiva && CATS_TOTAL_CS.includes(s.cat));
+                const registrosZona = scansCS().filter(s => s.ubic === rutaActiva && s.zona === zonaActiva && CATS_TOTAL_CS.includes(s.cat));
                 const faltanZona = registrosZona.filter(s => {
                     if (s.guia === val) return !completo;
                     return CATS_PENDIENTES_CS.includes(s.cat);
@@ -3894,14 +3925,14 @@
         // completo de Firebase, no solo la sesión actual), se bloquea el
         // reingreso por completo. Ya NO se permite sumarlo como "bulto extra":
         // una vez aprobado, no se debe volver a escanear.
-        const yaValidado = scans.find(s => s.guia === val && s.ubic === rutaActiva && s.zona === zonaActiva && CATS_APROBADAS_CS.includes(s.cat));
+        const yaValidado = scansCS().find(s => s.guia === val && s.ubic === rutaActiva && s.zona === zonaActiva && CATS_APROBADAS_CS.includes(s.cat));
         if (yaValidado) {
             mostrarModalRutaAlert('warning', '🔒 FOLIO YA VALIDADO', `El folio <b>${val}</b> ya fue validado y aprobado en el Control de Seguridad de la ruta <b>${rutaActiva}</b>, zona <b>${zonaActiva}</b>.<br><br>👤 Usuario: <b>${yaValidado.validadoPor || yaValidado.usuario || 'N/D'}</b><br>🕒 Hora: <b>${yaValidado.horaValidacion || yaValidado.hora || 'N/D'}</b><br><br>No se permite volver a escanearlo.`, 0);
             inp.value = ''; if(inpDesk) inpDesk.value = ''; inp.focus();
             return;
         }
 
-        const otraZona = scans.find(s => s.guia === val && CATS_TOTAL_CS.includes(s.cat));
+        const otraZona = scansCS().find(s => s.guia === val && CATS_TOTAL_CS.includes(s.cat));
         if (otraZona) {
             mostrarModalRutaAlert('warning', '⚠️ RUTA/ZONA INCORRECTA', `El folio <b>${val}</b> está registrado en <b>${otraZona.ubic}</b>, zona <b>${otraZona.zona}</b>, no en la ruta/zona activa.`, 4000);
             inp.value = ''; if(inpDesk) inpDesk.value = ''; inp.focus();
@@ -4056,7 +4087,7 @@
             return;
         }
 
-        const registrosZona = scans.filter(s => s.ubic === rutaActiva && s.zona === zonaActiva && CATS_TOTAL_CS.includes(s.cat));
+        const registrosZona = scansCS().filter(s => s.ubic === rutaActiva && s.zona === zonaActiva && CATS_TOTAL_CS.includes(s.cat));
         if (registrosZona.length === 0) {
             mostrarModalRutaAlert('warning', '⚠️ ZONA VACÍA', `No hay folios registrados en la ruta <b>${rutaActiva}</b>, zona <b>${zonaActiva}</b>.`, 3000);
             return;
@@ -4120,16 +4151,16 @@
     }
 
     function resolverBultoFaltanteCS(key, retirar) {
-        const registro = scans.find(s => s.key === key);
+        const registro = scansCS().find(s => s.key === key);
         if (!registro || !cierreZonaCSContexto) return;
         const { ruta, zona } = cierreZonaCSContexto;
 
         const finalizarFila = () => {
-            const restantes = scans.filter(s => s.ubic === ruta && s.zona === zona && CATS_PENDIENTES_CS.includes(s.cat) && s.key !== key);
+            const restantes = scansCS().filter(s => s.ubic === ruta && s.zona === zona && CATS_PENDIENTES_CS.includes(s.cat) && s.key !== key);
             renderListaCierreZonaCS(restantes);
             if (restantes.length === 0) {
                 cerrarModalCierreZonaCS();
-                const quedanPendientes = scans.some(s => s.ubic === ruta && s.zona === zona && CATS_PENDIENTES_CS.includes(s.cat));
+                const quedanPendientes = scansCS().some(s => s.ubic === ruta && s.zona === zona && CATS_PENDIENTES_CS.includes(s.cat));
                 if (!quedanPendientes) {
                     marcarZonaCSCerrada(ruta, zona);
                 } else {
@@ -4152,6 +4183,199 @@
         } else {
             finalizarFila();
         }
+    }
+
+
+    // ======================================
+    // LIBERAR ZONAS (PL) YA CONTROLADAS (SOLO ADMIN)
+    // Cuando el despacho ya se realizó, permite liberar una o varias zonas
+    // (Ruta + PL) para volver a usarlas en otro día: borra su cierre en
+    // "zonasCerradasIL" y marca sus registros de Control de Seguridad con
+    // liberado:true (no se borran, así la trazabilidad se conserva).
+    // ======================================
+    let liberarZonasSel = new Set();
+    let liberarZonasVisibles = [];
+    let liberarGruposVisibles = [];
+
+    function escLZ(t) {
+        return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function actualizarBotonesLiberarZonasCS() {
+        const visible = (typeof esAdmin === 'function') && esAdmin();
+        document.querySelectorAll('.btnLiberarZonasCS').forEach(b => { b.style.display = visible ? 'flex' : 'none'; });
+    }
+
+    function obtenerZonasLiberablesCS() {
+        const mapa = {};
+        const obtener = (ruta, zona) => {
+            const k = claveZonaCerrada(ruta, zona);
+            if (!mapa[k]) mapa[k] = { clave: k, ruta, zona, cerrada: null, aprobados: 0, pendientes: 0, fecha: '' };
+            return mapa[k];
+        };
+        Object.values(zonasCerradasILCache || {}).forEach(z => {
+            if (!z || !z.ruta) return;
+            const r = obtener(z.ruta, z.zona || 'SIN ZONA');
+            r.cerrada = z;
+            r.fecha = String(z.hora || '').split(' - ')[0];
+        });
+        const activos = scansCS().filter(s => CATS_TOTAL_CS.includes(s.cat));
+        activos.forEach(s => {
+            if (!CATS_APROBADAS_CS.includes(s.cat)) return;
+            const r = obtener(s.ubic, s.zona || 'SIN ZONA');
+            r.aprobados++;
+            if (!r.fecha) r.fecha = String(s.hora || '').split(' - ')[0];
+        });
+        activos.forEach(s => {
+            if (!CATS_PENDIENTES_CS.includes(s.cat)) return;
+            const r = mapa[claveZonaCerrada(s.ubic, s.zona || 'SIN ZONA')];
+            if (r) r.pendientes++;
+        });
+        return Object.values(mapa).sort((a, b) => String(a.ruta).localeCompare(String(b.ruta), undefined, { numeric: true }) || String(a.zona).localeCompare(String(b.zona), undefined, { numeric: true }));
+    }
+
+    function abrirModalLiberarZonasCS() {
+        if (!esAdmin()) { alert('Solo el administrador puede liberar zonas.'); return; }
+        liberarZonasSel = new Set();
+        document.getElementById('estadoLiberarZonasCS').textContent = '';
+        document.getElementById('modalLiberarZonasCS').style.display = 'flex';
+        renderizarLiberarZonasCS();
+    }
+
+    function cerrarModalLiberarZonasCS() {
+        document.getElementById('modalLiberarZonasCS').style.display = 'none';
+    }
+
+    function refrescarLiberarZonasCSSiAbierto() {
+        const m = document.getElementById('modalLiberarZonasCS');
+        if (!m || m.style.display !== 'flex') return;
+        clearTimeout(refrescarLiberarZonasCSSiAbierto._t);
+        refrescarLiberarZonasCSSiAbierto._t = setTimeout(renderizarLiberarZonasCS, 300);
+    }
+
+    function renderizarLiberarZonasCS() {
+        const cont = document.getElementById('listaLiberarZonasCS');
+        if (!cont) return;
+        const fRuta = document.getElementById('filtroLiberarRutaCS').value.toUpperCase().trim();
+        const fFecha = document.getElementById('filtroLiberarFechaCS').value.trim();
+        const fEstado = document.getElementById('filtroLiberarEstadoCS').value;
+
+        const todas = obtenerZonasLiberablesCS();
+        // Limpia de la selección las zonas que ya no existen (p. ej. ya liberadas)
+        const clavesExistentes = new Set(todas.map(z => z.clave));
+        liberarZonasSel.forEach(k => { if (!clavesExistentes.has(k)) liberarZonasSel.delete(k); });
+
+        liberarZonasVisibles = todas.filter(z => {
+            if (fRuta && !String(z.ruta).toUpperCase().includes(fRuta)) return false;
+            if (fFecha && !String(z.fecha).includes(fFecha)) return false;
+            if (fEstado === 'cerrada' && !z.cerrada) return false;
+            if (fEstado === 'aprobados' && z.cerrada) return false;
+            return true;
+        });
+
+        if (liberarZonasVisibles.length === 0) {
+            liberarGruposVisibles = [];
+            cont.innerHTML = '<div class="resumen-vacio">No hay zonas cerradas o con folios aprobados para liberar.</div>';
+            actualizarContadorLiberarZonasCS();
+            return;
+        }
+
+        const grupos = {};
+        liberarZonasVisibles.forEach((z, i) => { (grupos[z.ruta] = grupos[z.ruta] || []).push(i); });
+        liberarGruposVisibles = Object.keys(grupos).map(r => ({ ruta: r, idx: grupos[r] }));
+
+        cont.innerHTML = liberarGruposVisibles.map((g, gi) => {
+            const todosMarcados = g.idx.every(i => liberarZonasSel.has(liberarZonasVisibles[i].clave));
+            const filas = g.idx.map(i => {
+                const z = liberarZonasVisibles[i];
+                const estado = z.cerrada
+                    ? `🔒 Cerrada · ${escLZ(z.cerrada.cerradaPor || 'N/D')} · ${escLZ(z.cerrada.hora || 'N/D')}`
+                    : '✅ Con aprobados (sin cerrar)';
+                return `
+                <label style="display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--border); border-radius:6px; cursor:pointer;">
+                    <input type="checkbox" ${liberarZonasSel.has(z.clave) ? 'checked' : ''} onchange="toggleZonaLiberarCS(${i}, this.checked)">
+                    <span style="flex:1;">
+                        <span style="font-weight:800; font-size:12px;">PL ${escLZ(z.zona)}</span>
+                        <span style="display:block; font-size:10px; color:var(--text-muted);">${estado}</span>
+                    </span>
+                    <span style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">✅ ${z.aprobados} aprob.${z.pendientes ? `<br>⏳ ${z.pendientes} pend.` : ''}</span>
+                </label>`;
+            }).join('');
+            return `
+            <div style="border:1px solid var(--border); border-radius:8px; padding:6px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:900; font-size:12px; padding:4px 4px 6px; cursor:pointer;">
+                    <input type="checkbox" ${todosMarcados ? 'checked' : ''} onchange="toggleRutaLiberarCS(${gi}, this.checked)">
+                    🛣️ RUTA ${escLZ(g.ruta)} <span style="font-weight:700; color:var(--text-muted);">(${g.idx.length} zona${g.idx.length > 1 ? 's' : ''} · marcar toda la ruta)</span>
+                </label>
+                <div style="display:flex; flex-direction:column; gap:5px;">${filas}</div>
+            </div>`;
+        }).join('');
+        actualizarContadorLiberarZonasCS();
+    }
+
+    function actualizarContadorLiberarZonasCS() {
+        const btn = document.getElementById('btnEjecutarLiberarCS');
+        if (btn) btn.textContent = `🔓 LIBERAR SELECCIONADAS (${liberarZonasSel.size})`;
+    }
+
+    function toggleZonaLiberarCS(i, marcado) {
+        const z = liberarZonasVisibles[i];
+        if (!z) return;
+        if (marcado) liberarZonasSel.add(z.clave); else liberarZonasSel.delete(z.clave);
+        renderizarLiberarZonasCS();
+    }
+
+    function toggleRutaLiberarCS(gi, marcado) {
+        const g = liberarGruposVisibles[gi];
+        if (!g) return;
+        g.idx.forEach(i => {
+            const k = liberarZonasVisibles[i].clave;
+            if (marcado) liberarZonasSel.add(k); else liberarZonasSel.delete(k);
+        });
+        renderizarLiberarZonasCS();
+    }
+
+    function seleccionarVisiblesLiberarCS(marcado) {
+        liberarZonasVisibles.forEach(z => { if (marcado) liberarZonasSel.add(z.clave); else liberarZonasSel.delete(z.clave); });
+        renderizarLiberarZonasCS();
+    }
+
+    function ejecutarLiberarZonasCS() {
+        if (!esAdmin()) { alert('Solo el administrador puede liberar zonas.'); return; }
+        const estado = document.getElementById('estadoLiberarZonasCS');
+        const elegidas = obtenerZonasLiberablesCS().filter(z => liberarZonasSel.has(z.clave));
+        if (elegidas.length === 0) {
+            estado.style.color = 'var(--danger)';
+            estado.textContent = 'Selecciona al menos una zona.';
+            return;
+        }
+        const rutas = new Set(elegidas.map(z => z.ruta));
+        if (!confirm(`¿Liberar ${elegidas.length} zona(s) (PL) de ${rutas.size} ruta(s)?\n\nSe quitará el cierre y sus folios dejarán de bloquear el Control de Seguridad. Hazlo solo si el despacho ya fue realizado.`)) return;
+
+        const ahora = obtenerFechaYHoraActual();
+        const updates = {};
+        let totalRegistros = 0;
+        elegidas.forEach(z => {
+            updates["zonasCerradasIL/" + z.clave] = null;
+            scansCS().filter(s => s.ubic === z.ruta && (s.zona || 'SIN ZONA') === z.zona && CATS_TOTAL_CS.includes(s.cat)).forEach(s => {
+                updates["escaneos_compartidos/" + s.key + "/liberado"] = true;
+                updates["escaneos_compartidos/" + s.key + "/liberadoPor"] = usuarioActivo;
+                updates["escaneos_compartidos/" + s.key + "/liberadoHora"] = ahora;
+                totalRegistros++;
+            });
+        });
+
+        estado.style.color = 'var(--text-muted)';
+        estado.textContent = 'Liberando...';
+        rtdb.ref().update(updates).then(() => {
+            liberarZonasSel = new Set();
+            estado.style.color = 'var(--success)';
+            estado.textContent = `✅ ${elegidas.length} zona(s) liberadas (${totalRegistros} registros).`;
+            setTimeout(renderizarLiberarZonasCS, 400);
+        }).catch(err => {
+            estado.style.color = 'var(--danger)';
+            estado.textContent = 'Error al liberar: ' + (err && err.message ? err.message : err);
+        });
     }
 
     function cerrarModalCierreZonaCS() {
@@ -4429,6 +4653,7 @@
         });
 
         rtdb.ref("escaneos_compartidos").on("value", (snapshot) => {
+            refrescarLiberarZonasCSSiAbierto();
             scans = [];
             snapshot.forEach((child) => {
                 let node = child.val();
@@ -4470,6 +4695,7 @@
         // con Control de Seguridad, sin importar el turno/jornada en que se hizo.
         rtdb.ref("zonasCerradasIL").on("value", (snapshot) => {
             zonasCerradasILCache = snapshot.val() || {};
+            refrescarLiberarZonasCSSiAbierto();
             if (modoControlSeguridadActivo) ejecutarSeguro(actualizarPanelControlSeguridad);
         });
 

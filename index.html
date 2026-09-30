@@ -875,7 +875,6 @@
                 </div>
             </div>
             <button class="btn-header" style="display:flex; margin-top:10px; width:100%; background:rgba(16,185,129,0.08); color:#3f8862; justify-content:center; border:1px dashed #3f8862;" onclick="cerrarZonaControlSeguridad()">🔒 CERRAR ZONA (PL)</button>
-            <button class="btn-header btnLiberarZonasCS" style="display:none; margin-top:6px; width:100%; background:rgba(185,69,63,0.08); color:var(--danger); justify-content:center; border:1px dashed var(--danger);" onclick="abrirModalLiberarZonasCS()">🔓 LIBERAR ZONAS (PL)</button>
             <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:10px 0 4px;">📋 Folios de la zona</div>
             <div id="listaFoliosZonaCSDesk" style="display:flex; flex-direction:column; gap:6px; max-height: 40vh; overflow-y:auto;">
                 <div class="resumen-vacio">Indica Ruta (Ubicación) y Zona (PL) para ver los folios pendientes.</div>
@@ -1121,7 +1120,6 @@
             </div>
         </div>
         <button class="btn-header" style="display:flex; margin-top:10px; width:100%; background:rgba(16,185,129,0.08); color:#3f8862; justify-content:center; border:1px dashed #3f8862;" onclick="cerrarZonaControlSeguridad()">🔒 CERRAR ZONA (PL)</button>
-            <button class="btn-header btnLiberarZonasCS" style="display:none; margin-top:6px; width:100%; background:rgba(185,69,63,0.08); color:var(--danger); justify-content:center; border:1px dashed var(--danger);" onclick="abrirModalLiberarZonasCS()">🔓 LIBERAR ZONAS (PL)</button>
         <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:10px 0 4px;">📋 Folios de la zona</div>
         <div id="listaFoliosZonaCS" style="display:flex; flex-direction:column; gap:6px; max-height: 50vh; overflow-y:auto;">
             <div class="resumen-vacio">Indica Ruta (Ubicación) y Zona (PL) para ver los folios pendientes.</div>
@@ -1170,6 +1168,7 @@
             <button class="btn-header" id="btnUsuariosOnlineDesk" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;" onclick="abrirModalUsuariosOnline();">👥 Usuarios en Línea <span id="badgeOnlineCount" style="background:rgba(255,255,255,0.25); padding:1px 7px; border-radius:10px; font-size:10px;">0</span></button>
             <button class="btn-header btn-search-admin" id="btnConsultarAdminDesk" onclick="abrirModalConsulta();" style="display:flex; padding: 12px; font-size: 11px;">🔍 Consultar Registros</button>
             <button class="btn-header" id="btnTrazabilidadDesk" onclick="abrirModalTrazabilidad();" style="display:flex; padding: 12px; font-size: 11px;">🧭 Trazabilidad de Ruta</button>
+            <button class="btn-header" id="btnLiberarZonasDesk" onclick="abrirModalLiberarZonasCS();" style="display:none; padding: 12px; font-size: 11px;">🔓 Liberar Zonas (PL)</button>
             <button class="btn-header" id="btnCruceILDesk" onclick="abrirModalCruceIL();" style="display:flex; padding: 12px; font-size: 11px;">🔀 Cruce de Datos IL</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 12px; font-size: 11px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 12px; font-size: 11px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
@@ -3104,6 +3103,7 @@
             if (btnConsolaPCDesk) btnConsolaPCDesk.style.display = "flex";
             if (btnTrazabilidad) btnTrazabilidad.style.display = "flex";
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = "flex";
+            { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "flex"; }
             if (btnCruceIL) btnCruceIL.style.display = "flex";
             if (btnCruceILDesk) btnCruceILDesk.style.display = "flex";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = "flex";
@@ -3184,6 +3184,7 @@
             if (btnConsolaPCDesk) btnConsolaPCDesk.style.display = p.consola_pc ? "flex" : "none";
             if (btnTrazabilidad) btnTrazabilidad.style.display = p.trazabilidad ? "flex" : "none";
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = p.trazabilidad ? "flex" : "none";
+            { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "none"; }
             if (btnCruceIL) btnCruceIL.style.display = p.cruce_il ? "flex" : "none";
             if (btnCruceILDesk) btnCruceILDesk.style.display = p.cruce_il ? "flex" : "none";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = p.vista_global ? "flex" : "none";
@@ -3229,6 +3230,7 @@
             if (btnConsolaPCDesk) btnConsolaPCDesk.style.display = "none";
             if (btnTrazabilidad) btnTrazabilidad.style.display = "none";
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = "none";
+            { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "none"; }
             if (btnCruceIL) btnCruceIL.style.display = "none";
             if (btnCruceILDesk) btnCruceILDesk.style.display = "none";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = "none";
@@ -3698,7 +3700,7 @@
     const CATS_PENDIENTES_CS = ["RUTEO IL", "RUTEO IL (MULTIFOLIOS)"];
     const CATS_APROBADAS_CS = ["APROBADO", "APROBADO MULTIFOLIOS"];
     const CATS_TOTAL_CS = CATS_PENDIENTES_CS.concat(CATS_APROBADAS_CS);
-    // Registros de Control de Seguridad vigentes (excluye los ya liberados tras el despacho)
+    // Registros de Control de Seguridad vigentes (excluye los ya liberados desde REVERSA tras el despacho)
     const scansCS = () => scans.filter(s => !s.liberado);
 
     function toggleControlSeguridad() {
@@ -3744,7 +3746,6 @@
     }
 
     function actualizarPanelControlSeguridad() {
-        actualizarBotonesLiberarZonasCS();
         const rutaActiva = document.getElementById('inpUbic').value.toUpperCase().trim();
         const zonaActiva = document.getElementById('inpZona').value.toUpperCase().trim() || 'SIN ZONA';
         const listaCont = document.getElementById('listaFoliosZonaCS');
@@ -4199,11 +4200,6 @@
 
     function escLZ(t) {
         return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function actualizarBotonesLiberarZonasCS() {
-        const visible = (typeof esAdmin === 'function') && esAdmin();
-        document.querySelectorAll('.btnLiberarZonasCS').forEach(b => { b.style.display = visible ? 'flex' : 'none'; });
     }
 
     function obtenerZonasLiberablesCS() {

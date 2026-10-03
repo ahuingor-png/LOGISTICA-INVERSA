@@ -9833,7 +9833,7 @@
     };
 
     function clasificarRutaRepro(rutaTexto) {
-        const t = (rutaTexto || '').toUpperCase();
+        const t = String(rutaTexto == null ? '' : rutaTexto).toUpperCase();
         if (t.includes('CUARENTENA')) return CONFIG_ESTADO_REPRO_DEVOL.CUARENTENA;
         if (t.includes('REPROGRAMA')) return CONFIG_ESTADO_REPRO_DEVOL.REPROGRAMACIONES;
         if (t.includes('ANULADO')) return CONFIG_ESTADO_REPRO_DEVOL.ANULADO;
@@ -9878,12 +9878,12 @@
         db.forEach(item => {
             const rutaBase = buscarColumna(item, ["RUTA"]);
             const cfg = clasificarRutaRepro(rutaBase);
-            if (cfg) rutas.add((rutaBase || '').toUpperCase());
+            if (cfg) rutas.add(String(rutaBase || '').toUpperCase());
         });
 
         scansRepro.forEach(r => {
             categorias.add(r.resultado === 'INVENTARIADO' ? 'INVENTARIADO (sin base)' : (r.categoria || 'ENCONTRADO'));
-            if (r.ruta && r.ruta !== '-') rutas.add(r.ruta.toUpperCase());
+            if (r.ruta && r.ruta !== '-') rutas.add(String(r.ruta).toUpperCase());
             if (r.usuario) usuarios.add(r.usuario);
             if (r.turno_operativo) turnos.add(r.turno_operativo);
         });
@@ -9909,7 +9909,7 @@
             const rutaBase = (buscarColumna(item, ["RUTA"]) || '').toString();
             const cfg = clasificarRutaRepro(rutaBase);
             if (!cfg) return;
-            const rutaKey = rutaBase.toUpperCase();
+            const rutaKey = String(rutaBase || '').toUpperCase();
             if (fRuta.length && !fRuta.includes(rutaKey)) return;
             // El filtro de categoría acepta tanto el nombre genérico
             // (CUARENTENA/REPROGRAMACIONES/ANULADO/FALLOS) como el texto
@@ -9937,7 +9937,7 @@
                 return;
             }
 
-            const rutaKey = r.ruta.toUpperCase();
+            const rutaKey = String(r.ruta || '').toUpperCase();
             if (fRuta.length && !fRuta.includes(rutaKey)) return;
             if (fCat.length && !fCat.includes(rutaKey) && !fCat.includes(r.categoria)) return;
 

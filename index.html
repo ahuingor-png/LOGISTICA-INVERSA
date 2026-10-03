@@ -11781,9 +11781,7 @@
                                 const dataString = dataset.data[index];
                                 if (dataString > 0) {
                                     // Pinta el número justo a la derecha de la barra
-                                    const totalDs = dataset.data.reduce((acc, n) => acc + n, 0);
-                                    const pctDs = totalDs > 0 ? Math.round(dataString / totalDs * 100) : 0;
-                                    ctx.fillText(`${dataString}  ·  ${pctDs}%`, element.x + 6, element.y);
+                                    ctx.fillText(`${dataString}`, element.x + 6, element.y);
                                 }
                             });
                         }

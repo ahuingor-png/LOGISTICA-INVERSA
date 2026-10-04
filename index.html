@@ -845,7 +845,7 @@
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiTotal" style="font-size:20px; font-weight:900; color:var(--warning);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">GUÍAS EN LIQUIDACIÓN</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiRutas" style="font-size:20px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">RUTAS AFECTADAS</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiSinFecha" style="font-size:20px; font-weight:900; color:var(--text-muted);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">BASE RUTA SIN FECHA DE CARGA</div></div>
+            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiSinFecha" style="font-size:20px; font-weight:900; color:var(--text-muted);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">BASE RUTA SIN FECHA DE CARGA</div><button onclick="asignarFechaCargaSinFechaLQ()" style="margin-top:6px; background:var(--warning); color:#fff; border:none; padding:5px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;">📅 Asignar fecha</button></div>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
             <input type="text" id="lqBuscar" placeholder="Buscar guía o ruta" oninput="renderizarLiquidacionLQ()" style="flex:1.4; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
@@ -4633,6 +4633,32 @@
         document.getElementById('modalLiquidacion').style.display = 'none';
     }
 
+    // Asigna una fecha de carga a los registros de Base Ruta que no la tienen
+    // (cargados antes de la función de liquidación o dados de alta a mano).
+    function asignarFechaCargaSinFechaLQ() {
+        const sin = (baseDatosRutaNube || []).filter(x => x && x.key && !x._loteFecha);
+        if (!sin.length) { alert('No hay registros de Base Ruta sin fecha de carga.'); return; }
+        const txt = prompt(`Fecha y hora de carga para ${sin.length} registros sin fecha (dd/mm/aaaa hh:mm):`, '02/10/2026 21:00');
+        if (!txt) return;
+        const m = txt.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+        if (!m) { alert('Formato inválido. Usa dd/mm/aaaa hh:mm, por ejemplo 02/10/2026 21:00.'); return; }
+        const f = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), 0, 0);
+        if (isNaN(f.getTime()) || f.getTime() > Date.now()) { alert('La fecha no es válida o es futura.'); return; }
+        if (!confirm(`Se asignará ${f.toLocaleString()} como fecha de carga a ${sin.length} registros. ¿Continuar?`)) return;
+        const loteId = rtdb.ref("cargas_ruta").push().key;
+        const ts = f.getTime();
+        const updates = {};
+        sin.forEach(r => {
+            updates["inventario_ruta_il/" + r.key + "/_loteId"] = loteId;
+            updates["inventario_ruta_il/" + r.key + "/_loteFecha"] = ts;
+            updates["inventario_ruta_il/" + r.key + "/_loteUsuario"] = usuarioActivo;
+        });
+        updates["cargas_ruta/" + loteId] = { usuario: usuarioActivo, fecha: ts, nombreArchivo: 'Fecha asignada a registros sin fecha', cantidad: sin.length };
+        rtdb.ref().update(updates)
+            .then(() => alert('✅ Fecha de carga asignada a ' + sin.length + ' registros.'))
+            .catch(err => alert('Error al asignar la fecha: ' + err.message));
+    }
+
     function refrescarLiquidacionSiAbierto() {
         const abierto = id => { const el = document.getElementById(id); return !!el && el.style.display === 'flex'; };
         const a = abierto('modalLiquidacion'), b = abierto('modalLiquidacionGraficos'), c = abierto('modalNoLiquidacion');
@@ -8352,7 +8378,7 @@
                 cancelarEdicionBaseRuta();
             });
         } else {
-            rtdb.ref("inventario_ruta_il").push(itemData).then(() => {
+            rtdb.ref("inventario_ruta_il").push(Object.assign({}, itemData, { _loteFecha: Date.now(), _loteUsuario: usuarioActivo })).then(() => {
                 showToast();
                 cancelarEdicionBaseRuta();
             });

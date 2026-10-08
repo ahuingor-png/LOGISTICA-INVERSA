@@ -4532,7 +4532,45 @@
     // ======================================
     let liquidacionFiltradasLQ = [];
     let liqMinDiasLQ = 1;
-    let _liqCacheLQ = { scansRef: null, baseRef: null, min: 0, res: null, mapa: null };
+    let _liqCacheLQ = { scansRef: null, baseRef: null, persRef: null, min: 0, res: null, mapa: null };
+
+    // Registro permanente de liquidaciones (Firebase: liquidaciones_registro).
+    // Se alimenta justo antes de borrar escaneos del historial, así la guía sigue
+    // en la vista Liquidación (y se puede ver cuántas veces se vuelve a rutear).
+    let liqPersistidasLQ = {};
+    function claveGuiaLQ(g) { return String(g).replace(/[.#$\[\]\/]/g, '_'); }
+
+    function escucharLiquidacionesPersistidasLQ() {
+        rtdb.ref('liquidaciones_registro').on('value', snap => {
+            liqPersistidasLQ = snap.val() || {};
+            refrescarLiquidacionSiAbierto();
+        }, err => console.error('liquidaciones_registro:', err));
+    }
+
+    // Guarda las liquidaciones de los escaneos que se van a borrar (keys = Set de
+    // claves, o null para todo el historial). Devuelve true si se puede continuar.
+    async function confirmarPreservarLQ(keys) {
+        try {
+            const filas = calcularLiquidacionLQ(1).filas.filter(f => f.key && (!keys || keys.has(f.key)));
+            const upd = {};
+            filas.forEach(f => {
+                const k = claveGuiaLQ(f.guia);
+                if (liqPersistidasLQ[k] || upd[k]) return;
+                upd[k] = {
+                    guia: f.guia, guiaRegistrada: f.guiaRegistrada, marca: f.marca, dia: f.dia, ruta: f.ruta, sec: f.sec,
+                    cargaTxt: f.cargaTxt, cargaJornada: f.cargaJornada, usuarioCarga: f.usuarioCarga,
+                    escaneoTxt: f.escaneoTxt, escaneoJornada: f.escaneoJornada, usuarioEscaneo: f.usuarioEscaneo,
+                    dias: f.dias, ts: f.ts, vecesRuteada: f.vecesRuteada, fechasRuteo: f.fechasRuteo,
+                    conservadoPor: usuarioActivo, conservadoEn: Date.now()
+                };
+            });
+            if (Object.keys(upd).length) await rtdb.ref('liquidaciones_registro').update(upd);
+            return true;
+        } catch (err) {
+            console.error('No se pudieron conservar las liquidaciones:', err);
+            return confirm('⚠️ No se pudieron conservar las guías en liquidación antes de borrar (' + err.message + ').\n\n¿Borrar de todos modos? Esas guías dejarán de aparecer en Liquidación.');
+        }
+    }
 
     function fechaJornadaLQ(d) {
         const j = obtenerJornadaLogica(d).split('_')[0];
@@ -4605,15 +4643,30 @@
             };
             (candidatas[g] = candidatas[g] || []).push({ fila, marcada: !!(sc.liquidada || sc.marca) });
         });
+        const persistidas = {};
+        Object.values(liqPersistidasLQ || {}).forEach(p => { if (p && p.guia != null) persistidas[String(p.guia)] = p; });
         Object.keys(candidatas).forEach(g => {
+            if (persistidas[g]) return; // ya liquidada y conservada: los escaneos nuevos son reinventariado
             const lista = candidatas[g].slice().sort((a, b) => a.fila.ts - b.fila.ts);
             const elegida = lista.find(c => c.marcada) || lista[0];
             retornos[g] = 1;
             filas.push(elegida.fila);
         });
+        Object.keys(persistidas).forEach(g => {
+            const p = persistidas[g];
+            if (!((p.dias || 0) >= minDias)) return;
+            retornos[g] = 1;
+            filas.push({
+                key: null, guia: g, guiaRegistrada: p.guiaRegistrada || '', marca: p.marca || '', dia: p.dia || '', ruta: p.ruta || '', sec: p.sec || '',
+                cargaTxt: p.cargaTxt || '', cargaJornada: p.cargaJornada || '', usuarioCarga: p.usuarioCarga || '',
+                escaneoTxt: p.escaneoTxt || '', escaneoJornada: p.escaneoJornada || '', usuarioEscaneo: p.usuarioEscaneo || '',
+                dias: p.dias || 0, ts: p.ts || 0, observacion: 'LIQUIDACIÓN', persistida: true,
+                _vecesGuardadas: p.vecesRuteada || 0, _fechasGuardadas: p.fechasRuteo || ''
+            });
+        });
         filas.forEach(f => {
-            f.vecesRuteada = ruteos[f.guia] ? ruteos[f.guia].veces : 0;
-            f.fechasRuteo = ruteos[f.guia] ? ruteos[f.guia].fechas.join(', ') : '';
+            f.vecesRuteada = ruteos[f.guia] ? ruteos[f.guia].veces : (f._vecesGuardadas || 0);
+            f.fechasRuteo = ruteos[f.guia] ? ruteos[f.guia].fechas.join(', ') : (f._fechasGuardadas || '');
             f.vecesVolvio = retornos[f.guia] || 0;
         });
         filas.sort((a, b) => b.ts - a.ts);
@@ -4623,11 +4676,11 @@
     // Resultado memorizado (scans y la Base Ruta se reemplazan en cada cambio de Firebase)
     function liquidacionCacheLQ() {
         const c = _liqCacheLQ;
-        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.min !== liqMinDiasLQ || !c.res) {
+        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.persRef !== liqPersistidasLQ || c.min !== liqMinDiasLQ || !c.res) {
             c.res = calcularLiquidacionLQ(liqMinDiasLQ);
             c.mapa = new Map();
             c.res.filas.forEach(f => { if (f.key) c.mapa.set(f.key, f); });
-            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.min = liqMinDiasLQ;
+            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.persRef = liqPersistidasLQ; c.min = liqMinDiasLQ;
         }
         return c;
     }
@@ -4718,7 +4771,7 @@
                 <td ${td}>+${f.dias} d</td>
                 <td ${td} title="${escLZ(f.fechasRuteo)}"><b>${f.vecesRuteada}</b> <span style="font-size:9px; color:var(--text-muted);">${escLZ(f.fechasRuteo)}</span></td>
                 <td ${td}><b>${f.vecesVolvio}</b></td>
-                <td ${td}><span style="background:rgba(185,133,47,0.15); color:var(--warning); padding:2px 8px; border-radius:10px; font-weight:900; font-size:10px;">${f.observacion}</span></td>
+                <td ${td}><span style="background:rgba(185,133,47,0.15); color:var(--warning); padding:2px 8px; border-radius:10px; font-weight:900; font-size:10px;">${f.observacion}</span>${f.persistida ? '<br><span title="Conservada aunque se borró el historial" style="font-size:9px; color:var(--text-muted);">📌 conservada</span>' : ''}</td>
             </tr>`).join('');
             wrap.innerHTML = `<table style="width:100%; border-collapse:collapse;"><thead><tr>
                 <th ${th}>SEGUIMIENTO</th><th ${th}>REGISTRADO COMO</th><th ${th}>DÍA</th><th ${th}>RUTA</th><th ${th}>SEC</th><th ${th}>CARGA BASE RUTA</th><th ${th}>ESCANEO GENERAL</th><th ${th}>TRANSCURRIDO</th><th ${th}>VECES RUTEADA</th><th ${th}>VECES QUE VOLVIÓ</th><th ${th}>OBSERVACIÓN</th>
@@ -4737,7 +4790,7 @@
             'Escaneo General': f.escaneoTxt, 'Usuario escaneo': f.usuarioEscaneo,
             'Días transcurridos': f.dias,
             'Veces ruteada': f.vecesRuteada, 'Fechas de ruteo': f.fechasRuteo, 'Veces que volvió': f.vecesVolvio,
-            'Observación': f.observacion
+            'Observación': f.observacion, 'Conservada tras borrar historial': f.persistida ? 'SI' : 'NO'
         }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'Liquidacion');
@@ -5317,6 +5370,8 @@
                 ejecutarSeguro(renderizarVistaRepros);
             }
         });
+
+        escucharLiquidacionesPersistidasLQ();
 
         rtdb.ref("escaneos_compartidos").on("value", (snapshot) => {
             refrescarLiquidacionSiAbierto();
@@ -7260,8 +7315,12 @@
         if (claves.length === 0) return;
 
         if (confirm(`🚨 ¿Eliminar los ${claves.length} registros seleccionados?`)) {
-            let promesas = claves.map(k => rtdb.ref("escaneos_compartidos/" + k).remove());
-            Promise.all(promesas).then(() => {
+            confirmarPreservarLQ(new Set(claves)).then(ok => {
+                if (!ok) return;
+                let promesas = claves.map(k => rtdb.ref("escaneos_compartidos/" + k).remove());
+                return Promise.all(promesas);
+            }).then(r => {
+                if (!r) return;
                 alert(`Eliminados ${claves.length} registros.`);
                 seleccionConsultaSet.clear();
                 ejecutarFiltroAdmin();
@@ -7272,7 +7331,8 @@
     function eliminarFilaConsulta(key) {
         if (!puedeBorrarHistorial()) return alert("Solo usuarios con permiso pueden borrar historiales.");
         if (confirm("¿Deseas eliminar este escaneo?")) {
-            rtdb.ref("escaneos_compartidos/" + key).remove().then(() => {
+            confirmarPreservarLQ(new Set([key])).then(ok => ok ? rtdb.ref("escaneos_compartidos/" + key).remove().then(() => true) : false).then(r => {
+                if (!r) return;
                 showToast();
                 seleccionConsultaSet.delete(key);
                 if(document.getElementById('modalConsultaAdmin').style.display === 'flex') {
@@ -7291,11 +7351,11 @@
         const hayArchivados = registrosFiltradosConsultaGlobal.length > soloActivos.length;
         const avisoArchivados = hayArchivados ? `\n\n(Los resultados de respaldos archivados no se incluyen aquí; bórralos uno por uno con su botón "Eliminar".)` : '';
         if (confirm(`🚨 ¿Purgar los ${count} registros activos?${avisoArchivados}`)) {
-            let promesas = soloActivos.map(item => {
-                return rtdb.ref("escaneos_compartidos/" + item.key).remove();
-            });
-
-            Promise.all(promesas).then(() => {
+            confirmarPreservarLQ(new Set(soloActivos.map(i => i.key))).then(ok => {
+                if (!ok) return;
+                return Promise.all(soloActivos.map(item => rtdb.ref("escaneos_compartidos/" + item.key).remove()));
+            }).then(r => {
+                if (!r) return;
                 alert(`Purgados ${count} registros.`);
                 document.getElementById('inpBusquedaAdmin').value = "";
                 seleccionConsultaSet.clear();
@@ -9084,7 +9144,8 @@
 
     function eliminarRegistro() {
         if (puedeBorrarHistorial() && confirm("¿Eliminar?")) {
-            rtdb.ref("escaneos_compartidos/" + duplicadoKey).remove().then(() => cerrarModalDup());
+            const kDup = duplicadoKey;
+            confirmarPreservarLQ(new Set([kDup])).then(ok => ok ? rtdb.ref("escaneos_compartidos/" + kDup).remove().then(() => cerrarModalDup()) : null);
         }
     }
 
@@ -9116,6 +9177,7 @@
 
     async function ejecutarLimpiezaTodo(conRespaldo) {
         try {
+            if (!(await confirmarPreservarLQ(null))) return;
             if (conRespaldo) {
                 const nuevaRef = rtdb.ref("historial_archivado").push();
                 await nuevaRef.set({

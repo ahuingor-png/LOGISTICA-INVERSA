@@ -813,6 +813,7 @@
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiTotal" style="font-size:20px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">ESCANEOS NO LIQUIDACIÓN</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiSinBase" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">NO ESTÁ EN BASE RUTA</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiMisma" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">MISMA JORNADA / DENTRO DEL PLAZO</div></div>
+            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiYaLiq" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">YA LIQUIDADA (REINVENTARIADO)</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiOtros" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">NO EVALUABLES / ANTES DE LA CARGA</div></div>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
@@ -824,6 +825,7 @@
                 <option value="MISMA">Misma jornada / dentro del plazo</option>
                 <option value="SIN_FECHA">No evaluable (falta fecha)</option>
                 <option value="ANTES">Escaneo anterior a la carga</option>
+                <option value="YA_LIQ">Ya liquidada anteriormente (reinventariado)</option>
             </select>
             <label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:var(--text-muted);">Días mín.
                 <input type="number" id="lqnMinDias" value="1" min="1" oninput="renderizarNoLiquidacionLQN()" style="width:56px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
@@ -4576,6 +4578,11 @@
 
         const filas = [];
         const retornos = {};
+        // Una guía se liquida UNA sola vez: de todos los escaneos que cumplen la
+        // regla se conserva uno por guía (el marcado como liquidación en el
+        // escaneo, y si no hay, el primero en el tiempo). Los reinventariados
+        // posteriores ya no cuentan como liquidación.
+        const candidatas = {};
         (scans || []).forEach(sc => {
             if (!esEscaneoGeneralLQ(sc)) return;
             const g = String(sc.guiaOriginal || sc.guia || '');
@@ -4590,13 +4597,19 @@
                 if (jScan.dia - jC.dia >= minDias && (!mejor || r._loteFecha > mejor._loteFecha)) { mejor = r; mejorJ = jC; }
             });
             if (!mejor) return;
-            retornos[g] = (retornos[g] || 0) + 1;
-            filas.push({
+            const fila = {
                 key: sc.key, guia: g, guiaRegistrada: sc.guia || '', marca: sc.marca || '', dia: mejor.dia || '', ruta: mejor.ruta || '', sec: mejor.secuencia || '',
                 cargaTxt: fmtFechaHoraLQ(new Date(mejor._loteFecha)), cargaJornada: mejorJ.txt, usuarioCarga: mejor._loteUsuario || '',
                 escaneoTxt: fmtFechaHoraLQ(fe), escaneoJornada: jScan.txt, usuarioEscaneo: sc.usuario || '',
                 dias: jScan.dia - mejorJ.dia, ts: fe.getTime(), observacion: 'LIQUIDACIÓN'
-            });
+            };
+            (candidatas[g] = candidatas[g] || []).push({ fila, marcada: !!(sc.liquidada || sc.marca) });
+        });
+        Object.keys(candidatas).forEach(g => {
+            const lista = candidatas[g].slice().sort((a, b) => a.fila.ts - b.fila.ts);
+            const elegida = lista.find(c => c.marcada) || lista[0];
+            retornos[g] = 1;
+            filas.push(elegida.fila);
         });
         filas.forEach(f => {
             f.vecesRuteada = ruteos[f.guia] ? ruteos[f.guia].veces : 0;
@@ -4918,7 +4931,8 @@
         SIN_BASE: 'No está en Base Ruta',
         MISMA: 'Misma jornada / dentro del plazo',
         SIN_FECHA: 'No evaluable (falta fecha)',
-        ANTES: 'Escaneo anterior a la carga'
+        ANTES: 'Escaneo anterior a la carga',
+        YA_LIQ: 'Ya liquidada anteriormente (reinventariado)'
     };
 
     function calcularNoLiquidacionLQN() {
@@ -4947,7 +4961,7 @@
                     const ult = fechadas.reduce((a, b) => (b._loteFecha > a._loteFecha ? b : a));
                     carga = fmtFechaHoraLQ(new Date(ult._loteFecha)); ruta = ult.ruta || ''; dia = ult.dia || '';
                     const diffs = fechadas.map(r => jS - fechaJornadaLQ(new Date(r._loteFecha)).dia);
-                    motivo = diffs.every(d => d < 0) ? 'ANTES' : 'MISMA';
+                    motivo = diffs.every(d => d < 0) ? 'ANTES' : (diffs.some(d => d >= liqMinDiasLQ) ? 'YA_LIQ' : 'MISMA');
                 }
             }
             filas.push({
@@ -4989,6 +5003,7 @@
         document.getElementById('lqnKpiTotal').textContent = todas.length;
         document.getElementById('lqnKpiSinBase').textContent = cuenta('SIN_BASE');
         document.getElementById('lqnKpiMisma').textContent = cuenta('MISMA');
+        document.getElementById('lqnKpiYaLiq').textContent = cuenta('YA_LIQ');
         document.getElementById('lqnKpiOtros').textContent = cuenta('SIN_FECHA') + cuenta('ANTES');
 
         noLiqFiltradasLQN = fMotivo ? todas.filter(f => f.motivo === fMotivo) : todas;

@@ -843,7 +843,7 @@
             <span style="color:var(--warning);">💸 LIQUIDACIÓN</span>
             <button onclick="cerrarModalLiquidacionLQ()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Guías escaneadas en el <b>Escaneo General</b> que están en la <b>Base de Ruta</b> y cuyo escaneo ocurrió días <b>después</b> de la jornada en que se cargó esa base. Se marcan automáticamente con la observación <b>LIQUIDACIÓN</b>. La jornada corta a las 8:00 AM (la madrugada cuenta como el día anterior).</p>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Guías escaneadas en el <b>Escaneo General</b> que están en la <b>Base de Ruta</b> y cuyo escaneo ocurrió días <b>después</b> de la jornada en que se cargó esa base. Se marcan automáticamente con la observación <b>LIQUIDACIÓN</b>. La jornada corta a las 8:00 AM (la madrugada cuenta como el día anterior). <b>Se conservan aunque limpies el historial</b>; solo se borran con el botón 🗑️ de esta vista.</p>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiTotal" style="font-size:20px; font-weight:900; color:var(--warning);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">GUÍAS EN LIQUIDACIÓN</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiRutas" style="font-size:20px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">RUTAS AFECTADAS</div></div>
@@ -860,6 +860,10 @@
                 <input type="number" id="lqMinRuteos" value="" min="0" placeholder="0" oninput="renderizarLiquidacionLQ()" style="width:56px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
             </label>
             <button onclick="exportarLiquidacionLQ()" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">📥 Excel</button>
+            <button onclick="guardarBackupLiquidacionLQ()" title="Guarda todas las liquidaciones: archivo .json + copia en la nube" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">💾 Backup</button>
+            <button onclick="document.getElementById('lqRestaurarFile').click()" title="Restaurar desde un backup .json" style="background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">📂 Restaurar</button>
+            <input type="file" id="lqRestaurarFile" accept=".json,application/json" style="display:none;" onchange="restaurarBackupLiquidacionLQ(event)">
+            <button onclick="borrarLiquidacionesLQ()" title="Borra solo las liquidaciones; no toca el historial" style="background:var(--danger); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">🗑️ Borrar</button>
         </div>
         <div id="lqTablaWrap" style="overflow:auto; flex:1; min-height:160px; border:1px solid var(--border); border-radius:8px;"></div>
         <div id="lqNota" style="font-size:10px; color:var(--text-muted); margin-top:6px;"></div>
@@ -4532,7 +4536,7 @@
     // ======================================
     let liquidacionFiltradasLQ = [];
     let liqMinDiasLQ = 1;
-    let _liqCacheLQ = { scansRef: null, baseRef: null, persRef: null, min: 0, res: null, mapa: null };
+    let _liqCacheLQ = { scansRef: null, baseRef: null, persRef: null, corte: 0, min: 0, res: null, mapa: null };
 
     // Registro permanente de liquidaciones (Firebase: liquidaciones_registro).
     // Se alimenta justo antes de borrar escaneos del historial, así la guía sigue
@@ -4540,11 +4544,76 @@
     let liqPersistidasLQ = {};
     function claveGuiaLQ(g) { return String(g).replace(/[.#$\[\]\/]/g, '_'); }
 
+    // Corte: al borrar la vista Liquidación se guarda la fecha de borrado; los
+    // escaneos del historial anteriores a ese momento ya no generan liquidación
+    // (si no, reaparecerían al recalcularse desde el historial que sigue ahí).
+    let liqCorteLQ = 0;
+    let liqRegistroListoLQ = false, liqCorteListoLQ = false, liqAutoOcupadoLQ = false;
+
     function escucharLiquidacionesPersistidasLQ() {
         rtdb.ref('liquidaciones_registro').on('value', snap => {
             liqPersistidasLQ = snap.val() || {};
+            liqRegistroListoLQ = true;
             refrescarLiquidacionSiAbierto();
         }, err => console.error('liquidaciones_registro:', err));
+        rtdb.ref('liquidaciones_config/corte').on('value', snap => {
+            liqCorteLQ = Number(snap.val()) || 0;
+            liqCorteListoLQ = true;
+            refrescarLiquidacionSiAbierto();
+        }, err => console.error('liquidaciones_config/corte:', err));
+    }
+
+    // Convierte una fila de liquidación al formato del registro permanente.
+    // Firebase rechaza valores undefined, por eso todo se normaliza.
+    function filaARegistroLQ(f) {
+        const t = v => (v === undefined || v === null) ? '' : v;
+        const n = v => Number(v) || 0;
+        const o = {
+            guia: String(f.guia), scanKey: t(f.key || f.scanKey), guiaRegistrada: t(f.guiaRegistrada), marca: t(f.marca), dia: t(f.dia), ruta: t(f.ruta), sec: t(f.sec),
+            cargaTxt: t(f.cargaTxt), cargaJornada: t(f.cargaJornada), usuarioCarga: t(f.usuarioCarga),
+            escaneoTxt: t(f.escaneoTxt), escaneoJornada: t(f.escaneoJornada), usuarioEscaneo: t(f.usuarioEscaneo),
+            dias: n(f.dias), ts: n(f.ts), vecesRuteada: n(f.vecesRuteada), fechasRuteo: t(f.fechasRuteo),
+            conservadoPor: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '', conservadoEn: Date.now()
+        };
+        if (f.conservadoPor) o.conservadoPor = f.conservadoPor;
+        if (f.conservadoEn) o.conservadoEn = n(f.conservadoEn) || Date.now();
+        return o;
+    }
+
+    async function escribirRegistroLQ(upd) {
+        const ks = Object.keys(upd);
+        for (let i = 0; i < ks.length; i += 400) {
+            const lote = {};
+            ks.slice(i, i + 400).forEach(k => { lote[k] = upd[k]; });
+            await rtdb.ref('liquidaciones_registro').update(lote);
+        }
+    }
+
+    // Conserva cada liquidación apenas se detecta (no solo al borrar el historial),
+    // así sigue en la vista aunque se limpie el historial o se reemplace la Base Ruta.
+    function programarConservarAutoLQ() {
+        if (!liqRegistroListoLQ || !liqCorteListoLQ) return;
+        clearTimeout(programarConservarAutoLQ._t);
+        programarConservarAutoLQ._t = setTimeout(conservarAutoLQ, 4000);
+    }
+
+    async function conservarAutoLQ() {
+        if (liqAutoOcupadoLQ) return;
+        liqAutoOcupadoLQ = true;
+        try {
+            if (!esAdmin()) return;
+            const upd = {};
+            calcularLiquidacionLQ(1).filas.forEach(f => {
+                if (!f.key) return; // las ya conservadas no llevan key
+                const k = claveGuiaLQ(f.guia);
+                if (!liqPersistidasLQ[k] && !upd[k]) upd[k] = filaARegistroLQ(f);
+            });
+            if (Object.keys(upd).length) await escribirRegistroLQ(upd);
+        } catch (err) {
+            console.error('Conservación automática de liquidaciones:', err);
+        } finally {
+            liqAutoOcupadoLQ = false;
+        }
     }
 
     // Guarda las liquidaciones de los escaneos que se van a borrar (keys = Set de
@@ -4556,15 +4625,9 @@
             filas.forEach(f => {
                 const k = claveGuiaLQ(f.guia);
                 if (liqPersistidasLQ[k] || upd[k]) return;
-                upd[k] = {
-                    guia: f.guia, guiaRegistrada: f.guiaRegistrada, marca: f.marca, dia: f.dia, ruta: f.ruta, sec: f.sec,
-                    cargaTxt: f.cargaTxt, cargaJornada: f.cargaJornada, usuarioCarga: f.usuarioCarga,
-                    escaneoTxt: f.escaneoTxt, escaneoJornada: f.escaneoJornada, usuarioEscaneo: f.usuarioEscaneo,
-                    dias: f.dias, ts: f.ts, vecesRuteada: f.vecesRuteada, fechasRuteo: f.fechasRuteo,
-                    conservadoPor: usuarioActivo, conservadoEn: Date.now()
-                };
+                upd[k] = filaARegistroLQ(f);
             });
-            if (Object.keys(upd).length) await rtdb.ref('liquidaciones_registro').update(upd);
+            if (Object.keys(upd).length) await escribirRegistroLQ(upd);
             return true;
         } catch (err) {
             console.error('No se pudieron conservar las liquidaciones:', err);
@@ -4628,6 +4691,7 @@
             if (!cargas) return;
             const fe = parsearHoraAObj(sc.hora);
             if (!fe.getTime()) return;
+            if (liqCorteLQ && fe.getTime() <= liqCorteLQ) return; // anterior al último borrado de Liquidación
             const jScan = fechaJornadaLQ(fe);
             let mejor = null, mejorJ = null;
             cargas.forEach(r => {
@@ -4652,15 +4716,25 @@
             retornos[g] = 1;
             filas.push(elegida.fila);
         });
+        // Escaneos vivos que corresponden a una guía ya conservada (misma clave o misma guía+hora)
+        const vivas = {};
+        (scans || []).forEach(sc => {
+            if (!esEscaneoGeneralLQ(sc)) return;
+            const g = String(sc.guiaOriginal || sc.guia || '');
+            if (!persistidas[g]) return;
+            const t = parsearHoraAObj(sc.hora).getTime();
+            (vivas[g] = vivas[g] || []).push({ key: sc.key, ts: t });
+        });
         Object.keys(persistidas).forEach(g => {
             const p = persistidas[g];
             if (!((p.dias || 0) >= minDias)) return;
             retornos[g] = 1;
+            const viva = (vivas[g] || []).find(x => (p.scanKey && x.key === p.scanKey) || (x.ts && x.ts === p.ts));
             filas.push({
-                key: null, guia: g, guiaRegistrada: p.guiaRegistrada || '', marca: p.marca || '', dia: p.dia || '', ruta: p.ruta || '', sec: p.sec || '',
+                key: viva ? viva.key : null, scanKey: p.scanKey || '', guia: g, guiaRegistrada: p.guiaRegistrada || '', marca: p.marca || '', dia: p.dia || '', ruta: p.ruta || '', sec: p.sec || '',
                 cargaTxt: p.cargaTxt || '', cargaJornada: p.cargaJornada || '', usuarioCarga: p.usuarioCarga || '',
                 escaneoTxt: p.escaneoTxt || '', escaneoJornada: p.escaneoJornada || '', usuarioEscaneo: p.usuarioEscaneo || '',
-                dias: p.dias || 0, ts: p.ts || 0, observacion: 'LIQUIDACIÓN', persistida: true,
+                dias: p.dias || 0, ts: p.ts || 0, observacion: 'LIQUIDACIÓN', persistida: !viva,
                 _vecesGuardadas: p.vecesRuteada || 0, _fechasGuardadas: p.fechasRuteo || ''
             });
         });
@@ -4676,17 +4750,36 @@
     // Resultado memorizado (scans y la Base Ruta se reemplazan en cada cambio de Firebase)
     function liquidacionCacheLQ() {
         const c = _liqCacheLQ;
-        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.persRef !== liqPersistidasLQ || c.min !== liqMinDiasLQ || !c.res) {
+        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.persRef !== liqPersistidasLQ || c.corte !== liqCorteLQ || c.min !== liqMinDiasLQ || !c.res) {
             c.res = calcularLiquidacionLQ(liqMinDiasLQ);
             c.mapa = new Map();
             c.res.filas.forEach(f => { if (f.key) c.mapa.set(f.key, f); });
-            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.persRef = liqPersistidasLQ; c.min = liqMinDiasLQ;
+            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.persRef = liqPersistidasLQ; c.corte = liqCorteLQ; c.min = liqMinDiasLQ;
         }
         return c;
     }
 
     function esLiquidacionLQ(scan) {
-        try { return !!(scan && scan.key && liquidacionCacheLQ().mapa.has(scan.key)); } catch (e) { return false; }
+        try {
+            if (!scan) return false;
+            const c = liquidacionCacheLQ();
+            if (scan.key && c.mapa.has(scan.key)) return true;
+            // Escaneo de un respaldo: trae la marca guardada al archivar...
+            if (scan.obsLiquidacion === 'LIQUIDACIÓN') return true;
+            // ...o coincide con una liquidación conservada (guía + hora, para respaldos viejos sin marca)
+            if (!c.persSet || c.persSetRef !== liqPersistidasLQ) {
+                c.persSet = new Set();
+                Object.values(liqPersistidasLQ || {}).forEach(p => {
+                    if (!p) return;
+                    if (p.scanKey) c.persSet.add('k|' + p.scanKey);
+                    c.persSet.add('t|' + p.guia + '|' + p.ts);
+                });
+                c.persSetRef = liqPersistidasLQ;
+            }
+            if (scan.key && c.persSet.has('k|' + scan.key)) return true;
+            const t = parsearHoraAObj(scan.hora).getTime();
+            return !!(t && c.persSet.has('t|' + String(scan.guiaOriginal || scan.guia || '') + '|' + t));
+        } catch (e) { return false; }
     }
 
     function abrirModalLiquidacionLQ() {
@@ -4726,6 +4819,7 @@
     }
 
     function refrescarLiquidacionSiAbierto() {
+        programarConservarAutoLQ();
         const abierto = id => { const el = document.getElementById(id); return !!el && el.style.display === 'flex'; };
         const a = abierto('modalLiquidacion'), b = abierto('modalLiquidacionGraficos'), c = abierto('modalNoLiquidacion');
         if (!a && !b && !c) return;
@@ -4778,7 +4872,7 @@
             </tr></thead><tbody>${filas}</tbody></table>`;
         }
         const extra = liquidacionFiltradasLQ.length > LIMITE ? `Mostrando ${LIMITE} de ${liquidacionFiltradasLQ.length}; el Excel incluye todas. ` : '';
-        document.getElementById('lqNota').textContent = extra + (r.sinFecha ? `${r.sinFecha} registros de Base Ruta no tienen fecha de carga (se cargaron antes de esta función) y no se pueden evaluar.` : '');
+        document.getElementById('lqNota').textContent = extra + (liqCorteLQ ? `Liquidación borrada el ${fmtFechaHoraLQ(new Date(liqCorteLQ))}: no se toman en cuenta escaneos anteriores. ` : '') + (r.sinFecha ? `${r.sinFecha} registros de Base Ruta no tienen fecha de carga (se cargaron antes de esta función) y no se pueden evaluar.` : '');
         if (document.getElementById('modalRegistros') && document.getElementById('modalRegistros').style.display === 'flex') actualizarListaTarjetas();
     }
 
@@ -4795,6 +4889,72 @@
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'Liquidacion');
         XLSX.writeFile(wb, `Liquidacion_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
+    // ---- Backup / restaurar / borrar (propios de la vista Liquidación) ----
+    function descargarJsonLQ(obj, nombre) {
+        const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = nombre;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+
+    // Guarda TODAS las liquidaciones (sin filtros): copia en la nube + archivo .json
+    async function guardarBackupLiquidacionLQ(silencioso) {
+        if (!esAdmin()) { alert('Solo el administrador puede guardar backups de Liquidación.'); return false; }
+        const filas = calcularLiquidacionLQ(1).filas.map(filaARegistroLQ);
+        if (!filas.length) { if (!silencioso) alert('No hay liquidaciones para respaldar.'); return !!silencioso; }
+        const ahora = new Date();
+        const backup = { tipo: 'liquidaciones_backup', version: 1, fecha: ahora.getTime(), fechaTxt: fmtFechaHoraLQ(ahora),
+                         creadoPor: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '', cantidad: filas.length, filas };
+        let nube = true;
+        try { await rtdb.ref('liquidaciones_backups').push(backup); } catch (err) { nube = false; console.error('Backup en la nube:', err); }
+        const p = n => String(n).padStart(2, '0');
+        descargarJsonLQ(backup, `Backup_Liquidacion_${ahora.getFullYear()}-${p(ahora.getMonth() + 1)}-${p(ahora.getDate())}_${p(ahora.getHours())}${p(ahora.getMinutes())}.json`);
+        if (!silencioso) alert(`✅ Backup de ${filas.length} guías: archivo descargado` + (nube ? ' y copia guardada en la nube.' : '. ⚠️ No se pudo guardar la copia en la nube.'));
+        return true;
+    }
+
+    function restaurarBackupLiquidacionLQ(ev) {
+        const file = ev.target.files[0];
+        ev.target.value = '';
+        if (!file) return;
+        if (!esAdmin()) { alert('Solo el administrador puede restaurar Liquidación.'); return; }
+        const rd = new FileReader();
+        rd.onload = async () => {
+            try {
+                const b = JSON.parse(rd.result);
+                const filas = (b && b.tipo === 'liquidaciones_backup' && Array.isArray(b.filas)) ? b.filas.filter(f => f && f.guia != null && f.guia !== '') : null;
+                if (!filas || !filas.length) { alert('El archivo no es un backup de Liquidación válido.'); return; }
+                if (!confirm(`Se restaurarán ${filas.length} guías (backup del ${b.fechaTxt || '—'}). Las que ya existan se sobrescriben; el resto se conserva. ¿Continuar?`)) return;
+                const upd = {};
+                filas.forEach(f => { upd[claveGuiaLQ(f.guia)] = filaARegistroLQ(f); });
+                await escribirRegistroLQ(upd);
+                alert(`✅ ${filas.length} guías restauradas.`);
+            } catch (err) {
+                console.error(err);
+                alert('❌ No se pudo restaurar el backup: ' + err.message);
+            }
+        };
+        rd.readAsText(file);
+    }
+
+    // Borra el registro de Liquidación sin tocar el Historial ni la Base de Ruta
+    async function borrarLiquidacionesLQ() {
+        if (!esAdmin()) { alert('Solo el administrador puede borrar Liquidación.'); return; }
+        const total = calcularLiquidacionLQ(1).filas.length;
+        if (!total && !Object.keys(liqPersistidasLQ).length) { alert('No hay liquidaciones para borrar.'); return; }
+        if (!confirm(`🚨 Se borrarán las ${total} guías de Liquidación (también las conservadas). No se toca el Historial ni la Base de Ruta.\n\nAntes se guardará un backup automático (archivo + nube).\n\n¿Continuar?`)) return;
+        if (prompt('Para confirmar escribe BORRAR:') !== 'BORRAR') { alert('Cancelado.'); return; }
+        try {
+            if (!(await guardarBackupLiquidacionLQ(true))) return;
+            await rtdb.ref().update({ 'liquidaciones_registro': null, 'liquidaciones_config/corte': Date.now() });
+            alert('✅ Liquidación borrada. El backup quedó descargado y en la nube.');
+        } catch (err) {
+            console.error(err);
+            alert('❌ No se pudo borrar Liquidación: ' + err.message);
+        }
     }
 
 
@@ -9180,11 +9340,18 @@
             if (!(await confirmarPreservarLQ(null))) return;
             if (conRespaldo) {
                 const nuevaRef = rtdb.ref("historial_archivado").push();
+                // La observación LIQUIDACIÓN se calcula en vivo, así que se estampa en cada escaneo antes de archivar
+                const liqPorKey = {};
+                calcularLiquidacionLQ(1).filas.forEach(f => { if (f.key) liqPorKey[f.key] = f; });
+                const datosRespaldo = scans.map(sc => {
+                    const f = sc.key && liqPorKey[sc.key];
+                    return f ? { ...sc, obsLiquidacion: 'LIQUIDACIÓN', liqCarga: f.cargaTxt || '', liqDias: f.dias || 0 } : sc;
+                });
                 await nuevaRef.set({
                     fechaArchivo: new Date().toLocaleString(),
                     cantidadRegistros: scans.length,
                     archivadoPor: usuarioActivo,
-                    datos: scans
+                    datos: datosRespaldo
                 });
             }
             await rtdb.ref("escaneos_compartidos").remove();

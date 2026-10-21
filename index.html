@@ -876,7 +876,7 @@
             <span style="color:var(--primary);">🔓 LIBERAR ZONAS (PL)</span>
             <button onclick="cerrarModalLiberarZonasCS()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Usa esto cuando el <b>despacho ya fue realizado</b>. Al liberar una zona se quita su cierre y sus folios aprobados dejan de bloquear el Control de Seguridad, así el mismo PL se puede volver a usar en otro día. El historial y la trazabilidad se conservan.</p>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Usa esto cuando el <b>despacho ya fue realizado</b>. Al liberar una zona se quita su cierre y sus folios aprobados dejan de bloquear el Control de Seguridad, así el mismo PL se puede volver a usar en otro día. Aquí figuran también los PL que quedaron en los <b>respaldos</b> de la nube. El historial y la trazabilidad se conservan.</p>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
             <input type="text" id="filtroLiberarRutaCS" placeholder="Filtrar ruta" oninput="renderizarLiberarZonasCS()" style="flex:1; min-width:110px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
             <input type="text" id="filtroLiberarFechaCS" placeholder="Fecha (dd/mm/aaaa)" oninput="renderizarLiberarZonasCS()" style="flex:1; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
@@ -884,6 +884,7 @@
                 <option value="">Todas</option>
                 <option value="cerrada">🔒 Solo cerradas</option>
                 <option value="aprobados">✅ Solo con aprobados (sin cerrar)</option>
+                <option value="respaldo">📦 Con registros en respaldo</option>
             </select>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
@@ -4348,6 +4349,24 @@
     let liberarZonasSel = new Set();
     let liberarZonasVisibles = [];
     let liberarGruposVisibles = [];
+    let liberarRespaldosCS = {};          // copia local de historial_archivado (respaldos de la nube)
+    let liberarRespaldosEstadoCS = '';    // '' | 'cargando' | 'listo' | 'error'
+
+    async function cargarRespaldosLiberarCS() {
+        liberarRespaldosEstadoCS = 'cargando';
+        renderizarLiberarZonasCS();
+        try {
+            const snap = await rtdb.ref('historial_archivado').once('value');
+            liberarRespaldosCS = snap.val() || {};
+            liberarRespaldosEstadoCS = 'listo';
+        } catch (err) {
+            console.error('No se pudieron cargar los respaldos para liberar PL:', err);
+            liberarRespaldosCS = {};
+            liberarRespaldosEstadoCS = 'error';
+        }
+        const m = document.getElementById('modalLiberarZonasCS');
+        if (m && m.style.display === 'flex') renderizarLiberarZonasCS();
+    }
 
     function escLZ(t) {
         return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -4357,7 +4376,7 @@
         const mapa = {};
         const obtener = (ruta, zona) => {
             const k = claveZonaCerrada(ruta, zona);
-            if (!mapa[k]) mapa[k] = { clave: k, ruta, zona, cerrada: null, aprobados: 0, pendientes: 0, fecha: '' };
+            if (!mapa[k]) mapa[k] = { clave: k, ruta, zona, cerrada: null, aprobados: 0, pendientes: 0, aprobRespaldo: 0, pendRespaldo: 0, refsRespaldo: [], respaldos: new Set(), fecha: '' };
             return mapa[k];
         };
         Object.values(zonasCerradasILCache || {}).forEach(z => {
@@ -4378,6 +4397,34 @@
             const r = mapa[claveZonaCerrada(s.ubic, s.zona || 'SIN ZONA')];
             if (r) r.pendientes++;
         });
+
+        // Registros que quedaron guardados en los respaldos de la nube (historial_archivado)
+        const regsRespaldo = [];
+        Object.keys(liberarRespaldosCS || {}).forEach(bk => {
+            const datos = (liberarRespaldosCS[bk] || {}).datos;
+            if (!datos) return;
+            Object.keys(datos).forEach(idx => {
+                const s = datos[idx];
+                if (!s || s.liberado || !s.ubic || !CATS_TOTAL_CS.includes(s.cat)) return;
+                regsRespaldo.push({ bk, idx, s });
+            });
+        });
+        regsRespaldo.forEach(({ bk, idx, s }) => {
+            if (!CATS_APROBADAS_CS.includes(s.cat)) return;
+            const r = obtener(s.ubic, s.zona || 'SIN ZONA');
+            r.aprobRespaldo++;
+            r.respaldos.add(bk);
+            r.refsRespaldo.push({ bk, idx });
+            if (!r.fecha) r.fecha = String(s.hora || '').split(' - ')[0];
+        });
+        regsRespaldo.forEach(({ bk, idx, s }) => {
+            if (!CATS_PENDIENTES_CS.includes(s.cat)) return;
+            const r = mapa[claveZonaCerrada(s.ubic, s.zona || 'SIN ZONA')];
+            if (!r) return;
+            r.pendRespaldo++;
+            r.respaldos.add(bk);
+            r.refsRespaldo.push({ bk, idx });
+        });
         return Object.values(mapa).sort((a, b) => String(a.ruta).localeCompare(String(b.ruta), undefined, { numeric: true }) || String(a.zona).localeCompare(String(b.zona), undefined, { numeric: true }));
     }
 
@@ -4387,6 +4434,7 @@
         document.getElementById('estadoLiberarZonasCS').textContent = '';
         document.getElementById('modalLiberarZonasCS').style.display = 'flex';
         renderizarLiberarZonasCS();
+        cargarRespaldosLiberarCS();
     }
 
     function cerrarModalLiberarZonasCS() {
@@ -4407,6 +4455,12 @@
         const fFecha = document.getElementById('filtroLiberarFechaCS').value.trim();
         const fEstado = document.getElementById('filtroLiberarEstadoCS').value;
 
+        const estadoCarga = document.getElementById('estadoLiberarZonasCS');
+        if (estadoCarga && !liberarZonasSel.size) {
+            if (liberarRespaldosEstadoCS === 'cargando') { estadoCarga.style.color = 'var(--text-muted)'; estadoCarga.textContent = '🔄 Cargando respaldos de la nube...'; }
+            else if (liberarRespaldosEstadoCS === 'error') { estadoCarga.style.color = 'var(--danger)'; estadoCarga.textContent = '⚠️ No se pudieron cargar los respaldos; se muestran solo los registros activos.'; }
+            else if (liberarRespaldosEstadoCS === 'listo' && /Cargando respaldos|No se pudieron cargar/.test(estadoCarga.textContent)) estadoCarga.textContent = '';
+        }
         const todas = obtenerZonasLiberablesCS();
         // Limpia de la selección las zonas que ya no existen (p. ej. ya liberadas)
         const clavesExistentes = new Set(todas.map(z => z.clave));
@@ -4417,12 +4471,13 @@
             if (fFecha && !String(z.fecha).includes(fFecha)) return false;
             if (fEstado === 'cerrada' && !z.cerrada) return false;
             if (fEstado === 'aprobados' && z.cerrada) return false;
+            if (fEstado === 'respaldo' && !(z.aprobRespaldo || z.pendRespaldo)) return false;
             return true;
         });
 
         if (liberarZonasVisibles.length === 0) {
             liberarGruposVisibles = [];
-            cont.innerHTML = '<div class="resumen-vacio">No hay zonas cerradas o con folios aprobados para liberar.</div>';
+            cont.innerHTML = '<div class="resumen-vacio">No hay zonas cerradas, con folios aprobados o en respaldo para liberar.</div>';
             actualizarContadorLiberarZonasCS();
             return;
         }
@@ -4435,9 +4490,12 @@
             const todosMarcados = g.idx.every(i => liberarZonasSel.has(liberarZonasVisibles[i].clave));
             const filas = g.idx.map(i => {
                 const z = liberarZonasVisibles[i];
-                const estado = z.cerrada
+                const estadoBase = z.cerrada
                     ? `🔒 Cerrada · ${escLZ(z.cerrada.cerradaPor || 'N/D')} · ${escLZ(z.cerrada.hora || 'N/D')}`
-                    : '✅ Con aprobados (sin cerrar)';
+                    : (z.aprobados ? '✅ Con aprobados (sin cerrar)' : '📦 Solo en respaldo');
+                const estado = estadoBase + ((z.aprobRespaldo || z.pendRespaldo) ? ` · 📦 en ${z.respaldos.size} respaldo${z.respaldos.size > 1 ? 's' : ''}` : '');
+                const detalleResp = (z.aprobRespaldo || z.pendRespaldo)
+                    ? `<br>📦 ${z.aprobRespaldo} aprob.${z.pendRespaldo ? ` / ${z.pendRespaldo} pend.` : ''}` : '';
                 return `
                 <label style="display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--border); border-radius:6px; cursor:pointer;">
                     <input type="checkbox" ${liberarZonasSel.has(z.clave) ? 'checked' : ''} onchange="toggleZonaLiberarCS(${i}, this.checked)">
@@ -4445,7 +4503,7 @@
                         <span style="font-weight:800; font-size:12px;">PL ${escLZ(z.zona)}</span>
                         <span style="display:block; font-size:10px; color:var(--text-muted);">${estado}</span>
                     </span>
-                    <span style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">✅ ${z.aprobados} aprob.${z.pendientes ? `<br>⏳ ${z.pendientes} pend.` : ''}</span>
+                    <span style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">✅ ${z.aprobados} aprob.${z.pendientes ? `<br>⏳ ${z.pendientes} pend.` : ''}${detalleResp}</span>
                 </label>`;
             }).join('');
             return `
@@ -4497,7 +4555,7 @@
             return;
         }
         const rutas = new Set(elegidas.map(z => z.ruta));
-        if (!confirm(`¿Liberar ${elegidas.length} zona(s) (PL) de ${rutas.size} ruta(s)?\n\nSe quitará el cierre y sus folios dejarán de bloquear el Control de Seguridad. Hazlo solo si el despacho ya fue realizado.`)) return;
+        if (!confirm(`¿Liberar ${elegidas.length} zona(s) (PL) de ${rutas.size} ruta(s)?\n\nSe quitará el cierre y sus folios (incluidos los guardados en respaldos) dejarán de bloquear el Control de Seguridad. Hazlo solo si el despacho ya fue realizado.`)) return;
 
         const ahora = obtenerFechaYHoraActual();
         const updates = {};
@@ -4510,11 +4568,32 @@
                 updates["escaneos_compartidos/" + s.key + "/liberadoHora"] = ahora;
                 totalRegistros++;
             });
+            // Registros de esta zona que están en los respaldos: se marcan igual (no se borran)
+            (z.refsRespaldo || []).forEach(rf => {
+                const base = "historial_archivado/" + rf.bk + "/datos/" + rf.idx;
+                updates[base + "/liberado"] = true;
+                updates[base + "/liberadoPor"] = usuarioActivo;
+                updates[base + "/liberadoHora"] = ahora;
+                totalRegistros++;
+            });
         });
 
         estado.style.color = 'var(--text-muted)';
         estado.textContent = 'Liberando...';
-        rtdb.ref().update(updates).then(() => {
+        // Se escribe por lotes: los respaldos pueden tener miles de registros
+        const _ks = Object.keys(updates);
+        (async () => {
+            for (let i = 0; i < _ks.length; i += 400) {
+                const lote = {};
+                _ks.slice(i, i + 400).forEach(k => { lote[k] = updates[k]; });
+                await rtdb.ref().update(lote);
+            }
+        })().then(() => {
+            // Refleja el cambio en la copia local de los respaldos
+            elegidas.forEach(z => (z.refsRespaldo || []).forEach(rf => {
+                const reg = liberarRespaldosCS[rf.bk] && liberarRespaldosCS[rf.bk].datos && liberarRespaldosCS[rf.bk].datos[rf.idx];
+                if (reg) reg.liberado = true;
+            }));
             liberarZonasSel = new Set();
             estado.style.color = 'var(--success)';
             estado.textContent = `✅ ${elegidas.length} zona(s) liberadas (${totalRegistros} registros).`;
@@ -8837,6 +8916,39 @@
         poblarFiltrosTrazabilidad();
         renderizarTrazabilidad();
         document.getElementById('inpBusquedaTrazabilidad').focus();
+        cargarRespaldosTrazabilidad();
+    }
+
+    // Índice por guía de los escaneos guardados en los respaldos de la nube
+    // (historial_archivado). Así la trazabilidad no se pierde al "Guardar Respaldo y Limpiar".
+    let trazaRespaldosIdx = {};
+    let trazaRespaldosEstado = ''; // '' | 'cargando' | 'listo' | 'error'
+
+    async function cargarRespaldosTrazabilidad() {
+        trazaRespaldosEstado = 'cargando';
+        renderizarTrazabilidad();
+        try {
+            const snap = await rtdb.ref('historial_archivado').once('value');
+            const resp = snap.val() || {};
+            const idx = {};
+            Object.keys(resp).sort().forEach(bk => { // claves push = orden cronológico
+                const datos = (resp[bk] || {}).datos;
+                if (!datos) return;
+                Object.keys(datos).forEach(k => {
+                    const sc = datos[k];
+                    if (!sc || !sc.guia) return;
+                    (idx[sc.guia] = idx[sc.guia] || []).push({ ...sc, _resp: true });
+                });
+            });
+            trazaRespaldosIdx = idx;
+            trazaRespaldosEstado = 'listo';
+        } catch (err) {
+            console.error('No se pudieron cargar los respaldos para la trazabilidad:', err);
+            trazaRespaldosIdx = {};
+            trazaRespaldosEstado = 'error';
+        }
+        const m = document.getElementById('modalTrazabilidad');
+        if (m && m.style.display === 'flex') renderizarTrazabilidad();
     }
 
     // Puebla los menús desplegables de filtros de Trazabilidad (Día, Ruta, Zona esperada
@@ -8890,7 +9002,8 @@
     // Devuelve el estado de trazabilidad (etiquetado / escaneado en zona / aprobado)
     // de una guía concreta, cruzando contra el array global "scans".
     function calcularTrazabilidadGuia(guia, zonaEsperada) {
-        const scansGuia = scans.filter(s => s.guia === guia);
+        // Primero los del respaldo (más antiguos), luego los activos
+        const scansGuia = (trazaRespaldosIdx[guia] || []).concat(scans.filter(s => s.guia === guia));
 
         const evEtiquetado = scansGuia.find(s => s.modo === "IMPRESION_COLD" || (s.cat && String(s.cat).startsWith("IMPRESO")));
         const esEscaneoZona = s => s.modo === "VALIDAR_RUTA" || (!s.modo && s.zona && s.zona !== "-" && !(s.cat && String(s.cat).startsWith("IMPRESO")));
@@ -8907,14 +9020,17 @@
             etiquetado: !!evEtiquetado,
             etiquetadoHora: evEtiquetado ? evEtiquetado.hora : null,
             etiquetadoUsuario: evEtiquetado ? evEtiquetado.usuario : null,
+            etiquetadoResp: !!(evEtiquetado && evEtiquetado._resp),
             escaneadoZona: !!evEscaneoZona,
             escaneadoZonaHora: evEscaneoZona ? evEscaneoZona.hora : null,
             escaneadoZonaUsuario: evEscaneoZona ? evEscaneoZona.usuario : null,
+            escaneadoZonaResp: !!(evEscaneoZona && evEscaneoZona._resp),
             zonaReal: evEscaneoZona ? evEscaneoZona.zona : null,
             zonaCorrecta: zonaCorrecta,
             aprobado: !!evAprobado,
             aprobadoHora: evAprobado ? evAprobado.hora : null,
-            aprobadoUsuario: evAprobado ? evAprobado.usuario : null
+            aprobadoUsuario: evAprobado ? evAprobado.usuario : null,
+            aprobadoResp: !!(evAprobado && evAprobado._resp)
         };
     }
 
@@ -8987,6 +9103,9 @@
             <span class="traza-pill warn">${totalFaltanEscanear} faltan por escanear en zona</span>
             <span class="traza-pill ok">${totalAprobados} aprobados</span>
             <span class="traza-pill warn">${totalZonaIncorrecta} zona incorrecta</span>
+            ${trazaRespaldosEstado === 'cargando' ? '<span class="traza-pill total">🔄 cargando respaldos...</span>'
+              : trazaRespaldosEstado === 'error' ? '<span class="traza-pill warn">⚠️ no se pudieron cargar los respaldos</span>'
+              : trazaRespaldosEstado === 'listo' ? `<span class="traza-pill total">📦 ${items.filter(({ t }) => t.etiquetadoResp || t.escaneadoZonaResp || t.aprobadoResp).length} con datos de respaldo</span>` : ''}
         `;
 
         if (!items.length) {
@@ -9025,16 +9144,16 @@
 
                     <div class="traza-fila">
                         ${chip(t.etiquetado, 'Etiquetado', 'Sin etiquetar')}
-                        <span class="traza-meta">${t.etiquetado ? `${t.etiquetadoHora || '-'} · ${t.etiquetadoUsuario || '-'}` : ''}</span>
+                        <span class="traza-meta">${t.etiquetado ? `${t.etiquetadoHora || '-'} · ${t.etiquetadoUsuario || '-'}${t.etiquetadoResp ? ' · 📦 respaldo' : ''}` : ''}</span>
                     </div>
                     <div class="traza-fila">
                         ${chip(t.escaneadoZona, 'Escaneado en zona', 'Sin escanear en zona')}
-                        <span class="traza-meta">${t.escaneadoZona ? `${t.escaneadoZonaHora || '-'} · ${t.escaneadoZonaUsuario || '-'}` : ''}</span>
+                        <span class="traza-meta">${t.escaneadoZona ? `${t.escaneadoZonaHora || '-'} · ${t.escaneadoZonaUsuario || '-'}${t.escaneadoZonaResp ? ' · 📦 respaldo' : ''}` : ''}</span>
                     </div>
                     ${zonaBadge}
                     <div class="traza-fila">
                         ${chip(t.aprobado, 'Aprobado', 'Sin aprobar')}
-                        <span class="traza-meta">${t.aprobado ? `${t.aprobadoHora || '-'} · ${t.aprobadoUsuario || '-'}` : ''}</span>
+                        <span class="traza-meta">${t.aprobado ? `${t.aprobadoHora || '-'} · ${t.aprobadoUsuario || '-'}${t.aprobadoResp ? ' · 📦 respaldo' : ''}` : ''}</span>
                     </div>
                 </div>
             `;

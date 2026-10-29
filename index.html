@@ -1929,7 +1929,11 @@
             </div>
             
             <div style="background: var(--bg); padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md); margin-top: 4px;">
-                <div id="tituloAccionBaseRuta" style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">Añadir Registro a Base de Ruta</div>
+                <div role="button" tabindex="0" onclick="toggleCargasEspecificas('cuerpoManualRuta', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCargasEspecificas('cuerpoManualRuta', this);}" style="display:flex; align-items:center; justify-content:space-between; gap:6px; cursor:pointer; margin-bottom:4px;">
+                    <div id="tituloAccionBaseRuta" style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Añadir Registro a Base de Ruta</div>
+                    <span class="flecha-cargas-esp" style="font-size:11px; color:var(--text-muted);">▸</span>
+                </div>
+                <div id="cuerpoManualRuta" style="display:none;">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px;">
                     <input type="text" id="baseRutaInpGuia" placeholder="Tracking / Guía" style="padding:6px; font-size:11px; border:1px solid var(--border); border-radius:4px; font-weight:700; text-transform:uppercase;">
                     <input type="text" id="baseRutaInpRuta" placeholder="Ruta (ej: RUTA 10)" style="padding:6px; font-size:11px; border:1px solid var(--border); border-radius:4px; font-weight:700; text-transform:uppercase;">
@@ -1945,6 +1949,7 @@
                 <button id="btnCancelarEdicionRuta" onclick="cancelarEdicionBaseRuta()" style="display:none; width:100%; margin-top:4px; background:var(--bg); border:1px solid var(--border); padding:4px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">Cancelar Edición</button>
                 <button id="btnAgregarExcelMasivoRuta" onclick="document.getElementById('excelRutaAgregarFile').click();" style="width:100%; margin-top:6px; background:rgba(2,132,199,0.1); border:1px solid #0284c7; color:#0284c7; padding:6px; border-radius:4px; font-size:10.5px; font-weight:800; cursor:pointer;">➕ AGREGAR EXCEL MASIVO (MANTIENE LA BASE ACTUAL)</button>
                 <input type="file" id="excelRutaAgregarFile" accept=".xlsx,.xls" style="display:none" onchange="cargarExcelRutaNubeAgregar(event)">
+                </div>
 
                 <div style="background: var(--card-bg); padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-top: 10px;">
                     <div role="button" tabindex="0" onclick="toggleCargasEspecificas('cuerpoCargasRuta', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCargasEspecificas('cuerpoCargasRuta', this);}" style="font-size: 10.5px; font-weight: 800; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px; cursor:pointer; justify-content:space-between;">
@@ -2114,9 +2119,10 @@
             </div>
 
             <div style="background: var(--card-bg); padding: 14px; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-                <div style="font-size: 11px; font-weight: 800; color: #6c5b9e; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px;">
-                    ✏️ Añadir Registro Manual
+                <div role="button" tabindex="0" onclick="toggleCargasEspecificas('cuerpoManualBase', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCargasEspecificas('cuerpoManualBase', this);}" style="font-size: 11px; font-weight: 800; color: #6c5b9e; text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px; cursor:pointer; justify-content:space-between;">
+                    <span>✏️ Añadir Registro Manual</span><span class="flecha-cargas-esp">▸</span>
                 </div>
+                <div id="cuerpoManualBase" style="display:none; margin-top:10px;">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                     <input type="text" id="baseInpGuia" placeholder="Tracking / Guía" style="padding:9px; font-size:11px; border:1px solid var(--border); border-radius:6px; font-weight:700; text-transform:uppercase; background:var(--bg); color:var(--text-main); box-sizing:border-box;">
                     <input type="text" id="baseInpRuta" placeholder="Ruta (ej: RUTA 10)" style="padding:9px; font-size:11px; border:1px solid var(--border); border-radius:6px; font-weight:700; text-transform:uppercase; background:var(--bg); color:var(--text-main); box-sizing:border-box;">
@@ -2128,6 +2134,7 @@
                 </div>
                 <button id="btnAgregarExcelMasivoBase" onclick="document.getElementById('excelBaseAgregarFile').click();" style="width:100%; background:rgba(108,91,158,0.08); border:1px dashed #6c5b9e; color:#6c5b9e; padding:9px; border-radius:6px; font-size:10.5px; font-weight:800; cursor:pointer;">➕ AGREGAR EXCEL MASIVO (MANTIENE LA BASE ACTUAL)</button>
                 <input type="file" id="excelBaseAgregarFile" accept=".xlsx,.xls" style="display:none" onchange="cargarExcelBaseAgregar(event)">
+                </div>
             </div>
 
             <div style="background: var(--card-bg); padding: 14px; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-top: 14px;">
@@ -8883,6 +8890,12 @@
 
     function editarRegistroBaseRuta(key, guia, ruta, dia, sec, zona) {
         editandoBaseRutaKey = key;
+        const _cuerpoManualRuta = document.getElementById('cuerpoManualRuta');
+        if (_cuerpoManualRuta && _cuerpoManualRuta.style.display === 'none') {
+            _cuerpoManualRuta.style.display = 'block';
+            const _fl = _cuerpoManualRuta.parentElement.querySelector('.flecha-cargas-esp');
+            if (_fl) _fl.textContent = '▾';
+        }
         document.getElementById('baseRutaInpGuia').value = guia;
         document.getElementById('baseRutaInpRuta').value = ruta;
         document.getElementById('baseRutaInpDia').value = dia;

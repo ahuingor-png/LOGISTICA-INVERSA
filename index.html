@@ -1947,11 +1947,13 @@
                 <input type="file" id="excelRutaAgregarFile" accept=".xlsx,.xls" style="display:none" onchange="cargarExcelRutaNubeAgregar(event)">
 
                 <div style="background: var(--card-bg); padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-top: 10px;">
-                    <div style="font-size: 10.5px; font-weight: 800; color: var(--danger); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px;">
-                        🗑️ Borrar una Carga Específica
+                    <div role="button" tabindex="0" onclick="toggleCargasEspecificas('cuerpoCargasRuta', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCargasEspecificas('cuerpoCargasRuta', this);}" style="font-size: 10.5px; font-weight: 800; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px; cursor:pointer; justify-content:space-between;">
+                        <span>🗑️ Borrar una Carga Específica</span><span class="flecha-cargas-esp">▸</span>
                     </div>
-                    <div style="font-size:9.5px; color:var(--text-muted); margin-bottom:8px;">Elimina solo los registros de una carga masiva (Agregar Excel Masivo) de la Base de Ruta, sin afectar el resto de la base.</div>
-                    <div id="listaCargasRuta"></div>
+                    <div id="cuerpoCargasRuta" style="display:none; margin-top:8px;">
+                        <div style="font-size:9.5px; color:var(--text-muted); margin-bottom:8px;">Elimina solo los registros de una carga masiva (Agregar Excel Masivo) de la Base de Ruta, sin afectar el resto de la base.</div>
+                        <div id="listaCargasRuta"></div>
+                    </div>
                 </div>
             </div>
 
@@ -2129,11 +2131,13 @@
             </div>
 
             <div style="background: var(--card-bg); padding: 14px; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-top: 14px;">
-                <div style="font-size: 11px; font-weight: 800; color: var(--danger); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px;">
-                    🗑️ Borrar una Carga Específica
+                <div role="button" tabindex="0" onclick="toggleCargasEspecificas('cuerpoCargasBase', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCargasEspecificas('cuerpoCargasBase', this);}" style="font-size: 11px; font-weight: 800; color: var(--danger); text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px; cursor:pointer; justify-content:space-between;">
+                    <span>🗑️ Borrar una Carga Específica</span><span class="flecha-cargas-esp">▸</span>
                 </div>
-                <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px;">Elimina solo los registros de una carga masiva (Agregar Excel Masivo), sin afectar el resto de la base.</div>
-                <div id="listaCargasBase"></div>
+                <div id="cuerpoCargasBase" style="display:none; margin-top:10px;">
+                    <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px;">Elimina solo los registros de una carga masiva (Agregar Excel Masivo), sin afectar el resto de la base.</div>
+                    <div id="listaCargasBase"></div>
+                </div>
             </div>
 
             <div style="margin-top: 14px;">
@@ -2847,6 +2851,16 @@
         if (!cuerpo) return;
         const abierta = cuerpo.classList.toggle('abierta');
         titulo.classList.toggle('abierta', abierta);
+    }
+
+    // Muestra/oculta la sección "Borrar una Carga Específica" (oculta por defecto).
+    function toggleCargasEspecificas(idCuerpo, cabecera) {
+        const cuerpo = document.getElementById(idCuerpo);
+        if (!cuerpo) return;
+        const abrir = cuerpo.style.display === 'none';
+        cuerpo.style.display = abrir ? 'block' : 'none';
+        const fl = cabecera && cabecera.querySelector('.flecha-cargas-esp');
+        if (fl) fl.textContent = abrir ? '▾' : '▸';
     }
 
     function toggleGrupoAdmin(id, botonQueLoAbre) {

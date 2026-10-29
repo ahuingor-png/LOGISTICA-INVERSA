@@ -463,8 +463,8 @@
         
         .history-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; padding-right: 2px; }
         .history-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 10px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 4px; }
-        .history-card.card-forzado { border-left-color: var(--danger); background: #fef2f2; }
-        .history-card.card-sinprog { border-left-color: var(--warning); background: #fffbeb; }
+        .history-card.card-forzado { border-left-color: var(--danger); background: rgba(239,68,68,0.07); }
+        .history-card.card-sinprog { border-left-color: var(--warning); background: rgba(245,158,11,0.09); }
         .folio-cs-card { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:var(--radius-md); border:1px solid var(--border); background: var(--card-bg); font-weight:800; font-size:13px; transition: all .2s ease; }
         .folio-cs-card.pendiente { border-left:4px solid #b9852f; color: var(--text-main); }
         .folio-cs-card.aprobado { border-left:4px solid #3f8862; background: rgba(16,185,129,0.12); color:#3f8862; }
@@ -474,6 +474,92 @@
         .history-card-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 800; }
         .history-card-mid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: 10px; background: rgba(0,0,0,0.02); padding: 4px; border-radius: 4px; margin: 2px 0; text-align: center; }
         .history-card-bot { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); align-items: center; }
+
+        /* ===== Tarjeta de historial rediseñada (Historial de Escaneos + Consultar Registros) ===== */
+        .history-list.hc-lista { min-height:0; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; display:grid; grid-template-columns:repeat(auto-fill, minmax(min(360px,100%), 1fr)); gap:10px; align-content:start; }
+        .history-card.hc2 { gap:9px; padding:12px 14px; transition: box-shadow .15s ease; }
+        .history-card.hc2:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .hc2 .hc-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .hc2 .hc-folio { display:flex; align-items:center; gap:6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:15px; font-weight:900; letter-spacing:.3px; word-break:break-all; }
+        .hc2 .hc-folio input[type=checkbox] { width:18px; height:18px; cursor:pointer; margin:0; flex-shrink:0; }
+        .hc2 .hc-sec { margin-left:auto; font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; background:rgba(61,90,128,0.12); color:var(--primary); white-space:nowrap; }
+        .hc2 .hc-badges { display:flex; gap:5px; flex-wrap:wrap; }
+        .hc2 .hc-datos { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; }
+        .hc2 .hc-dato { grid-column:span 2; background:rgba(127,127,127,0.10); border-radius:8px; padding:6px 9px; min-width:0; }
+        .hc2 .hc-dato.hc-w3 { grid-column:span 3; }
+        .hc2 .hc-dato span { display:block; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); }
+        .hc2 .hc-dato b { display:block; font-size:12.5px; font-weight:800; color:var(--text-main); overflow-wrap:break-word; word-break:normal; line-height:1.25; }
+        .hc2 .hc-dato b.vacio { color:var(--text-muted); font-weight:600; opacity:.6; }
+        .hc2 .hc-dato.hc-bul b { font-size:15px; }
+        .hc2 .hc-cat { font-size:10px; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(61,90,128,0.12); color:var(--primary); letter-spacing:.3px; white-space:nowrap; }
+        .hc2 .hc-cat.aviso { background:rgba(245,158,11,0.18); color:#b45309; }
+        [data-theme="dark"] .hc2 .hc-cat.aviso { color:#fbbf24; }
+        .hc2 .hc-bot .hc-hora { font-variant-numeric:tabular-nums; }
+
+        /* ===== Historial en formato tabla (profesional, responsive) ===== */
+        .hr-tabla { grid-column:1/-1; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:clip; font-size:12.5px; }
+        .hr-head, .hr-row { display:grid; grid-template-columns:26px minmax(190px,1.7fr) 64px minmax(80px,1fr) minmax(80px,1fr) 56px minmax(80px,1fr) minmax(112px,.9fr) minmax(110px,1.1fr) 150px minmax(90px,.9fr) 34px; align-items:center; column-gap:10px; padding:0 14px; }
+        .hr-head { position:sticky; top:0; z-index:2; background:var(--bg); border-bottom:1px solid var(--border); height:34px; border-left:3px solid transparent; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); }
+        .hr-row { min-height:44px; border-bottom:1px solid var(--border); border-left:3px solid transparent; position:relative; transition:background .12s; }
+        .hr-row:last-child { border-bottom:none; }
+        .hr-row:hover { background:rgba(127,127,127,0.07); }
+        .hr-row.card-forzado { border-left-color:var(--danger); }
+        .hr-row.card-sinprog { border-left-color:var(--warning); }
+        .hr-c { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-main); font-weight:600; }
+        .hr-c.num { text-align:center; font-variant-numeric:tabular-nums; }
+        .hr-c.mut { color:var(--text-muted); font-weight:500; }
+        .hr-c.vacio { color:var(--text-muted); opacity:.55; }
+        .hr-guia { display:flex; align-items:center; gap:8px; }
+        .hr-folio { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-weight:800; font-size:13px; letter-spacing:.2px; }
+        .hr-chk input { width:16px; height:16px; margin:0; cursor:pointer; }
+        .hr-tag { font-size:9px; font-weight:800; letter-spacing:.4px; padding:2px 7px; border-radius:4px; white-space:nowrap; text-transform:uppercase; }
+        .hr-tag.t-act { background:rgba(34,197,94,0.14); color:#15803d; }
+        .hr-tag.t-resp { background:rgba(8,145,178,0.14); color:#0e7490; }
+        .hr-tag.t-liq { background:rgba(185,133,47,0.16); color:#92660f; }
+        [data-theme="dark"] .hr-tag.t-act { color:#4ade80; } [data-theme="dark"] .hr-tag.t-resp { color:#22d3ee; } [data-theme="dark"] .hr-tag.t-liq { color:#fbbf24; }
+        .hr-cat { display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid var(--border); color:var(--text-muted); }
+        .hr-cat.aviso { border-color:rgba(245,158,11,0.5); background:rgba(245,158,11,0.12); color:#b45309; }
+        [data-theme="dark"] .hr-cat.aviso { color:#fbbf24; }
+        .hr-del { width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border:none; border-radius:6px; background:transparent; color:var(--text-muted); cursor:pointer; opacity:.55; }
+        .hr-row:hover .hr-del { opacity:1; }
+        .hr-del:hover { background:rgba(239,68,68,0.14); color:var(--danger); }
+        .hr-del svg { width:15px; height:15px; }
+        .hr-lbl { display:none; }
+        @media (max-width:1100px) {
+            .hr-head { display:none; }
+            .hr-row { grid-template-columns:repeat(6,minmax(0,1fr)); row-gap:8px; padding:12px 12px 10px 12px; }
+            .hr-row > .hr-c { white-space:normal; }
+            .hr-chk { display:none; }
+            .hr-chk.on { display:block; grid-column:1/2; }
+            .hr-guia { grid-column:1/6; flex-wrap:wrap; }
+            .hr-sec { grid-column:6/7; text-align:right; }
+            .hr-d { grid-column:span 2; }
+            .hr-d.w3 { grid-column:span 3; }
+            .hr-lbl { display:block; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-bottom:1px; }
+            .hr-hora { grid-column:1/5; font-size:11px; }
+            .hr-user { grid-column:5/6; font-size:11px; text-align:right; }
+            .hr-acc { grid-column:6/7; text-align:right; }
+            .hr-d.num { text-align:left; }
+            .hr-catc { grid-column:span 6; }
+            .hr-cat { white-space:normal; }
+            .hr-sec::before { content:'Sec. '; color:var(--text-muted); font-weight:600; font-size:11px; }
+        }
+        .hc-tools { display:flex; flex-direction:column; gap:8px; }
+        .hc-tools-fila { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .hc-buscar { flex:1; min-width:180px; padding:9px 12px; font-size:13px; font-weight:600; border:1.5px solid var(--border); border-radius:var(--radius-md); background:var(--bg); color:var(--text-main); outline:none; }
+        .hc-buscar:focus { border-color:var(--primary); }
+        .hc-chips { display:flex; gap:6px; flex-wrap:wrap; }
+        .hc-chip { font-size:11px; font-weight:800; padding:5px 11px; border-radius:999px; border:1px solid var(--border); background:var(--bg); color:var(--text-muted); cursor:pointer; }
+        .hc-chip.on { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .hc-resumen { margin-left:auto; display:flex; gap:6px; font-size:11px; font-weight:800; color:var(--text-muted); }
+        .hc-resumen b { color:var(--text-main); }
+        .hc-resumen span { background:rgba(127,127,127,0.12); padding:4px 10px; border-radius:999px; white-space:nowrap; }
+        .hc-vacio { grid-column:1/-1; text-align:center; padding:40px 12px; font-size:13px; font-weight:700; color:var(--text-muted); }
+        @media (max-width:480px) { .hc-resumen { margin-left:0; width:100%; } }
+        .hc2 .hc-bot { display:flex; align-items:center; gap:6px 14px; flex-wrap:wrap; font-size:11px; font-weight:700; color:var(--text-muted); border-top:1px dashed var(--border); padding-top:8px; }
+        .hc2 .hc-bot .hc-hora, .hc2 .hc-bot .hc-op { white-space:nowrap; }
+        .hc2 .hc-del { margin-left:auto; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:var(--danger); font-size:11px; padding:5px 12px; border-radius:6px; font-weight:800; cursor:pointer; }
+        .hc2 .hc-del:hover { background:rgba(239,68,68,0.22); }
 
         /* ===== TRAZABILIDAD DE RUTA (pantalla dedicada dentro del admin) ===== */
         #modalTrazabilidad .modal-content { padding: 0; background: var(--bg); overflow: hidden; }
@@ -2258,7 +2344,7 @@
             </div>
         </div>
         
-        <div class="history-list" id="contenedorResultadosConsulta"></div>
+        <div class="history-list hc-lista" id="contenedorResultadosConsulta"></div>
     </div>
 </div>
 
@@ -2269,13 +2355,25 @@
                 <h4 style="font-weight:900;">HISTORIAL DE ESCANEOS</h4>
                 <button onclick="cerrarModalRegistros()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
             </div>
+            <div class="hc-tools">
+                <div class="hc-tools-fila">
+                    <input type="search" id="inpBuscarHistorialEsc" class="hc-buscar" placeholder="🔍 Buscar guía, ruta, ubicación, usuario..." oninput="actualizarListaTarjetas()" autocomplete="off">
+                    <div class="hc-resumen"><span>Guías <b id="hcResGuias">0</b></span><span>Bultos <b id="hcResBultos">0</b></span></div>
+                </div>
+                <div class="hc-chips" id="hcChipsHist">
+                    <button type="button" class="hc-chip on" data-f="todos" onclick="setFiltroHistorial('todos')">Todos</button>
+                    <button type="button" class="hc-chip" data-f="sinprog" onclick="setFiltroHistorial('sinprog')">⚠️ Sin programación</button>
+                    <button type="button" class="hc-chip" data-f="forzado" onclick="setFiltroHistorial('forzado')">🔴 Forzados</button>
+                    <button type="button" class="hc-chip" data-f="liq" onclick="setFiltroHistorial('liq')">💸 Liquidación</button>
+                </div>
+            </div>
             <div style="display: flex; gap: 6px; margin-top:4px;">
                 <button class="btn-header" style="background:var(--success); color:white; flex:1; justify-content:center; display:inline-block;" onclick="abrirModalExportarExcel()">📥 Descargar Excel</button>
                 <button class="btn-header" id="btnLimpiarHistorial" style="background:rgba(239,68,68,0.1); color:var(--danger); display: inline-block;" onclick="abrirModalLimpiarTodo()">Limpiar Todo</button>
                 <button class="btn-header" id="btnConsultarEspacioRapido" style="display:none; background:rgba(0,0,0,0.05);" onclick="consultarEspacioNubeRapido()">🔍 Espacio</button>
             </div>
         </div>
-        <div class="history-list" id="contenedorTarjetas"></div>
+        <div class="history-list hc-lista" id="contenedorTarjetas"></div>
     </div>
 </div>
 
@@ -7642,15 +7740,39 @@
         }
     }
 
+    let filtroHistorialActivo = 'todos';
+    function setFiltroHistorial(f) {
+        filtroHistorialActivo = f;
+        document.querySelectorAll('#hcChipsHist .hc-chip').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+        actualizarListaTarjetas();
+    }
+
     function actualizarListaTarjetas() {
         const contenedor = document.getElementById('contenedorTarjetas');
-        
-        const tarjetasHtml = construirHtmlTarjetas(scans, esAdmin());
-        
+
+        // Búsqueda + filtro rápido (solo afecta la vista; no toca los datos)
+        const inp = document.getElementById('inpBuscarHistorialEsc');
+        const q = inp ? inp.value.trim().toLowerCase() : '';
+        const esSinProg = s => s.cat === "SIN PROGRAMACIÓN" || (s.cat && String(s.cat).startsWith("IMPRESO"));
+        const lista = scans.filter(s => {
+            if (filtroHistorialActivo === 'sinprog' && !esSinProg(s)) return false;
+            if (filtroHistorialActivo === 'forzado' && !s.forzado) return false;
+            if (filtroHistorialActivo === 'liq' && !esLiquidacionLQ(s)) return false;
+            if (!q) return true;
+            return [s.guia, s.ruta, s.dia, s.sec, s.ubic, s.zona, s.cat, s.usuario, s.hora]
+                .some(v => v != null && String(v).toLowerCase().includes(q));
+        });
+
         if (contenedor) {
-            contenedor.innerHTML = tarjetasHtml;
+            contenedor.innerHTML = lista.length
+                ? construirHtmlTarjetas(lista, esAdmin())
+                : '<div class="hc-vacio">Sin resultados para este filtro.</div>';
         }
-        
+
+        const rg = document.getElementById('hcResGuias'), rb = document.getElementById('hcResBultos');
+        if (rg) rg.textContent = lista.length;
+        if (rb) rb.textContent = lista.reduce((a, s) => a + (parseInt(s.bul) || 1), 0);
+
         document.getElementById('tTotal').textContent = scans.length;
     }
 
@@ -7761,7 +7883,12 @@
             });
         });
 
-        registrosFiltradosConsultaGlobal = resultadosActivos.concat(resultadosArchivados);
+        // Orden: del registro MÁS RECIENTE al MÁS ANTIGUO (activos y respaldos mezclados),
+        // usando la fecha y hora del escaneo. Si empatan, se conserva el orden original.
+        registrosFiltradosConsultaGlobal = resultadosActivos.concat(resultadosArchivados)
+            .map((s, i) => ({ s, i, t: parsearHoraAObj(s.hora).getTime() || 0 }))
+            .sort((a, b) => (b.t - a.t) || (a.i - b.i))
+            .map(o => o.s);
 
         const totalGuias = registrosFiltradosConsultaGlobal.length;
         const totalBultos = registrosFiltradosConsultaGlobal.reduce((sum, item) => sum + (parseInt(item.bul) || 0), 0);
@@ -9575,7 +9702,7 @@
     }
 
     function construirHtmlTarjetas(listaData, esConsulta = false) {
-        return listaData.map(s => {
+        const filasHtml = listaData.map(s => {
             let claseForzado = s.forzado ? 'card-forzado' : '';
             if (s.cat === "SIN PROGRAMACIÓN" || (s.cat && String(s.cat).startsWith("IMPRESO"))) claseForzado = 'card-sinprog';
             
@@ -9585,15 +9712,15 @@
             let checkboxSeleccion = '';
             if (s._archivado) {
                 if (esAdmin()) {
-                    botonEliminarFila = `<button onclick="eliminarLineaArchivadaDesdeConsulta('${s._respaldoKey}', ${s._idx})" style="background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger); font-size:10px; padding:3px 8px; border-radius:4px; font-weight:800; cursor:pointer; margin-left:auto;">Eliminar</button>`;
+                    botonEliminarFila = `<button class="hc-del" onclick="eliminarLineaArchivadaDesdeConsulta('${s._respaldoKey}', ${s._idx})">🗑️ Eliminar</button>`;
                 }
                 // Los archivados no se pueden seleccionar para borrado masivo:
                 // cada uno vive dentro de un respaldo distinto.
             } else {
                 if (puedeBorrarHistorial()) {
-                    botonEliminarFila = `<button onclick="eliminarFilaConsulta('${s.key}')" style="background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); color:var(--danger); font-size:10px; padding:3px 8px; border-radius:4px; font-weight:800; cursor:pointer; margin-left:auto;">Eliminar</button>`;
+                    botonEliminarFila = `<button class="hc-del" onclick="eliminarFilaConsulta('${s.key}')">🗑️ Eliminar</button>`;
                 }
-                checkboxSeleccion = (esConsulta && puedeBorrarHistorial()) ? `<input type="checkbox" class="chk-fila-consulta" data-key="${s.key}" ${seleccionConsultaSet.has(s.key) ? 'checked' : ''} onchange="toggleSeleccionFila('${s.key}', this.checked)" style="width:16px; height:16px; cursor:pointer; margin-right:6px;">` : '';
+                checkboxSeleccion = (esConsulta && puedeBorrarHistorial()) ? `<input type="checkbox" class="chk-fila-consulta" data-key="${s.key}" ${seleccionConsultaSet.has(s.key) ? 'checked' : ''} onchange="toggleSeleccionFila('${s.key}', this.checked)">` : '';
             }
 
             // Etiqueta que distingue si el resultado viene de un escaneo activo
@@ -9607,32 +9734,44 @@
             const badgeLiquidacion = esLiquidacionLQ(s)
                 ? `<span style="background:rgba(185,133,47,0.15); color:var(--warning); font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px;">💸 LIQUIDACIÓN</span>` : '';
 
+            const badgesHtml = (badgeOrigen || badgeLiquidacion)
+                ? `<div class="hc-badges">${badgeOrigen}${badgeLiquidacion}</div>` : '';
+
+            const esAviso = (s.cat === "SIN PROGRAMACIÓN" || (s.cat && String(s.cat).startsWith("IMPRESO")));
+            const vac = v => (v === '' || v == null);
+            const celda = (cls, et, v) => `<div class="hr-c hr-d ${cls} ${vac(v) ? 'vacio' : ''}"><span class="hr-lbl">${et}</span>${vac(v) ? '—' : v}</div>`;
+
+            const tagOrigen = esConsulta
+                ? (s._archivado ? `<span class="hr-tag t-resp">Respaldo ${s._fechaRespaldo}</span>` : `<span class="hr-tag t-act">Activo</span>`)
+                : '';
+            const tagLiq = esLiquidacionLQ(s) ? `<span class="hr-tag t-liq">Liquidación</span>` : '';
+
+            const svgDel = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>';
+            const accion = botonEliminarFila
+                ? botonEliminarFila.replace('class="hc-del"', 'class="hr-del" title="Eliminar"').replace(/>[^<]*Eliminar<\/button>/, '>' + svgDel + '</button>')
+                : '';
+
             return `
-                <div class="history-card ${claseForzado}">
-                    <div class="history-card-top">
-                        <span style="display:flex; align-items:center;">${checkboxSeleccion}${tagForzado}${s.guia}</span>
-                        <span style="color:var(--primary)">Sec: ${s.sec || "S/S"}</span>
-                    </div>
-                    ${badgeOrigen ? `<div style="margin:2px 0;">${badgeOrigen}</div>` : ''}
-                    ${badgeLiquidacion ? `<div style="margin:2px 0;">${badgeLiquidacion}</div>` : ''}
-                    <div class="history-card-mid">
-                        <div><b>Día</b><br>${s.dia || "S/P"}</div>
-                        <div><b>Ubic.</b><br>${s.ubic || "-"}</div>
-                        <div><b>Zona</b><br>${s.zona || "-"}</div>
-                        <div><b>Cat.</b><br>${s.cat || "-"}</div>
-                        <div><b>Bultos</b><br>${s.bul || 1}</div>
-                        <div style="grid-column: span 3; text-align:right; font-weight:700; color:var(--text-muted)">${s.ruta || "S/P"}</div>
-                    </div>
-                    <div class="history-card-bot">
-                        <span>🕒 ${s.hora}</span>
-                        <div style="display:flex; align-items:center; gap:8px; width:100%; justify-content:flex-end;">
-                            <span style="font-weight:700;">Op: ${s.usuario || "@?"}</span>
-                            ${botonEliminarFila}
-                        </div>
-                    </div>
+                <div class="hr-row ${claseForzado}">
+                    <div class="hr-c hr-chk ${checkboxSeleccion ? 'on' : ''}">${checkboxSeleccion}</div>
+                    <div class="hr-c hr-guia"><span class="hr-folio">${s.guia}</span>${tagOrigen}${tagLiq}</div>
+                    <div class="hr-c hr-sec num"><span class="hr-lbl" style="display:none"></span>${s.sec || "S/S"}</div>
+                    ${celda('', 'Día', s.dia || "S/P")}
+                    ${celda('', 'Ruta', s.ruta || "S/P")}
+                    ${celda('num', 'Bultos', s.bul || 1)}
+                    ${celda('w3', 'Ubic.', s.ubic)}
+                    ${celda('w3 num', 'Zona', s.zona)}
+                    <div class="hr-c hr-d hr-catc">${s.cat ? `<span class="hr-lbl">Categoría</span><span class="hr-cat ${esAviso ? 'aviso' : ''}" title="${s.cat}">${s.cat}</span>` : '<span class="hr-lbl">Categoría</span>—'}</div>
+                    <div class="hr-c hr-hora mut">${s.hora}</div>
+                    <div class="hr-c hr-user mut">${s.usuario || "@?"}</div>
+                    <div class="hr-c hr-acc">${accion}</div>
                 </div>
             `;
         }).join('');
+        return `<div class="hr-tabla">
+            <div class="hr-head"><div></div><div>Guía</div><div style="text-align:center">Sec.</div><div>Día</div><div>Ruta</div><div style="text-align:center">Bultos</div><div>Ubicación</div><div style="text-align:center">Zona</div><div>Categoría</div><div>Fecha y hora</div><div>Usuario</div><div></div></div>
+            ${filasHtml}
+        </div>`;
     }
 
     function abrirModalRegistros() { 

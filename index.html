@@ -267,6 +267,8 @@
         .zona-soltar small { display:block; font-size:9.5px; font-weight:600; opacity:.8; }
         .zona-soltar:hover { border-color: var(--primary); color: var(--text-main); }
         .zona-soltar.dropzone-activa { border-color: var(--primary); background: rgba(61,90,128,0.15); color: var(--text-main); }
+        .bloque-carga { border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:8px; display:flex; flex-direction:column; gap:6px; background:rgba(0,0,0,0.015); }
+        .bloque-carga-titulo { font-size:11.5px; font-weight:800; color:var(--text-main); text-transform:uppercase; letter-spacing:.4px; }
         .estado-carga { font-size:10.5px; font-weight:700; min-height:0; padding:0 2px; color:var(--text-muted); }
         .estado-carga.ok { color: var(--success); }
         .estado-carga.err { color: var(--danger); }
@@ -1360,14 +1362,21 @@
                 <button class="btn-header btn-upload" id="btnCargarBaseDesk" onclick="document.getElementById('excelFile').click();" style="display:flex; padding: 8px 12px; font-size: 12px;">+ Cargar Base RF</button>
                 <button class="btn-header" id="btnBaseRutaLocalDesk" style="display:flex; padding: 8px 12px; font-size: 12px;" onclick="document.getElementById('excelRutaLocalFile').click();">📂 + Cargar Base Ruta</button>
 
-                <div class="zonas-soltar">
+                <div class="bloque-carga">
+                    <div class="bloque-carga-titulo">📊 Base RF</div>
                     <div class="zona-soltar" id="zonaSoltarRF" onclick="document.getElementById('excelFile').click();">📥 Arrastra aquí el Excel de <b>BASE RF</b><small>o toca para elegir el archivo</small></div>
-                    <div class="zona-soltar" id="zonaSoltarRuta" onclick="document.getElementById('excelRutaLocalFile').click();">📥 Arrastra aquí el Excel de <b>BASE RUTA</b><small>o toca para elegir el archivo</small></div>
-                    <div class="estado-carga" id="estadoCargaBases"></div>
+                    <div class="estado-carga" id="estadoCargaRF"></div>
+                    <div class="historial-cargas-titulo">📋 Cargas RF</div>
+                    <div class="historial-cargas" id="historialCargasRF"></div>
                 </div>
 
-                <div class="historial-cargas-titulo">📋 Cargas realizadas</div>
-                <div class="historial-cargas" id="historialCargasDesk"></div>
+                <div class="bloque-carga">
+                    <div class="bloque-carga-titulo">🛣️ Base Ruta</div>
+                    <div class="zona-soltar" id="zonaSoltarRuta" onclick="document.getElementById('excelRutaLocalFile').click();">📥 Arrastra aquí el Excel de <b>BASE RUTA</b><small>o toca para elegir el archivo</small></div>
+                    <div class="estado-carga" id="estadoCargaRuta"></div>
+                    <div class="historial-cargas-titulo">📋 Cargas Ruta</div>
+                    <div class="historial-cargas" id="historialCargasRuta"></div>
+                </div>
             </div>
 
             <button class="btn-header btn-delete-db" id="btnGrupoBorrarBasesDesk" onclick="toggleGrupoAdmin('grupoBorrarBasesDesk', this)" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">🗑️ Borrar Bases <span class="flecha-grupo">▾</span></button>
@@ -5761,7 +5770,7 @@
         const input = e.target;
         const file = input.files && input.files[0];
         if (!file) return;
-        _estadoCargaBases('⏳ Leyendo ' + file.name + '...', '');
+        _estadoCargaBases('⏳ Leyendo ' + file.name + '...', '', 'RUTA');
         const reader = new FileReader();
         reader.onload = function(evt) {
             try {
@@ -5788,12 +5797,12 @@
                 }).filter(item => item.seguimiento !== '');
 
                 if (datosMapeados.length === 0) {
-                    _estadoCargaBases('⚠️ El archivo no tiene registros válidos.', 'err');
+                    _estadoCargaBases('⚠️ El archivo no tiene registros válidos.', 'err', 'RUTA');
                     input.value = "";
                     return;
                 }
                 if (!confirm('Cargar Base Ruta REEMPLAZA la base de ruta actual.\n\nArchivo: ' + file.name + '\nRegistros: ' + datosMapeados.length + '\n\n¿Continuar?')) {
-                    _estadoCargaBases('Carga cancelada.', '');
+                    _estadoCargaBases('Carga cancelada.', '', 'RUTA');
                     input.value = "";
                     return;
                 }
@@ -5811,12 +5820,12 @@
 
                 // Reemplaza base + historial de cargas de ruta en una sola operación.
                 rtdb.ref().update({ "inventario_ruta_il": mapa, "cargas_ruta": { [loteId]: meta } }).then(() => {
-                    _estadoCargaBases('✅ Base Ruta cargada: ' + datosMapeados.length + ' registros · ' + file.name, 'ok');
+                    _estadoCargaBases('✅ Base Ruta cargada: ' + datosMapeados.length + ' registros · ' + file.name, 'ok', 'RUTA');
                     input.value = "";
-                }).catch(err => { _estadoCargaBases('❌ Error al subir: ' + err.message, 'err'); });
+                }).catch(err => { _estadoCargaBases('❌ Error al subir: ' + err.message, 'err', 'RUTA'); });
 
             } catch(err) {
-                _estadoCargaBases('❌ Error al procesar el archivo de rutas.', 'err');
+                _estadoCargaBases('❌ Error al procesar el archivo de rutas.', 'err', 'RUTA');
             }
         };
         reader.readAsArrayBuffer(file);
@@ -6358,8 +6367,8 @@
         window.addEventListener(evt, (e) => e.preventDefault());
     });
 
-    function _estadoCargaBases(txt, clase) {
-        const el = document.getElementById('estadoCargaBases');
+    function _estadoCargaBases(txt, clase, tipo) {
+        const el = document.getElementById(tipo === 'RUTA' ? 'estadoCargaRuta' : 'estadoCargaRF');
         if (!el) return;
         el.textContent = txt;
         el.className = 'estado-carga' + (clase ? ' ' + clase : '');
@@ -6370,16 +6379,16 @@
         const input = e.target;
         const file = input.files && input.files[0];
         if (!file) return;
-        _estadoCargaBases('⏳ Leyendo ' + file.name + '...', '');
+        _estadoCargaBases('⏳ Leyendo ' + file.name + '...', '', 'RF');
         const reader = new FileReader();
         reader.onload = (evt) => {
             try {
                 const data = new Uint8Array(evt.target.result);
                 const wb = XLSX.read(data, {type: 'array'});
                 const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                if (json.length === 0) { _estadoCargaBases('⚠️ El archivo no contiene registros.', 'err'); input.value = ""; return; }
+                if (json.length === 0) { _estadoCargaBases('⚠️ El archivo no contiene registros.', 'err', 'RF'); input.value = ""; return; }
                 if (!confirm('Cargar Base RF REEMPLAZA la base general actual.\n\nArchivo: ' + file.name + '\nRegistros: ' + json.length + '\n\n¿Continuar?')) {
-                    _estadoCargaBases('Carga cancelada.', '');
+                    _estadoCargaBases('Carga cancelada.', '', 'RF');
                     input.value = "";
                     return;
                 }
@@ -6397,12 +6406,12 @@
                 // Reemplaza base + historial de cargas de la base general en una sola operación.
                 rtdb.ref().update({ "inventario_base": mapa, "cargas_base": { [loteId]: meta } })
                     .then(() => {
-                        _estadoCargaBases('✅ Base RF cargada: ' + json.length + ' registros · ' + file.name, 'ok');
+                        _estadoCargaBases('✅ Base RF cargada: ' + json.length + ' registros · ' + file.name, 'ok', 'RF');
                         input.value = "";
                     })
-                    .catch(err => _estadoCargaBases('❌ Error: ' + err.message, 'err'));
+                    .catch(err => _estadoCargaBases('❌ Error: ' + err.message, 'err', 'RF'));
             } catch(err) {
-                _estadoCargaBases('❌ Error al procesar el archivo.', 'err');
+                _estadoCargaBases('❌ Error al procesar el archivo.', 'err', 'RF');
             }
         };
         reader.readAsArrayBuffer(file);
@@ -6517,30 +6526,29 @@
 
     // Historial unificado (RF + Ruta) que se muestra debajo de "Cargar Bases".
     function renderizarHistorialCargasSidebar() {
-        const cont = document.getElementById('historialCargasDesk');
-        if (!cont) return;
-        const items = [];
-        Object.keys(cargasBaseCache || {}).forEach(id => items.push({ id, tipo: 'RF', c: cargasBaseCache[id] }));
-        Object.keys(cargasRutaCache || {}).forEach(id => items.push({ id, tipo: 'RUTA', c: cargasRutaCache[id] }));
-        if (items.length === 0) {
-            cont.innerHTML = '<div style="font-size:10.5px; color:var(--text-muted); padding:6px;">Aún no hay cargas registradas.</div>';
-            return;
-        }
-        items.sort((a, b) => (b.c.fecha || 0) - (a.c.fecha || 0));
-        cont.innerHTML = items.map(({id, tipo, c}) => {
-            const fechaTxt = c.fecha ? new Date(c.fecha).toLocaleString('es-CL') : 's/f';
-            const esRuta = tipo === 'RUTA';
-            const fnDl = esRuta ? 'descargarCargaRuta' : 'descargarCargaBase';
-            const fnDel = esRuta ? 'borrarCargaRuta' : 'borrarCargaBase';
-            return `<div class="carga-card">
-                <div class="cc-top"><span>${_escCarga((c.usuario || 'desconocido').toString().toUpperCase())} · ${_escCarga(fechaTxt)}</span><span class="cc-tag ${esRuta ? 'ruta' : ''}">${tipo}</span></div>
-                <div class="cc-sub">${c.cantidad || 0} registros${c.nombreArchivo ? ' · ' + _escCarga(c.nombreArchivo) : ''}</div>
-                <div class="cc-btns">
-                    <button class="cc-dl" onclick="${fnDl}('${id}')">⬇️ Descargar</button>
-                    <button class="cc-del" onclick="${fnDel}('${id}')">🗑️ Borrar esta carga</button>
-                </div>
-            </div>`;
-        }).join('');
+        const armar = (cache, tipo) => {
+            const ids = Object.keys(cache || {});
+            if (ids.length === 0) return '<div style="font-size:10.5px; color:var(--text-muted); padding:6px;">Aún no hay cargas registradas.</div>';
+            ids.sort((x, y) => (cache[y].fecha || 0) - (cache[x].fecha || 0));
+            const fnDl = tipo === 'RUTA' ? 'descargarCargaRuta' : 'descargarCargaBase';
+            const fnDel = tipo === 'RUTA' ? 'borrarCargaRuta' : 'borrarCargaBase';
+            return ids.map(id => {
+                const c = cache[id];
+                const fechaTxt = c.fecha ? new Date(c.fecha).toLocaleString('es-CL') : 's/f';
+                return `<div class="carga-card">
+                    <div class="cc-top"><span>${_escCarga((c.usuario || 'desconocido').toString().toUpperCase())} · ${_escCarga(fechaTxt)}</span></div>
+                    <div class="cc-sub">${c.cantidad || 0} registros${c.nombreArchivo ? ' · ' + _escCarga(c.nombreArchivo) : ''}</div>
+                    <div class="cc-btns">
+                        <button class="cc-dl" onclick="${fnDl}('${id}')">⬇️ Descargar</button>
+                        <button class="cc-del" onclick="${fnDel}('${id}')">🗑️ Borrar esta carga</button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+        const rf = document.getElementById('historialCargasRF');
+        const ru = document.getElementById('historialCargasRuta');
+        if (rf) rf.innerHTML = armar(cargasBaseCache, 'RF');
+        if (ru) ru.innerHTML = armar(cargasRutaCache, 'RUTA');
     }
 
     function descargarCargaBase(loteId) {

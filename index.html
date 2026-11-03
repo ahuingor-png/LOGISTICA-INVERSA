@@ -1966,60 +1966,170 @@
      Reprogramaciones del index_integrado.html). Accesible para cualquier usuario:
      historial, descarga en Excel y faltantes contra la base central (inventario_base)
      restringida a las categorías CUARENTENA / REPROGRAMACIONES / ANULADO / FALLOS. ===== -->
-<div id="modalVistaRepros" class="modal" style="z-index: 8500;">
-    <div class="modal-content" style="max-width: 1100px; width: 96%; height: 92vh;">
-        <div class="table-header">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h4 style="font-weight:900; color:#2563eb; margin:0;">🔄 VISTA DE REPROS <span id="tTotalVistaRepros" style="background:rgba(37,99,235,0.15); padding:2px 8px; border-radius:10px; font-size:11px;">0</span></h4>
-                <button onclick="cerrarModalVistaRepros()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:6px; margin-top:8px;">
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproCatBtn" onclick="toggleDateDropdown('filtroReproCatMenu', event)" style="width:100%; padding:8px; font-size:11px;">🏷️ Categoría (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproCatMenu"></div>
+<style id="estilosVistaRepros">
+/* ===== Vista de Repros — presentación corporativa (solo afecta a #modalVistaRepros) ===== */
+#modalVistaRepros { --rv-hover:#f1f5f9; --rv-ok:#2f6f4e; --rv-ok-bg:rgba(63,136,98,.13); --rv-warn:#8a6420; --rv-warn-bg:rgba(185,133,47,.15); --rv-info:#3d5a80; --rv-info-bg:rgba(61,90,128,.12); }
+[data-theme="dark"] #modalVistaRepros { --rv-hover:#273449; --rv-ok:#6fcf9b; --rv-ok-bg:rgba(63,136,98,.22); --rv-warn:#e3b865; --rv-warn-bg:rgba(185,133,47,.22); --rv-info:#9db8dc; --rv-info-bg:rgba(61,90,128,.3); }
+#modalVistaRepros .modal-content { padding:0 !important; background:var(--bg); overflow:hidden; font-family:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif; }
+#modalVistaRepros .rv-ico { width:14px; height:14px; flex:none; }
+#modalVistaRepros .rv-top { background:var(--card-bg); border-bottom:1px solid var(--border); padding:16px 20px 14px; }
+#modalVistaRepros .rv-wrap { max-width:1240px; margin:0 auto; }
+#modalVistaRepros .rv-titlebar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+#modalVistaRepros .rv-title { margin:0; font-size:18px; font-weight:700; letter-spacing:-.01em; color:var(--text-main); display:flex; align-items:center; gap:10px; }
+#modalVistaRepros .rv-count { font-size:12px; font-weight:600; padding:2px 10px; border-radius:999px; background:var(--rv-info-bg); color:var(--rv-info); font-variant-numeric:tabular-nums; }
+#modalVistaRepros .rv-sub { margin:3px 0 0; font-size:12.5px; color:var(--text-muted); }
+#modalVistaRepros .rv-close { width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); border-radius:8px; cursor:pointer; }
+#modalVistaRepros .rv-close:hover { background:var(--bg); color:var(--text-main); }
+#modalVistaRepros .rv-filtros { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+#modalVistaRepros .custom-filter-wrapper { display:block; min-width:0; }
+#modalVistaRepros .custom-filter-btn { display:block; width:100%; height:36px; padding:0 12px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12.5px; font-weight:600; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; box-shadow:none; color:var(--text-main); }
+#modalVistaRepros .custom-filter-btn:hover { background:var(--bg); border-color:var(--text-muted); }
+#modalVistaRepros .rv-acciones { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+#modalVistaRepros .rv-acciones .rv-espacio { flex:1; }
+#modalVistaRepros .rv-btn { display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 14px; border-radius:8px; font-size:12.5px; font-weight:600; font-family:inherit; cursor:pointer; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); white-space:nowrap; }
+#modalVistaRepros .rv-btn:hover { background:var(--bg); }
+#modalVistaRepros .rv-btn:focus-visible, #modalVistaRepros .rv-close:focus-visible, #modalVistaRepros .rv-toggle:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+#modalVistaRepros .rv-btn-primary { background:var(--primary); border-color:var(--primary); color:#fff; }
+#modalVistaRepros .rv-btn-primary:hover { background:var(--primary-hover); }
+#modalVistaRepros .rv-btn-danger { color:var(--danger); border-color:rgba(178,69,63,.35); background:transparent; }
+#modalVistaRepros .rv-btn-danger:hover { background:rgba(178,69,63,.08); }
+#modalVistaRepros .rv-body { flex:1; min-height:0; overflow-y:auto; padding:20px 20px 32px; }
+#modalVistaRepros .rv-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+#modalVistaRepros .rv-kpi { background:var(--card-bg); padding:16px 20px; }
+#modalVistaRepros .rv-kpi-l { display:block; font-size:12.5px; font-weight:600; color:var(--text-muted); }
+#modalVistaRepros .rv-kpi-v { display:block; margin-top:4px; font-size:28px; line-height:1.1; font-weight:700; color:var(--text-main); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+#modalVistaRepros .rv-bar { height:4px; border-radius:4px; background:var(--border); overflow:hidden; }
+#modalVistaRepros .rv-bar > i { display:block; height:100%; border-radius:4px; }
+#modalVistaRepros .rv-kpi .rv-bar { margin-top:10px; }
+#modalVistaRepros .rv-h { margin:26px 0 12px; font-size:14px; font-weight:700; color:var(--text-main); display:flex; align-items:baseline; gap:8px; }
+#modalVistaRepros .rv-h small { font-size:12px; font-weight:500; color:var(--text-muted); }
+#modalVistaRepros .rv-grupos { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr)); gap:14px; align-items:start; }
+#modalVistaRepros .rv-grupo { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+#modalVistaRepros .rv-g-head { padding:14px 16px 12px; }
+#modalVistaRepros .rv-g-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#modalVistaRepros .rv-g-name { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--text-main); min-width:0; }
+#modalVistaRepros .rv-g-name span:last-child { overflow:hidden; text-overflow:ellipsis; }
+#modalVistaRepros .rv-dot { width:9px; height:9px; border-radius:50%; flex:none; }
+#modalVistaRepros .rv-g-pct { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+#modalVistaRepros .rv-grupo .rv-bar { margin-top:10px; }
+#modalVistaRepros .rv-metricas { display:grid; grid-template-columns:repeat(3,1fr); margin-top:12px; }
+#modalVistaRepros .rv-metricas div { display:flex; flex-direction:column; gap:1px; }
+#modalVistaRepros .rv-metricas b { font-size:17px; font-weight:700; color:var(--text-main); font-variant-numeric:tabular-nums; }
+#modalVistaRepros .rv-metricas span { font-size:12px; color:var(--text-muted); }
+#modalVistaRepros .rv-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; padding:10px 16px; border:0; border-top:1px solid var(--border); background:transparent; font:inherit; font-size:12.5px; font-weight:600; color:var(--primary); cursor:pointer; text-align:left; }
+#modalVistaRepros .rv-toggle:hover { background:var(--rv-hover); }
+#modalVistaRepros .rv-toggle .rv-ico { transition:transform .15s; }
+#modalVistaRepros .rv-toggle[aria-expanded="true"] .rv-ico { transform:rotate(180deg); }
+#modalVistaRepros .rv-toggle-falt { color:var(--danger); background:rgba(178,69,63,.06); }
+#modalVistaRepros .rv-toggle-falt:hover { background:rgba(178,69,63,.12); }
+#modalVistaRepros .rv-panel { border-top:1px solid var(--border); }
+#modalVistaRepros .rv-panel-buscar { padding:10px 16px 6px; }
+#modalVistaRepros .rv-panel-buscar input { width:100%; box-sizing:border-box; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:6px; background:var(--card-bg); color:var(--text-main); font:inherit; font-size:12.5px; }
+#modalVistaRepros .rv-filas { max-height:240px; overflow-y:auto; }
+#modalVistaRepros .fila-repro-escaneado { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:7px 16px; border-top:1px solid var(--border); font-size:12.5px; }
+#modalVistaRepros .rv-mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-weight:600; font-variant-numeric:tabular-nums; }
+#modalVistaRepros .fila-repro-escaneado .rv-meta { display:flex; align-items:center; gap:10px; flex:none; color:var(--text-muted); font-size:12px; }
+#modalVistaRepros .rv-user { padding:2px 8px; border-radius:999px; background:var(--rv-info-bg); color:var(--rv-info); font-weight:600; }
+#modalVistaRepros .rv-faltantes { display:flex; flex-wrap:wrap; gap:6px; padding:12px 16px 14px; max-height:220px; overflow-y:auto; }
+#modalVistaRepros .rv-falt { font-size:12px; color:var(--danger); background:rgba(178,69,63,.09); border:1px solid rgba(178,69,63,.28); padding:3px 9px; border-radius:6px; }
+#modalVistaRepros .rv-tablebox { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+#modalVistaRepros .rv-tbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); }
+#modalVistaRepros .rv-tbar-t { font-size:14px; font-weight:700; color:var(--text-main); }
+#modalVistaRepros .rv-tbar-t small { margin-left:8px; font-size:12px; font-weight:500; color:var(--text-muted); font-variant-numeric:tabular-nums; }
+#modalVistaRepros .rv-search { position:relative; flex:1; min-width:220px; max-width:380px; }
+#modalVistaRepros .rv-search .rv-ico { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
+#modalVistaRepros .rv-search input { width:100%; box-sizing:border-box; height:34px; padding:0 12px 0 32px; border:1px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--text-main); font:inherit; font-size:12.5px; }
+#modalVistaRepros .rv-search input:focus, #modalVistaRepros .rv-panel-buscar input:focus { outline:2px solid var(--primary); outline-offset:-1px; border-color:var(--primary); }
+#modalVistaRepros .rv-scroll { overflow:auto; max-height:min(68vh,760px); }
+#modalVistaRepros table.rv-table { width:100%; min-width:900px; margin:0; border-collapse:separate; border-spacing:0; font-size:12.5px; }
+#modalVistaRepros .rv-table th { position:sticky; top:0; z-index:2; background:var(--bg); padding:10px 14px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:none; opacity:1; border-bottom:1px solid var(--border); white-space:nowrap; }
+#modalVistaRepros .rv-table td { padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text-main); white-space:nowrap; background:var(--card-bg); font-variant-numeric:tabular-nums; }
+#modalVistaRepros .rv-table tbody tr:hover td { background:var(--rv-hover); }
+#modalVistaRepros .rv-table th.rv-code, #modalVistaRepros .rv-table td.rv-code { position:sticky; left:0; z-index:1; }
+#modalVistaRepros .rv-table th.rv-code { z-index:3; }
+#modalVistaRepros .rv-table td.rv-code { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-weight:600; }
+#modalVistaRepros .rv-table td.rv-mut { color:var(--text-muted); }
+#modalVistaRepros .rv-badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; font-weight:600; }
+#modalVistaRepros .rv-badge.ok { background:var(--rv-ok-bg); color:var(--rv-ok); }
+#modalVistaRepros .rv-badge.warn { background:var(--rv-warn-bg); color:var(--rv-warn); }
+#modalVistaRepros .rv-badge.neutral { background:var(--rv-info-bg); color:var(--rv-info); }
+#modalVistaRepros .resumen-vacio { padding:28px 12px; font-style:normal; font-size:13px; }
+@media (max-width:760px) {
+  #modalVistaRepros .rv-top { padding:14px 14px 12px; }
+  #modalVistaRepros .rv-body { padding:14px 14px 28px; }
+  #modalVistaRepros .rv-filtros { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #modalVistaRepros .rv-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #modalVistaRepros .rv-kpi { padding:13px 14px; }
+  #modalVistaRepros .rv-kpi-v { font-size:24px; }
+  #modalVistaRepros .rv-acciones .rv-espacio { display:none; }
+  #modalVistaRepros .rv-btn { flex:1 1 calc(50% - 8px); justify-content:center; }
+  #modalVistaRepros .rv-sub { display:none; }
+}
+</style>
+<div id="modalVistaRepros" class="modal" style="z-index: 8500;" role="dialog" aria-label="Vista de repros">
+    <div class="modal-content">
+        <div class="rv-top">
+            <div class="rv-wrap">
+                <div class="rv-titlebar">
+                    <div>
+                        <h4 class="rv-title">Vista de repros <span id="tTotalVistaRepros" class="rv-count">0</span></h4>
+                        <p class="rv-sub">Avance de escaneo por ruta e historial de movimientos</p>
+                    </div>
+                    <button class="rv-close" onclick="cerrarModalVistaRepros()" aria-label="Cerrar"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
                 </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproRutaBtn" onclick="toggleDateDropdown('filtroReproRutaMenu', event)" style="width:100%; padding:8px; font-size:11px;">🚚 Ruta (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproRutaMenu"></div>
+                <div class="rv-filtros">
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproCatBtn" onclick="toggleDateDropdown('filtroReproCatMenu', event)">Categoría (Todas) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproCatMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproRutaBtn" onclick="toggleDateDropdown('filtroReproRutaMenu', event)">Ruta (Todas) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproRutaMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproUsuarioBtn" onclick="toggleDateDropdown('filtroReproUsuarioMenu', event)">Usuario (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproUsuarioMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproTurnoBtn" onclick="toggleDateDropdown('filtroReproTurnoMenu', event)">Jornada (Todas) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproTurnoMenu"></div>
+                    </div>
                 </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproUsuarioBtn" onclick="toggleDateDropdown('filtroReproUsuarioMenu', event)" style="width:100%; padding:8px; font-size:11px;">👤 Usuario (Todos) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproUsuarioMenu"></div>
+                <div class="rv-acciones">
+                    <button class="rv-btn rv-btn-primary" onclick="exportarReprosResumen()"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg> Excel resumen</button>
+                    <button class="rv-btn" onclick="exportarReprosDetallado()"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg> Excel detallado y faltantes</button>
+                    <button class="rv-btn" onclick="descargarHistorialReprosCompleto()"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg> Historial completo</button>
+                    <span class="rv-espacio"></span>
+                    <button class="rv-btn" onclick="abrirModalRespaldosRepros()"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg> Respaldos</button>
+                    <button class="rv-btn rv-btn-danger" onclick="abrirModalLimpiarRepros()"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg> Limpiar historial</button>
                 </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproTurnoBtn" onclick="toggleDateDropdown('filtroReproTurnoMenu', event)" style="width:100%; padding:8px; font-size:11px;">📅 Jornada (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproTurnoMenu"></div>
-                </div>
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                <button onclick="exportarReprosResumen()" style="flex:1; min-width:150px; background:var(--success); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📄 EXCEL RESUMEN</button>
-                <button onclick="exportarReprosDetallado()" style="flex:1; min-width:150px; background:var(--primary); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📑 EXCEL DETALLADO + FALTANTES</button>
-                <button onclick="descargarHistorialReprosCompleto()" style="flex:1; min-width:150px; background:#334155; color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬇️ HISTORIAL COMPLETO</button>
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                <button onclick="abrirModalRespaldosRepros()" style="flex:1; min-width:150px; background:#0891b2; color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📂 VER RESPALDOS DE REPROS</button>
-                <button onclick="abrirModalLimpiarRepros()" style="flex:1; min-width:150px; background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.3); padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🧹 LIMPIAR HISTORIAL DE REPROS</button>
             </div>
         </div>
-        <div style="overflow-y:auto; flex:1; padding: 4px 4px 4px 0;">
-            <div id="resumenReprosKPIs" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin: 10px 4px;"></div>
-            <div id="contenedorVistaRepros" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start; padding: 0 4px;">
-                <div class="resumen-vacio">Cargando...</div>
-            </div>
-            <div style="margin: 16px 4px 4px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-                    <h5 style="font-weight:900; color:var(--text-main); margin:0;">📋 Historial de escaneos de Repros</h5>
-                    <input type="text" id="inpBuscarHistorialRepros" placeholder="🔍 Buscar por código, usuario, ruta, zona, ubicación..." oninput="filtrarHistorialReprosTexto()" style="flex:1; min-width:220px; max-width:360px; padding:7px 10px; font-size:11px; border:1px solid var(--border); border-radius:6px; box-sizing:border-box;">
+        <div class="rv-body">
+            <div class="rv-wrap">
+                <div id="resumenReprosKPIs" class="rv-kpis"></div>
+                <h5 class="rv-h">Avance por ruta</h5>
+                <div id="contenedorVistaRepros" class="rv-grupos">
+                    <div class="resumen-vacio">Cargando...</div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="resumen-tabla" id="tablaHistorialRepros">
-                        <thead style="background:var(--bg);">
-                            <tr>
-                                <th>Fecha</th><th>Hora</th><th>Código</th><th>Resultado</th><th>Categoría/Ruta</th><th>Día</th><th>Sec</th><th>Zona</th><th>Ubicación</th><th>Usuario</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyHistorialRepros"></tbody>
-                    </table>
+                <h5 class="rv-h">Historial de escaneos</h5>
+                <div class="rv-tablebox">
+                    <div class="rv-tbar">
+                        <span class="rv-tbar-t">Movimientos registrados<small id="lblConteoHistorialRepros"></small></span>
+                        <label class="rv-search"><svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                            <input type="text" id="inpBuscarHistorialRepros" placeholder="Buscar por código, usuario, ruta, zona o ubicación" oninput="filtrarHistorialReprosTexto()">
+                        </label>
+                    </div>
+                    <div class="rv-scroll">
+                        <table class="rv-table" id="tablaHistorialRepros">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th><th>Hora</th><th class="rv-code">Código</th><th>Resultado</th><th>Categoría / Ruta</th><th>Día</th><th>Sec</th><th>Zona</th><th>Ubicación</th><th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyHistorialRepros"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -11230,10 +11340,10 @@
             if (r.turno_operativo) turnos.add(r.turno_operativo);
         });
 
-        poblarMenuMultiSelect('filtroReproCatMenu', 'filtroReproCatBtn', categorias, '🏷️ Categoría', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproRutaMenu', 'filtroReproRutaBtn', rutas, '🚚 Ruta', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproUsuarioMenu', 'filtroReproUsuarioBtn', usuarios, '👤 Usuario', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproTurnoMenu', 'filtroReproTurnoBtn', turnos, '📅 Jornada', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproCatMenu', 'filtroReproCatBtn', categorias, 'Categoría', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproRutaMenu', 'filtroReproRutaBtn', rutas, 'Ruta', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproUsuarioMenu', 'filtroReproUsuarioBtn', usuarios, 'Usuario', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproTurnoMenu', 'filtroReproTurnoBtn', turnos, 'Jornada', renderizarVistaRepros);
     }
 
     // Agrupa por RUTA (texto exacto de inventario_base) restringido a las 4
@@ -11326,23 +11436,12 @@
         document.getElementById('tTotalVistaRepros').textContent = totalHistorial;
 
         if (contKPIs) {
+            const colAv = pctGlobal >= 100 ? '#3f8862' : (pctGlobal >= 50 ? '#b9852f' : '#b2453f');
             contKPIs.innerHTML = `
-                <div style="background:rgba(37,99,235,0.08); border:1px solid rgba(37,99,235,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Programados</div>
-                    <div style="font-size:20px; font-weight:900; color:#2563eb;">${totalProgramado}</div>
-                </div>
-                <div style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Escaneados</div>
-                    <div style="font-size:20px; font-weight:900; color:#0ea5e9;">${totalEscaneado}</div>
-                </div>
-                <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Faltantes</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--danger);">${totalFaltante}</div>
-                </div>
-                <div style="background:rgba(61,90,128,0.08); border:1px solid rgba(61,90,128,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Avance</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--primary);">${pctGlobal.toFixed(0)}%</div>
-                </div>`;
+                <div class="rv-kpi"><span class="rv-kpi-l">Programados</span><span class="rv-kpi-v">${totalProgramado}</span></div>
+                <div class="rv-kpi"><span class="rv-kpi-l">Escaneados</span><span class="rv-kpi-v">${totalEscaneado}</span></div>
+                <div class="rv-kpi"><span class="rv-kpi-l">Faltantes</span><span class="rv-kpi-v" style="color:${totalFaltante > 0 ? 'var(--danger)' : 'var(--text-main)'};">${totalFaltante}</span></div>
+                <div class="rv-kpi"><span class="rv-kpi-l">Avance</span><span class="rv-kpi-v">${pctGlobal.toFixed(0)}%</span><div class="rv-bar"><i style="width:${pctGlobal}%; background:${colAv};"></i></div></div>`;
         }
 
         if (claves.length === 0 && inventariados.length === 0) {
@@ -11358,47 +11457,39 @@
                 const idEsc = `repro_esc_${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
                 const idFalt = `repro_falt_${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
 
+                const chevron = '<svg class="rv-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
                 html += `
-                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
-                    <div style="background: rgba(37,99,235,0.08); padding: 10px 12px; border-bottom: 1px solid var(--border);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                            <span style="font-weight:900; color:${g.cfg.color}; font-size:13px;">${g.cfg.icon} ${g.ruta}</span>
-                            <span style="font-size:10px; font-weight:800; color:${colorAvance};">${pct.toFixed(0)}% AVANCE</span>
+                <div class="rv-grupo">
+                    <div class="rv-g-head">
+                        <div class="rv-g-top">
+                            <div class="rv-g-name"><span class="rv-dot" style="background:${g.cfg.color};"></span><span>${escReproHtml(g.ruta)}</span></div>
+                            <span class="rv-g-pct" style="color:${colorAvance};">${pct.toFixed(0)}%</span>
                         </div>
-                        <div style="height:6px; background:var(--bg); border-radius:4px; margin-top:6px; overflow:hidden;">
-                            <div style="height:100%; width:${pct}%; background:${colorAvance};"></div>
-                        </div>
-                        <div style="display:flex; gap:10px; align-items:center; font-size:10px; font-weight:800; margin-top:6px; flex-wrap:wrap;">
-                            <span style="color:var(--text-muted);">Programados: <b style="color:var(--text-main);">${g.programado}</b></span>
-                            <span style="color:#0ea5e9;">Escaneados: <b>${g.escaneado}</b></span>
-                            <span style="color:${g.faltante > 0 ? 'var(--danger)' : 'var(--success)'};">Faltantes: <b>${g.faltante}</b></span>
+                        <div class="rv-bar"><i style="width:${pct}%; background:${colorAvance};"></i></div>
+                        <div class="rv-metricas">
+                            <div><b>${g.programado}</b><span>Programados</span></div>
+                            <div><b>${g.escaneado}</b><span>Escaneados</span></div>
+                            <div><b style="color:${g.faltante > 0 ? 'var(--danger)' : 'var(--success)'};">${g.faltante}</b><span>Faltantes</span></div>
                         </div>
                     </div>
-                    <div style="padding:0;">
-                        <button type="button" onclick="document.getElementById('${idEsc}').style.display = document.getElementById('${idEsc}').style.display === 'none' ? 'block' : 'none';" style="width:100%; text-align:left; background:rgba(0,0,0,0.02); border:none; border-bottom:1px solid var(--border); padding:7px 12px; font-size:10px; font-weight:700; color:var(--primary); cursor:pointer;">👁️ Ver/Ocultar ${g.escaneado} escaneado(s)</button>
-                        <div id="${idEsc}" style="display:none; border-bottom:1px solid var(--border);">
-                            <div style="padding:8px 12px 4px;">
-                                <input type="text" placeholder="🔎 Buscar código o usuario..." oninput="filtrarListaRepro(this, '${idEsc}_filas')" style="width:100%; padding:6px 9px; border-radius:6px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:10.5px;">
-                            </div>
-                            <div id="${idEsc}_filas" style="max-height:220px; overflow-y:auto;">
-                                ${g.escaneados.map((r, i) => `
-                                <div class="fila-repro-escaneado" data-buscar="${(r.codigo || '').toLowerCase()} ${(r.usuario || '').toLowerCase()}" style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 12px; font-size:10.5px; background:${i % 2 === 0 ? 'transparent' : 'rgba(0,0,0,0.015)'}; border-bottom:1px solid var(--border);">
-                                    <span style="font-family:monospace; font-weight:800; color:var(--text-main); word-break:break-all;">${r.codigo}</span>
-                                    <span style="display:flex; align-items:center; gap:8px; flex-shrink:0; color:var(--text-muted); font-weight:700;">
-                                        <span>🕐 ${r.hora || '-'}</span>
-                                        <span style="background:rgba(37,99,235,0.1); color:var(--primary); padding:2px 7px; border-radius:10px;">👤 ${r.usuario || '-'}</span>
-                                    </span>
-                                </div>`).join('') || '<div style="padding:10px 12px; font-size:10.5px; color:var(--text-muted);">-</div>'}
-                            </div>
+                    <button type="button" class="rv-toggle" aria-expanded="false" onclick="toggleReproPanel('${idEsc}', this)"><span>Ver ${g.escaneado} escaneado(s)</span>${chevron}</button>
+                    <div id="${idEsc}" class="rv-panel" style="display:none;">
+                        <div class="rv-panel-buscar">
+                            <input type="text" placeholder="Buscar código o usuario" oninput="filtrarListaRepro(this, '${idEsc}_filas')">
+                        </div>
+                        <div id="${idEsc}_filas" class="rv-filas">
+                            ${g.escaneados.map(r => `
+                            <div class="fila-repro-escaneado" data-buscar="${escReproHtml(((r.codigo || '') + ' ' + (r.usuario || '')).toLowerCase())}">
+                                <span class="rv-mono" style="word-break:break-all;">${escReproHtml(r.codigo)}</span>
+                                <span class="rv-meta"><span>${escReproHtml(r.hora || '-')}</span><span class="rv-user">${escReproHtml(r.usuario || '-')}</span></span>
+                            </div>`).join('') || '<div style="padding:10px 16px; font-size:12.5px; color:var(--text-muted);">Sin escaneos</div>'}
                         </div>
                     </div>
                     ${g.faltante > 0 ? `
-                    <div style="border-top: 2px solid var(--danger); background: rgba(239,68,68,0.06);">
-                        <button type="button" onclick="document.getElementById('${idFalt}').style.display = document.getElementById('${idFalt}').style.display === 'none' ? 'block' : 'none';" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:11px; font-weight:800; color:var(--danger); cursor:pointer;">⚠️ Ver/Ocultar ${g.faltante} código(s) FALTANTE(S) de Repro en esta ruta</button>
-                        <div id="${idFalt}" style="display:none; padding:8px 12px 10px; max-height:200px; overflow-y:auto;">
-                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                                ${g.faltantesGuias.map(cod => `<span style="font-family:monospace; font-size:10px; font-weight:800; color:var(--danger); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:4px 9px; border-radius:14px;">${cod}</span>`).join('') || '-'}
-                            </div>
+                    <button type="button" class="rv-toggle rv-toggle-falt" aria-expanded="false" onclick="toggleReproPanel('${idFalt}', this)"><span>Ver ${g.faltante} código(s) faltante(s)</span>${chevron}</button>
+                    <div id="${idFalt}" class="rv-panel" style="display:none;">
+                        <div class="rv-faltantes">
+                            ${g.faltantesGuias.map(cod => `<span class="rv-falt rv-mono">${escReproHtml(cod)}</span>`).join('') || '-'}
                         </div>
                     </div>` : ''}
                 </div>`;
@@ -11419,22 +11510,45 @@
     // la caja de búsqueda de texto filtra encima de esa lista, sin recalcular todo.
     let historialReprosFilasActuales = [];
 
+    function escReproHtml(v) {
+        return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function toggleReproPanel(id, btn) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const abrir = el.style.display === 'none';
+        el.style.display = abrir ? 'block' : 'none';
+        if (btn) btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    }
+
     function pintarTablaHistorialRepros(filas) {
         const tbody = document.getElementById('tbodyHistorialRepros');
         if (!tbody) return;
+        const lbl = document.getElementById('lblConteoHistorialRepros');
+        if (lbl) {
+            const total = historialReprosFilasActuales.length;
+            lbl.textContent = filas.length === total ? `${total} registros` : `${filas.length} de ${total} registros`;
+        }
+        const badge = (res) => {
+            const t = String(res || '').toUpperCase();
+            const clase = t === 'ENCONTRADO' ? 'ok' : (t === 'INVENTARIADO' ? 'warn' : 'neutral');
+            const txt = t ? t.charAt(0) + t.slice(1).toLowerCase() : '-';
+            return `<span class="rv-badge ${clase}">${escReproHtml(txt)}</span>`;
+        };
         tbody.innerHTML = filas.length ? filas.map(r => `
-            <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:6px 8px; font-size:10px;">${r.fecha || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.hora || ''}</td>
-                <td style="padding:6px 8px; font-size:10px; font-weight:800;">${r.codigo || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.resultado || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.categoria || r._ruta || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.dia || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.sec || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.zona || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.ubi || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.usuario || ''}</td>
-            </tr>`).join('') : `<tr><td colspan="10" class="resumen-vacio">Sin escaneos de Repros para estos filtros.</td></tr>`;
+            <tr>
+                <td>${escReproHtml(r.fecha || '')}</td>
+                <td class="rv-mut">${escReproHtml(r.hora || '')}</td>
+                <td class="rv-code">${escReproHtml(r.codigo || '')}</td>
+                <td>${badge(r.resultado)}</td>
+                <td>${escReproHtml(r.categoria || r._ruta || '-')}</td>
+                <td class="rv-mut">${escReproHtml(r.dia || '-')}</td>
+                <td class="rv-mut">${escReproHtml(r.sec || '-')}</td>
+                <td>${escReproHtml(r.zona || '-')}</td>
+                <td>${escReproHtml(r.ubi || '-')}</td>
+                <td>${escReproHtml(r.usuario || '')}</td>
+            </tr>`).join('') : `<tr><td colspan="10" class="resumen-vacio">No hay escaneos de Repros para estos filtros.</td></tr>`;
     }
 
     // Búsqueda de texto libre sobre el historial ya visible (no toca los

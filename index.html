@@ -65,8 +65,36 @@
             display: flex; flex-direction: column; gap: 6px; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border-bottom: 1px solid var(--border);
         }
-        .header-top { display: flex; justify-content: space-between; align-items: center; }
-        .header-title { font-size: 15px; font-weight: 800; }
+
+        /* --- Asistente flotante: recordatorio de formato de carga --- */
+        #recFab { position: fixed; right: 18px; bottom: 18px; z-index: 900; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--primary); color: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.25); display: flex; align-items: center; justify-content: center; transition: transform .15s, background .15s; }
+        #recFab:hover { transform: scale(1.07); background: var(--primary-hover); }
+        #recFab .rec-dot { position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--warning); border: 2px solid var(--card-bg); }
+        #recFab.visto .rec-dot { display: none; }
+        #recPanel { position: fixed; right: 18px; bottom: 76px; z-index: 900; width: 340px; max-width: calc(100vw - 36px); max-height: calc(100vh - 110px); overflow-y: auto; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: var(--radius-lg); box-shadow: 0 14px 34px rgba(0,0,0,.22); padding: 14px; display: none; font-family: 'Inter', sans-serif; }
+        #recPanel.abierto { display: block; animation: recIn .16s ease-out; }
+        @keyframes recIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        #recPanel .rec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        #recPanel .rec-title { font-size: 13px; font-weight: 800; }
+        #recPanel .rec-close { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; line-height: 1; }
+        #recPanel .rec-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin: 10px 0 5px; }
+        #recPanel .rec-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+        #recPanel code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; background: var(--bg); border: 1px solid var(--border); padding: 3px 8px; border-radius: 6px; }
+        #recPanel .rec-literal { display: flex; align-items: center; gap: 8px; justify-content: space-between; background: var(--bg); border: 1px dashed var(--primary); border-radius: 8px; padding: 8px 10px; }
+        #recPanel .rec-literal code { background: transparent; border: none; padding: 0; font-weight: 700; color: var(--primary); word-break: break-word; }
+        #recPanel .rec-copy { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        #recPanel .rec-copy.ok { background: var(--success); }
+        #recPanel .rec-note { font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-top: 4px; }
+        @media (max-width: 640px) { #recFab { right: 12px; bottom: 12px; } #recPanel { right: 12px; bottom: 68px; } }
+        .header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+        .brand-name { font-size: 15px; font-weight: 800; letter-spacing: 0.3px; color: var(--text-main); }
+        .brand-sub { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; margin-top: 2px; }
+        .count-pill { background: var(--primary); color: #fff; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .header-tools { display: flex; align-items: center; gap: 6px; }
+        .header-tools .theme-toggle { min-width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; padding: 0 8px; font-size: 14px; cursor: pointer; }
         
         /* Barra horizontal de herramientas (Botones directos) */
         .header-actions-wrapper {
@@ -321,12 +349,26 @@
             transform: rotate(180deg);
         }
 
-        .db-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; justify-content: space-between; background: rgba(0,0,0,0.045); padding: 4px 8px; border-radius: 6px; }
-        [data-theme="dark"] .db-status { background: rgba(0,0,0,0.15); }
-        .user-badge { display: flex; align-items: center; gap: 4px; }
-        .btn-logout { background: transparent; border: none; color: var(--danger); font-size: 11px; font-weight: 700; margin-left: 6px; }
-        #dbText, #dbTextRuta { color: var(--text-muted) !important; }
-        #displayUser { color: var(--text-main) !important; }
+        .panel-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .stat-cell { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.025); min-width: 0; }
+        [data-theme="dark"] .stat-cell { background: rgba(255,255,255,0.05); }
+        .stat-label { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+        .stat-num { font-size: 15px; font-weight: 800; color: var(--text-main); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); flex-shrink: 0; }
+        .user-badge { display: flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border: 1px solid var(--border); border-radius: 999px; background: rgba(0,0,0,0.03); }
+        [data-theme="dark"] .user-badge { background: rgba(255,255,255,0.06); }
+        .user-ico { color: var(--text-muted); flex-shrink: 0; }
+        .btn-logout { display: inline-flex; align-items: center; gap: 5px; background: transparent; border: none; color: var(--danger); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 999px; cursor: pointer; transition: background .15s; }
+        .btn-logout:hover { background: rgba(220,38,38,0.1); }
+        #displayUser { color: var(--text-main) !important; font-size: 12px; font-weight: 700; }
+        @media (max-width: 640px) {
+            .brand-sub { display: none; }
+            .header-right { width: 100%; justify-content: space-between; gap: 6px; }
+            .logout-text { display: none; }
+            .btn-logout { padding: 5px 8px; }
+            .header-tools { order: 1; }
+            .user-badge { order: 2; }
+        }
 
         .main-content { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease; }
 
@@ -1407,31 +1449,30 @@
 
 <div class="header">
     <div class="header-top">
-        <div class="header-title" style="display:flex; align-items:center; gap:8px;">
+        <div class="brand">
             <span class="header-logo"><img id="imgLogoHeader" alt="REVERSA"></span>
-            📦 INV IL <span id="tTotal" style="background: var(--primary); padding: 1px 6px; border-radius: 10px; font-size: 11px;">0</span>
+            <div class="brand-text">
+                <span class="brand-name">INV IL</span>
+                <span class="brand-sub">Logística Inversa</span>
+            </div>
         </div>
-        
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <button class="theme-toggle" id="btnInstalarApp" style="display:none; background: var(--primary); color:white;" onclick="instalarAppReversa()" title="Instalar REVERSA como aplicación">📲 Instalar</button>
-            <button class="theme-toggle" id="btnToggleHerramientasAdmin" style="display:none;" onclick="toggleHerramientasAdmin()" title="Mostrar/Ocultar Logística Inversa">📦</button>
-            <button class="theme-toggle" id="btnNotifPermiso" onclick="solicitarPermisoNotificaciones()" title="Activar notificaciones del navegador">🔕</button>
-            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-        </div>
-    </div>
-    
-    <div class="db-status">
-        <div style="display:flex; align-items:center; gap:4px;">
-            <span id="dbDot" style="width:8px; height:8px; border-radius:50%; background:var(--danger);"></span>
-            <span id="dbText" style="color:#94a3b8; font-size:10px;">CONECTANDO...</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:4px;">
-            <span id="dbDotRuta" style="width:8px; height:8px; border-radius:50%; background:var(--danger);"></span>
-            <span id="dbTextRuta" style="color:#94a3b8; font-size:10px;">RUTA: SIN DATOS</span>
-        </div>
-        <div class="user-badge">
-            <span id="displayUser" style="color:#f1f5f9; font-size:10px; font-weight:700;">@?</span>
-            <button class="btn-logout" onclick="cerrarSesion()">❌ Cerrar Sesión</button>
+
+        <div class="header-right">
+            <div class="header-tools">
+                <button class="theme-toggle" id="btnInstalarApp" style="display:none; background: var(--primary); color:white;" onclick="instalarAppReversa()" title="Instalar REVERSA como aplicación">📲 Instalar</button>
+                <button class="theme-toggle" id="btnToggleHerramientasAdmin" style="display:none;" onclick="toggleHerramientasAdmin()" title="Mostrar/Ocultar Logística Inversa">📦</button>
+                <button class="theme-toggle" id="btnNotifPermiso" onclick="solicitarPermisoNotificaciones()" title="Activar notificaciones del navegador">🔕</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+            </div>
+
+            <div class="user-badge">
+                <svg class="user-ico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                <span id="displayUser">@?</span>
+                <button class="btn-logout" onclick="cerrarSesion()" title="Cerrar sesión" aria-label="Cerrar sesión">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                    <span class="logout-text">Salir</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1606,6 +1647,20 @@
                 </div>
             </div>
             <span class="admin-online-badge"><span class="admin-online-dot"></span>Sistema sincronizado</span>
+        </div>
+        <div class="panel-stats">
+            <div class="stat-cell">
+                <span class="stat-label">Escaneos</span>
+                <span id="tTotal" class="stat-num">0</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label"><span class="status-dot" id="dbDot"></span>Base RF</span>
+                <span id="dbText" class="stat-num">…</span>
+            </div>
+            <div class="stat-cell">
+                <span class="stat-label"><span class="status-dot" id="dbDotRuta"></span>Ruta</span>
+                <span id="dbTextRuta" class="stat-num">Sin datos</span>
+            </div>
         </div>
         <div class="desktop-panel-body" style="gap: 3px;">
             <div class="admin-group-label" role="button" tabindex="0" onclick="toggleSeccionAdmin(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSeccionAdmin(this);}"><span>Operación</span><span class="admin-chev">▸</span></div>
@@ -3309,6 +3364,7 @@
             usuarioActivo = localUser;
             document.getElementById('displayUser').textContent = usuarioActivo;
             document.getElementById('modalGatekeeper').style.display = "none";
+            if (typeof mostrarRecordatorioInicio === 'function') mostrarRecordatorioInicio();
             
             if (esAdmin()) {
                 document.body.classList.add('is-admin');
@@ -3435,6 +3491,8 @@
         desvincularEscuchaMensajes();
         detenerPresencia();
         sessionStorage.removeItem('inv_session_user');
+        try { sessionStorage.removeItem('rec_inicio_mostrado'); } catch(e) {}
+        if (typeof toggleRecordatorio === 'function') toggleRecordatorio(false);
         usuarioActivo = "";
         document.getElementById('displayUser').textContent = "@?";
 
@@ -6701,11 +6759,11 @@
         const text = document.getElementById('dbText');
         if (db.length > 0) {
             dot.style.background = "var(--success)";
-            text.textContent = `BASE RF: ${db.length}`;
+            text.textContent = String(db.length);
             text.style.color = "var(--success)";
         } else {
             dot.style.background = "var(--danger)";
-            text.textContent = "SIN BASE";
+            text.textContent = "Sin base";
             text.style.color = "#94a3b8";
         }
     }
@@ -6716,11 +6774,11 @@
         if (!dot || !text) return;
         if (baseDatosRutaNube.length > 0) {
             dot.style.background = "var(--success)";
-            text.textContent = `RUTA: ${baseDatosRutaNube.length}`;
+            text.textContent = String(baseDatosRutaNube.length);
             text.style.color = "var(--success)";
         } else {
             dot.style.background = "var(--danger)";
-            text.textContent = "RUTA: SIN DATOS";
+            text.textContent = "Sin datos";
             text.style.color = "#94a3b8";
         }
     }
@@ -13279,6 +13337,48 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorar);
     else decorar();
 })();
+</script>
+
+<!-- Asistente flotante: recordatorio de formato de carga -->
+<button id="recFab" type="button" title="Recordatorio de formato de carga" aria-label="Abrir recordatorio de formato de carga" onclick="toggleRecordatorio()">💡<span class="rec-dot"></span></button>
+<div id="recPanel" role="dialog" aria-label="Recordatorio de formato de carga">
+    <div class="rec-head">
+        <span class="rec-title">💡 Recordatorio · Formato del archivo</span>
+        <button class="rec-close" type="button" onclick="toggleRecordatorio(false)" aria-label="Cerrar">×</button>
+    </div>
+    <div class="rec-label">Encabezados obligatorios</div>
+    <div class="rec-chips"><code>seguimiento</code><code>secuencia</code><code>ruta</code><code>dia</code></div>
+    <div class="rec-note">Columnas que debe tener el archivo para la búsqueda o extracción.</div>
+    <div class="rec-label">Contenido de la columna RUTA</div>
+    <div class="rec-literal">
+        <code id="recTextoRuta">. DOFFA . CUSTODIA SELLER . POR DEVOLVER BU</code>
+        <button class="rec-copy" type="button" onclick="copiarRecordatorio('recTextoRuta', this)">Copiar</button>
+    </div>
+    <div class="rec-note">Texto exacto y literal, en todas las filas de la columna <b>ruta</b>.</div>
+    <div class="rec-label">Acción esperada</div>
+    <div class="rec-note" style="margin-top:0;">Carga y mapeo de datos: aplica esta estructura al procesar, extraer o cargar el documento.</div>
+</div>
+<script>
+    function toggleRecordatorio(forzar) {
+        const panel = document.getElementById('recPanel');
+        const fab = document.getElementById('recFab');
+        const abrir = (typeof forzar === 'boolean') ? forzar : !panel.classList.contains('abierto');
+        panel.classList.toggle('abierto', abrir);
+        if (abrir) { fab.classList.add('visto'); try { localStorage.setItem('rec_visto', '1'); } catch(e) {} }
+    }
+    // Se muestra una sola vez por inicio de sesión (no al recargar la página).
+    function mostrarRecordatorioInicio() {
+        try { if (sessionStorage.getItem('rec_inicio_mostrado')) return; sessionStorage.setItem('rec_inicio_mostrado', '1'); } catch(e) {}
+        setTimeout(() => toggleRecordatorio(true), 600);
+    }
+    function copiarRecordatorio(id, btn) {
+        const txt = document.getElementById(id).textContent.trim();
+        const listo = () => { const o = btn.textContent; btn.textContent = '¡Copiado!'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = o; btn.classList.remove('ok'); }, 1400); };
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(listo).catch(() => {}); }
+        else { const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); listo(); } catch(e) {} t.remove(); }
+    }
+    (function() { try { if (localStorage.getItem('rec_visto')) document.getElementById('recFab').classList.add('visto'); } catch(e) {} })();
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleRecordatorio(false); });
 </script>
 </body>
 </html>

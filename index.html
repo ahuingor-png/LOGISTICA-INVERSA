@@ -6540,11 +6540,28 @@
         }
     }
 
+    // Android/Chrome móvil NO permite "new Notification()" (lanza Illegal constructor):
+    // se intenta primero el constructor y, si falla, el Service Worker; nunca lanza error.
+    function mostrarNotificacionSegura(titulo, opciones, alClick) {
+        try {
+            const n = new Notification(titulo, opciones);
+            if (alClick) n.onclick = () => alClick(n);
+            return;
+        } catch (e) { /* móvil: usar Service Worker */ }
+        try {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if (reg && reg.showNotification) return reg.showNotification(titulo, opciones);
+                }).catch(() => {});
+            }
+        } catch (e) { console.warn('No se pudo mostrar la notificación:', e); }
+    }
+
     function solicitarPermisoNotificaciones() {
         if (!('Notification' in window)) { alert('Este navegador no soporta notificaciones.'); return; }
         localStorage.setItem('inv_notif_solicitado', '1');
         if (Notification.permission === 'granted') {
-            new Notification('✅ REVERSA', { body: 'Las notificaciones ya están activadas.' });
+            mostrarNotificacionSegura('✅ REVERSA', { body: 'Las notificaciones ya están activadas.' });
             return;
         }
         Notification.requestPermission().then(() => actualizarIconoBotonNotif());
@@ -6568,12 +6585,11 @@
         iniciarParpadeoTitulo('📩 Nuevo mensaje - REVERSA');
         if ('Notification' in window && Notification.permission === 'granted') {
             try {
-                const notif = new Notification('📩 REVERSA · Nueva instrucción', {
+                mostrarNotificacionSegura('📩 REVERSA · Nueva instrucción', {
                     body: texto,
                     tag: 'reversa-mensaje',
                     renotify: true
-                });
-                notif.onclick = () => { window.focus(); notif.close(); };
+                }, (notif) => { window.focus(); notif.close(); });
             } catch (e) { console.warn('No se pudo mostrar la notificación:', e); }
         }
     }

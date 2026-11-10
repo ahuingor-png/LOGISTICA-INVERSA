@@ -86,6 +86,69 @@
         #recPanel .rec-copy.ok { background: var(--success); }
         #recPanel .rec-note { font-size: 12px; color: var(--text-muted); line-height: 1.45; margin-top: 4px; }
         @media (max-width: 640px) { #recFab { right: 12px; bottom: 12px; } #recPanel { right: 12px; bottom: 68px; } }
+
+        /* ===== Vista de Repros: diseño corporativo ===== */
+        #modalVistaRepros .vr-content { padding: 0 !important; background: var(--bg) !important; overflow: hidden; }
+        #modalVistaRepros .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 1480px; margin: 0 auto; }
+        #modalVistaRepros .vr-head { background: var(--card-bg); padding: 16px 22px 14px; border-bottom: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15,23,42,.05); }
+        #modalVistaRepros .vr-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        #modalVistaRepros .vr-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        #modalVistaRepros .vr-title-ico { width: 38px; height: 38px; border-radius: 10px; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #modalVistaRepros .vr-title-ico svg { width: 20px; height: 20px; }
+        #modalVistaRepros .vr-title h4 { margin: 0; font-size: 17px; font-weight: 800; color: var(--text-main); letter-spacing: .1px; }
+        #modalVistaRepros .vr-title p { margin: 2px 0 0; font-size: 12px; color: var(--text-muted); }
+        #modalVistaRepros .vr-count { background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 11px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+        #modalVistaRepros .vr-close { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 20px; line-height: 1; cursor: pointer; }
+        #modalVistaRepros .vr-close:hover { background: var(--bg); color: var(--text-main); }
+        #modalVistaRepros .vr-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        #modalVistaRepros .vr-filters .custom-filter-wrapper { width: 100%; }
+        #modalVistaRepros .vr-filters .custom-filter-btn { width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; text-align: left; border-radius: 8px; }
+        #modalVistaRepros .vr-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; margin-top: 14px; }
+        #modalVistaRepros .vr-action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        #modalVistaRepros .vr-group-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; margin-right: 2px; }
+        #modalVistaRepros .vr-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid transparent; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s; font-family: inherit; }
+        #modalVistaRepros .vr-btn svg { flex-shrink: 0; }
+        #modalVistaRepros .vr-btn-ghost { background: var(--card-bg); color: var(--text-main); border-color: var(--border); }
+        #modalVistaRepros .vr-btn-ghost:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+        #modalVistaRepros .vr-btn-danger-ghost { background: var(--card-bg); color: var(--danger); border-color: rgba(178,69,63,.35); }
+        #modalVistaRepros .vr-btn-danger-ghost:hover { background: rgba(178,69,63,.08); }
+        #modalVistaRepros .vr-btn-primary { background: var(--primary); color: #fff; }
+        #modalVistaRepros .vr-btn-primary:hover { background: var(--primary-hover); }
+        #modalVistaRepros .vr-btn-danger { background: var(--danger); color: #fff; }
+        #modalVistaRepros .vr-btn-danger:hover { filter: brightness(.92); }
+        #modalVistaRepros .vr-btn:disabled { opacity: .45; cursor: not-allowed; }
+        #modalVistaRepros .vr-body { flex: 1; overflow-y: auto; padding: 18px 22px 28px; }
+        #modalVistaRepros .vr-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        #modalVistaRepros .vr-kpi { background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--kpi, var(--primary)); border-radius: 10px; padding: 12px 16px; }
+        #modalVistaRepros .vr-kpi-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+        #modalVistaRepros .vr-kpi-val { font-size: 26px; font-weight: 800; color: var(--kpi, var(--primary)); margin-top: 2px; font-variant-numeric: tabular-nums; }
+        #modalVistaRepros .vr-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; margin: 0 0 10px; }
+        #modalVistaRepros .vr-table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        #modalVistaRepros .vr-table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+        #modalVistaRepros .vr-search { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 240px; padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text-muted); }
+        #modalVistaRepros .vr-search input { flex: 1; border: none; outline: none; background: transparent; padding: 9px 0; font-size: 12px; color: var(--text-main); font-family: inherit; }
+        #modalVistaRepros .vr-visible-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+        #modalVistaRepros .vr-visible-count b { color: var(--text-main); }
+        #modalVistaRepros .vr-table-scroll { overflow: auto; max-height: 520px; }
+        #modalVistaRepros .vr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        #modalVistaRepros .vr-table th { position: sticky; top: 0; z-index: 1; background: var(--bg); text-align: left; padding: 10px 12px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        #modalVistaRepros .vr-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text-main); white-space: nowrap; }
+        #modalVistaRepros .vr-table tbody tr:hover { background: rgba(61,90,128,.05); }
+        #modalVistaRepros .vr-table td.vr-cod { font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+        #modalVistaRepros .vr-table td.vr-mute { color: var(--text-muted); }
+        #modalVistaRepros .vr-th-acc, #modalVistaRepros .vr-td-acc { width: 44px; text-align: center; }
+        #modalVistaRepros .vr-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: rgba(100,116,139,.14); color: var(--text-muted); }
+        #modalVistaRepros .vr-pill.ok { background: rgba(63,136,98,.14); color: var(--success); }
+        #modalVistaRepros .vr-pill.warn { background: rgba(185,133,47,.16); color: var(--warning); }
+        #modalVistaRepros .vr-row-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        #modalVistaRepros .vr-row-del:hover { background: rgba(178,69,63,.12); color: var(--danger); }
+        #modalVistaRepros .vr-empty { text-align: center; color: var(--text-muted); padding: 28px 12px !important; font-style: italic; }
+        @media (max-width: 800px) {
+            #modalVistaRepros .vr-filters, #modalVistaRepros .vr-kpis { grid-template-columns: repeat(2, 1fr); }
+            #modalVistaRepros .vr-head { padding: 12px 14px; }
+            #modalVistaRepros .vr-body { padding: 14px; }
+            #modalVistaRepros .vr-title p { display: none; }
+        }
         .header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
         .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
         .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
@@ -2022,59 +2085,84 @@
      historial, descarga en Excel y faltantes contra la base central (inventario_base)
      restringida a las categorías CUARENTENA / REPROGRAMACIONES / ANULADO / FALLOS. ===== -->
 <div id="modalVistaRepros" class="modal" style="z-index: 8500;">
-    <div class="modal-content" style="max-width: 1100px; width: 96%; height: 92vh;">
-        <div class="table-header">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h4 style="font-weight:900; color:#2563eb; margin:0;">🔄 VISTA DE REPROS <span id="tTotalVistaRepros" style="background:rgba(37,99,235,0.15); padding:2px 8px; border-radius:10px; font-size:11px;">0</span></h4>
-                <button onclick="cerrarModalVistaRepros()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:6px; margin-top:8px;">
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproCatBtn" onclick="toggleDateDropdown('filtroReproCatMenu', event)" style="width:100%; padding:8px; font-size:11px;">🏷️ Categoría (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproCatMenu"></div>
+    <div class="modal-content vr-content">
+        <div class="vr-shell">
+            <div class="vr-head">
+                <div class="vr-titlebar">
+                    <div class="vr-title">
+                        <span class="vr-title-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></span>
+                        <div>
+                            <h4>Vista de Repros</h4>
+                            <p>Historial de escaneos y avance por ruta</p>
+                        </div>
+                        <span id="tTotalVistaRepros" class="vr-count" title="Total de escaneos">0</span>
+                    </div>
+                    <button class="vr-close" onclick="cerrarModalVistaRepros()" aria-label="Cerrar">&times;</button>
                 </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproRutaBtn" onclick="toggleDateDropdown('filtroReproRutaMenu', event)" style="width:100%; padding:8px; font-size:11px;">🚚 Ruta (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproRutaMenu"></div>
+
+                <div class="vr-filters">
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproCatBtn" onclick="toggleDateDropdown('filtroReproCatMenu', event)">Categoría (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproCatMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproRutaBtn" onclick="toggleDateDropdown('filtroReproRutaMenu', event)">Ruta (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproRutaMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproUsuarioBtn" onclick="toggleDateDropdown('filtroReproUsuarioMenu', event)">Usuario (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproUsuarioMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroReproTurnoBtn" onclick="toggleDateDropdown('filtroReproTurnoMenu', event)">Jornada (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroReproTurnoMenu"></div>
+                    </div>
                 </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproUsuarioBtn" onclick="toggleDateDropdown('filtroReproUsuarioMenu', event)" style="width:100%; padding:8px; font-size:11px;">👤 Usuario (Todos) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproUsuarioMenu"></div>
-                </div>
-                <div class="custom-filter-wrapper">
-                    <button class="custom-filter-btn" id="filtroReproTurnoBtn" onclick="toggleDateDropdown('filtroReproTurnoMenu', event)" style="width:100%; padding:8px; font-size:11px;">📅 Jornada (Todas) ▼</button>
-                    <div class="custom-filter-menu" id="filtroReproTurnoMenu"></div>
+
+                <div class="vr-actions">
+                    <div class="vr-action-group">
+                        <span class="vr-group-label">Exportar</span>
+                        <button class="vr-btn vr-btn-ghost" onclick="exportarReprosResumen()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13l4 4M12 13l-4 4"/></svg> Excel resumen</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="exportarReprosDetallado()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13l4 4M12 13l-4 4"/></svg> Excel detallado + faltantes</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="descargarHistorialReprosCompleto()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg> Historial completo</button>
+                    </div>
+                    <div class="vr-action-group">
+                        <span class="vr-group-label">Gestión</span>
+                        <button class="vr-btn vr-btn-ghost" onclick="abrirModalRespaldosRepros()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Respaldos</button>
+                        <button class="vr-btn vr-btn-danger-ghost" onclick="abrirModalLimpiarRepros()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> Limpiar historial</button>
+                    </div>
                 </div>
             </div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                <button onclick="exportarReprosResumen()" style="flex:1; min-width:150px; background:var(--success); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📄 EXCEL RESUMEN</button>
-                <button onclick="exportarReprosDetallado()" style="flex:1; min-width:150px; background:var(--primary); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📑 EXCEL DETALLADO + FALTANTES</button>
-                <button onclick="descargarHistorialReprosCompleto()" style="flex:1; min-width:150px; background:#334155; color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬇️ HISTORIAL COMPLETO</button>
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                <button onclick="abrirModalRespaldosRepros()" style="flex:1; min-width:150px; background:#0891b2; color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📂 VER RESPALDOS DE REPROS</button>
-                <button onclick="abrirModalLimpiarRepros()" style="flex:1; min-width:150px; background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.3); padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🧹 LIMPIAR HISTORIAL DE REPROS</button>
-            </div>
-        </div>
-        <div style="overflow-y:auto; flex:1; padding: 4px 4px 4px 0;">
-            <div id="resumenReprosKPIs" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin: 10px 4px;"></div>
-            <div id="contenedorVistaRepros" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start; padding: 0 4px;">
-                <div class="resumen-vacio">Cargando...</div>
-            </div>
-            <div style="margin: 16px 4px 4px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-                    <h5 style="font-weight:900; color:var(--text-main); margin:0;">📋 Historial de escaneos de Repros</h5>
-                    <input type="text" id="inpBuscarHistorialRepros" placeholder="🔍 Buscar por código, usuario, ruta, zona, ubicación..." oninput="filtrarHistorialReprosTexto()" style="flex:1; min-width:220px; max-width:360px; padding:7px 10px; font-size:11px; border:1px solid var(--border); border-radius:6px; box-sizing:border-box;">
+
+            <div class="vr-body">
+                <div id="resumenReprosKPIs" class="vr-kpis"></div>
+
+                <div class="vr-section-title">Avance por ruta</div>
+                <div id="contenedorVistaRepros" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start;">
+                    <div class="resumen-vacio">Cargando...</div>
                 </div>
-                <div style="overflow-x:auto;">
-                    <table class="resumen-tabla" id="tablaHistorialRepros">
-                        <thead style="background:var(--bg);">
-                            <tr>
-                                <th>Fecha</th><th>Hora</th><th>Código</th><th>Resultado</th><th>Categoría/Ruta</th><th>Día</th><th>Sec</th><th>Zona</th><th>Ubicación</th><th>Usuario</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyHistorialRepros"></tbody>
-                    </table>
+
+                <div class="vr-section-title" style="margin-top:22px;">Historial de escaneos</div>
+                <div class="vr-table-card">
+                    <div class="vr-table-toolbar">
+                        <div class="vr-search">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                            <input type="text" id="inpBuscarHistorialRepros" placeholder="Buscar por código, usuario, ruta, zona, ubicación…  (separa con coma para combinar)" oninput="filtrarHistorialReprosTexto()">
+                        </div>
+                        <span class="vr-visible-count"><b id="lblReprosVisibles">0</b> registro(s) en pantalla</span>
+                        <button class="vr-btn vr-btn-primary" onclick="descargarReprosFiltrado()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg> Descargar filtrado</button>
+                        <button class="vr-btn vr-btn-danger" id="btnEliminarReprosFiltrados" onclick="eliminarReprosFiltrados()" title="Elimina solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg> Eliminar filtrado</button>
+                    </div>
+                    <div class="vr-table-scroll">
+                        <table class="vr-table" id="tablaHistorialRepros">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th><th>Hora</th><th>Código</th><th>Resultado</th><th>Categoría / Ruta</th><th>Día</th><th>Sec</th><th>Zona</th><th>Ubicación</th><th>Usuario</th><th class="vr-th-acc"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyHistorialRepros"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -11304,10 +11392,10 @@
             if (r.turno_operativo) turnos.add(r.turno_operativo);
         });
 
-        poblarMenuMultiSelect('filtroReproCatMenu', 'filtroReproCatBtn', categorias, '🏷️ Categoría', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproRutaMenu', 'filtroReproRutaBtn', rutas, '🚚 Ruta', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproUsuarioMenu', 'filtroReproUsuarioBtn', usuarios, '👤 Usuario', renderizarVistaRepros);
-        poblarMenuMultiSelect('filtroReproTurnoMenu', 'filtroReproTurnoBtn', turnos, '📅 Jornada', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproCatMenu', 'filtroReproCatBtn', categorias, 'Categoría', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproRutaMenu', 'filtroReproRutaBtn', rutas, 'Ruta', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproUsuarioMenu', 'filtroReproUsuarioBtn', usuarios, 'Usuario', renderizarVistaRepros);
+        poblarMenuMultiSelect('filtroReproTurnoMenu', 'filtroReproTurnoBtn', turnos, 'Jornada', renderizarVistaRepros);
     }
 
     // Agrupa por RUTA (texto exacto de inventario_base) restringido a las 4
@@ -11400,23 +11488,12 @@
         document.getElementById('tTotalVistaRepros').textContent = totalHistorial;
 
         if (contKPIs) {
-            contKPIs.innerHTML = `
-                <div style="background:rgba(37,99,235,0.08); border:1px solid rgba(37,99,235,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Programados</div>
-                    <div style="font-size:20px; font-weight:900; color:#2563eb;">${totalProgramado}</div>
-                </div>
-                <div style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Escaneados</div>
-                    <div style="font-size:20px; font-weight:900; color:#0ea5e9;">${totalEscaneado}</div>
-                </div>
-                <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Faltantes</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--danger);">${totalFaltante}</div>
-                </div>
-                <div style="background:rgba(61,90,128,0.08); border:1px solid rgba(61,90,128,0.25); border-radius:8px; padding:10px; text-align:center;">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Avance</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--primary);">${pctGlobal.toFixed(0)}%</div>
-                </div>`;
+            const kpi = (label, val, color) => `<div class="vr-kpi" style="--kpi:${color};"><div class="vr-kpi-label">${label}</div><div class="vr-kpi-val">${val}</div></div>`;
+            contKPIs.innerHTML =
+                kpi('Programados', totalProgramado, '#3d5a80') +
+                kpi('Escaneados', totalEscaneado, '#2f7fa8') +
+                kpi('Faltantes', totalFaltante, '#b2453f') +
+                kpi('Avance', pctGlobal.toFixed(0) + '%', '#3f8862');
         }
 
         if (claves.length === 0 && inventariados.length === 0) {
@@ -11461,6 +11538,7 @@
                                     <span style="display:flex; align-items:center; gap:8px; flex-shrink:0; color:var(--text-muted); font-weight:700;">
                                         <span>🕐 ${r.hora || '-'}</span>
                                         <span style="background:rgba(37,99,235,0.1); color:var(--primary); padding:2px 7px; border-radius:10px;">👤 ${r.usuario || '-'}</span>
+                                        ${puedeEliminarReprosUI() && r.key ? `<button type="button" class="vr-row-del" title="Eliminar este escaneo" onclick="eliminarEscaneoRepro('${r.key}')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>` : ''}
                                     </span>
                                 </div>`).join('') || '<div style="padding:10px 12px; font-size:10.5px; color:var(--text-muted);">-</div>'}
                             </div>
@@ -11493,22 +11571,117 @@
     // la caja de búsqueda de texto filtra encima de esa lista, sin recalcular todo.
     let historialReprosFilasActuales = [];
 
+    // Filas actualmente visibles en la tabla (dropdowns + búsqueda de texto).
+    // Sobre esta lista actúan "Descargar filtrado" y "Eliminar filtrado".
+    let historialReprosFilasVisibles = [];
+
+    function puedeEliminarReprosUI() {
+        try { return !!puedeBorrarHistorial(); } catch (e) { return false; }
+    }
+
+    function _escHtmlRepro(v) {
+        return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
     function pintarTablaHistorialRepros(filas) {
+        historialReprosFilasVisibles = filas;
         const tbody = document.getElementById('tbodyHistorialRepros');
         if (!tbody) return;
+        const puedeBorrar = puedeEliminarReprosUI();
+        const lbl = document.getElementById('lblReprosVisibles');
+        if (lbl) lbl.textContent = filas.length;
+        const btnDel = document.getElementById('btnEliminarReprosFiltrados');
+        if (btnDel) { btnDel.style.display = puedeBorrar ? '' : 'none'; btnDel.disabled = filas.length === 0; }
+        document.querySelectorAll('#tablaHistorialRepros .vr-th-acc').forEach(th => th.style.display = puedeBorrar ? '' : 'none');
+
+        const pill = (res) => {
+            const t = String(res || '').toUpperCase();
+            const cls = t === 'ENCONTRADO' ? 'ok' : (t === 'INVENTARIADO' ? 'warn' : '');
+            return `<span class="vr-pill ${cls}">${_escHtmlRepro(res || '-')}</span>`;
+        };
+        const iconoBorrar = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+
         tbody.innerHTML = filas.length ? filas.map(r => `
-            <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:6px 8px; font-size:10px;">${r.fecha || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.hora || ''}</td>
-                <td style="padding:6px 8px; font-size:10px; font-weight:800;">${r.codigo || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.resultado || ''}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.categoria || r._ruta || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.dia || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.sec || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.zona || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.ubi || '-'}</td>
-                <td style="padding:6px 8px; font-size:10px;">${r.usuario || ''}</td>
-            </tr>`).join('') : `<tr><td colspan="10" class="resumen-vacio">Sin escaneos de Repros para estos filtros.</td></tr>`;
+            <tr>
+                <td>${_escHtmlRepro(r.fecha)}</td>
+                <td class="vr-mute">${_escHtmlRepro(r.hora)}</td>
+                <td class="vr-cod">${_escHtmlRepro(r.codigo)}</td>
+                <td>${pill(r.resultado)}</td>
+                <td>${_escHtmlRepro(r.categoria || r._ruta || '-')}</td>
+                <td class="vr-mute">${_escHtmlRepro(r.dia || '-')}</td>
+                <td class="vr-mute">${_escHtmlRepro(r.sec || '-')}</td>
+                <td>${_escHtmlRepro(r.zona || '-')}</td>
+                <td>${_escHtmlRepro(r.ubi || '-')}</td>
+                <td>${_escHtmlRepro(r.usuario)}</td>
+                ${puedeBorrar ? `<td class="vr-td-acc">${r.key ? `<button type="button" class="vr-row-del" title="Eliminar este escaneo" aria-label="Eliminar" onclick="eliminarEscaneoRepro('${r.key}')">${iconoBorrar}</button>` : ''}</td>` : ''}
+            </tr>`).join('') : `<tr><td colspan="11" class="vr-empty">Sin escaneos de Repros para estos filtros.</td></tr>`;
+    }
+
+    // Elimina UN escaneo del historial de Repros (nodo escaneos_repros/<key>).
+    async function eliminarEscaneoRepro(key) {
+        if (!puedeEliminarReprosUI()) return alert('No tienes permiso para eliminar registros del historial de Repros.');
+        const reg = scansRepro.find(r => r.key === key);
+        if (!confirm(`¿Eliminar el escaneo "${reg ? reg.codigo : key}"? No se puede deshacer.`)) return;
+        try {
+            await rtdb.ref('escaneos_repros/' + key).remove();
+        } catch (err) {
+            console.error(err);
+            alert('❌ No se pudo eliminar el registro. Intenta de nuevo.');
+        }
+    }
+
+    // Elimina TODO lo que está visible en la tabla (filtros + búsqueda aplicados).
+    async function eliminarReprosFiltrados() {
+        if (!puedeEliminarReprosUI()) return alert('No tienes permiso para eliminar registros del historial de Repros.');
+        const filas = (historialReprosFilasVisibles || []).filter(r => r.key);
+        if (filas.length === 0) return alert('No hay registros en pantalla para eliminar.');
+        const esTodo = filas.length === scansRepro.length;
+        if (!confirm(`⚠️ Se eliminarán ${filas.length} registro(s)${esTodo ? ' (TODO el historial de Repros)' : ' que coinciden con el filtro actual'}.\n\nEsta acción no se puede deshacer. ¿Continuar?`)) return;
+        const respaldar = confirm(`¿Guardar un respaldo de estos ${filas.length} registro(s) antes de eliminarlos?\n\nAceptar = guardar respaldo y eliminar\nCancelar = eliminar sin respaldo`);
+        try {
+            if (respaldar) {
+                const datos = filas.map(r => { const c = { ...r }; delete c._ruta; return c; });
+                await rtdb.ref('historial_archivado_repros').push().set({
+                    fechaArchivo: new Date().toLocaleString(),
+                    cantidadRegistros: datos.length,
+                    archivadoPor: usuarioActivo,
+                    datos: datos
+                });
+            }
+            for (let i = 0; i < filas.length; i += 400) {
+                const lote = {};
+                filas.slice(i, i + 400).forEach(r => { lote[r.key] = null; });
+                await rtdb.ref('escaneos_repros').update(lote);
+            }
+            alert(`✅ Se eliminaron ${filas.length} registro(s)${respaldar ? ' y se guardó el respaldo.' : '.'}`);
+        } catch (err) {
+            console.error(err);
+            alert('❌ Ocurrió un error durante la eliminación. Revisa la tabla y vuelve a intentar.');
+        }
+    }
+
+    // Descarga en Excel exactamente lo que se ve en la tabla (filtros + búsqueda).
+    function descargarReprosFiltrado() {
+        const filas = historialReprosFilasVisibles || [];
+        if (filas.length === 0) return alert('No hay registros en pantalla para descargar.');
+        const datos = filas.map(r => ({
+            "Fecha": r.fecha || "",
+            "Hora": r.hora || "",
+            "Código": r.codigo || "",
+            "Resultado": r.resultado || "",
+            "Categoría": r.categoria || "",
+            "Ruta": (r.ruta && r.ruta !== '-') ? r.ruta : (r._ruta || '-'),
+            "Día": r.dia || "-",
+            "Secuencia": r.sec || "-",
+            "Zona": r.zona || "",
+            "Ubicación": r.ubi || "",
+            "Usuario": r.usuario || "",
+            "Turno/Jornada": r.turno_operativo || ""
+        }));
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Repros_Filtrado");
+        XLSX.writeFile(wb, `Repros_Filtrado_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
     }
 
     // Búsqueda de texto libre sobre el historial ya visible (no toca los

@@ -1570,6 +1570,7 @@
             <button class="btn-header btn-search-admin" id="btnConsultarAdmin" onclick="abrirModalConsulta();">🔍 Consultar Registros</button>
             <button class="btn-header" id="btnTrazabilidad" onclick="abrirModalTrazabilidad();">🧭 Trazabilidad de Ruta</button>
             <button class="btn-header" id="btnCruceIL" onclick="abrirModalCruceIL();">🔀 Cruce de Datos IL</button>
+            <button class="btn-header" id="btnNoDespachado" onclick="abrirModalNoDespachado();">📦 No Despachado</button>
             <button class="btn-header" id="btnCargosManuales" onclick="abrirModalCargosManuales();" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosMovil" onclick="abrirModalVistaRepros();">🔄 Reprogramaciones <span id="badgeTotalReprosMenu" style="background:rgba(0,0,0,0.15); padding:1px 6px; border-radius:8px; font-size:10px; font-weight:900;">0</span></button>
             <button class="btn-header" id="btnRespaldosNubeMenu" style="display:none;" onclick="abrirModalRespaldosNube();">☁️ Respaldos en la Nube</button>
@@ -1764,6 +1765,7 @@
             <button class="btn-header" id="btnLiberarZonasDesk" onclick="abrirModalLiberarZonasCS();" style="display:none; padding: 8px 12px; font-size: 12px;">🔓 Liberar Zonas (PL)</button>
             <button class="btn-header" id="btnLiquidacionDesk" onclick="abrirModalLiquidacionLQ();" style="display:none; padding: 8px 12px; font-size: 12px;">💸 Liquidación</button>
             <button class="btn-header" id="btnCruceILDesk" onclick="abrirModalCruceIL();" style="display:flex; padding: 8px 12px; font-size: 12px;">🔀 Cruce de Datos IL</button>
+            <button class="btn-header" id="btnNoDespachadoDesk" onclick="abrirModalNoDespachado();" style="display:flex; padding: 8px 12px; font-size: 12px;">📦 No Despachado</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 8px 12px; font-size: 12px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
             </div>
@@ -1940,6 +1942,45 @@
         </div>
         <div style="flex:1; overflow:hidden; position:relative; background: var(--bg);">
             <iframe id="iframeCruceIL" style="width:100%; height:100%; border:none; display:block;" title="Cruce de Datos IL"></iframe>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalNoDespachado" class="modal" style="z-index: 8950;">
+    <div class="modal-content" style="max-width: 1600px; width: 98%; height: 96vh; padding: 0; overflow: hidden; position: relative;">
+        <div id="ndDropOverlay" style="display:none; position:absolute; inset:0; background:rgba(61,90,128,.9); color:#fff; z-index:50; align-items:center; justify-content:center; font-size:24px; font-weight:900; pointer-events:none; border:4px dashed #fff;">⬇ Suelta aquí el Excel</div>
+        <div class="table-header" style="padding: 10px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <h4 style="font-weight:900; color:var(--primary); margin:0;">📦 NO DESPACHADO <span id="ndEstadoNube" style="font-size:10px; font-weight:700; color:var(--text-muted); margin-left:6px;"></span></h4>
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <button onclick="document.getElementById('ndFile').click()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬆ Subir Excel</button>
+                    <span style="font-size:10px; font-weight:700; color:var(--text-muted);">o arrastra el archivo a esta ventana</span>
+                    <button onclick="ndExportar()" style="background:var(--success); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬇ Exportar filtrado</button>
+                    <button onclick="ndTogglePanelCargas()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🗂 Cargas</button>
+                    <button onclick="cerrarModalNoDespachado()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; cursor:pointer;">&times;</button>
+                </div>
+            </div>
+            <input type="file" id="ndFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="ndLeerArchivo(this)">
+        </div>
+
+        <div style="flex:1; min-height:0; display:flex; flex-direction:column; gap:8px; padding:10px 14px; background:var(--bg);">
+
+            <div id="ndPreview" style="display:none; background:var(--card-bg); border:1px dashed var(--primary); border-radius:8px; padding:10px;"></div>
+
+            <div id="ndPanelCargas" style="display:none; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:10px; max-height:30vh; overflow:auto;"></div>
+
+            <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:10px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <input id="ndBuscar" type="search" placeholder="🔎 Buscar en toda la tabla... (los filtros por columna están en los encabezados ▼)" oninput="ndBuscarCambio(this.value)" style="flex:1; min-width:240px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:12px;">
+                    <button onclick="ndLimpiarFiltros()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:8px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">✖ Limpiar filtros</button>
+                </div>
+                <div id="ndFiltros" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+            </div>
+
+            <div id="ndResumen" style="font-size:12px; font-weight:800; color:var(--text-muted);"></div>
+
+            <div id="ndTablaWrap" style="flex:1; min-height:0; overflow:auto; background:var(--card-bg); border:1px solid var(--border); border-radius:8px;"></div>
         </div>
     </div>
 </div>
@@ -11125,6 +11166,361 @@
         document.getElementById('modalCruceIL').style.display = 'none';
         // Libera memoria y evita estado obsoleto la próxima vez que se abra.
         document.getElementById('iframeCruceIL').srcdoc = '';
+    }
+
+
+    // =====================================================================
+    //  NO DESPACHADO: subir Excel -> tabla -> guardar en Firebase -> filtros
+    //  Nodos en la nube:
+    //    no_despachado/filas/{clave}   cada fila (clave = num_rastreo)
+    //    no_despachado/columnas        orden de columnas del Excel
+    //    no_despachado/lotes/{id}      historial de cargas
+    // =====================================================================
+    const ND = { filas: {}, columnas: [], lotes: {}, pendiente: null, filtros: {}, anchos: {}, busqueda: '', limite: 5000, escuchando: false, dragInit: false, _cols: [] };
+    const ND_VISIBLES = ['vueltas','transportista','bu','nruta','tipodevolucion','numeroorder','numrastreo','guiatms','estadodecarga','responsable','motivonocarga','comentarioil','ubicaciones','bultos','estadotms','descripcion','archivo'];
+    const ND_FILTROS = [['vueltas','Vuelta'],['transportista','Transportista'],['bu','BU'],['nruta','N° Ruta'],['tipodevolucion','Tipo devolución'],['estadodecarga','Estado de carga'],['responsable','Responsable'],['motivonocarga','Motivo no carga'],['estadotms','Estado TMS'],['ubicaciones','Ubicación'],['archivo','Archivo cargado']];
+
+    function ndNorm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function ndEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function ndSanKey(s) { return String(s).replace(/[.#$\[\]\/]/g, '_').trim(); }
+
+    function abrirModalNoDespachado() {
+        document.getElementById('modalNoDespachado').style.display = 'flex';
+        if (!ND.dragInit) { ND.dragInit = true; ndInitDragDrop(); }
+        if (!ND.escuchando) {
+            ND.escuchando = true;
+            document.getElementById('ndEstadoNube').textContent = '⏳ conectando...';
+            rtdb.ref('no_despachado/filas').on('value', snap => { ND.filas = snap.val() || {}; document.getElementById('ndEstadoNube').textContent = '☁ sincronizado'; ndRenderTodo(); }, err => { document.getElementById('ndEstadoNube').textContent = '⚠ sin acceso a la nube'; alert('No se pudo leer la nube (no_despachado): ' + err.message + '\n\nRevisa las Reglas de Firebase.'); });
+            rtdb.ref('no_despachado/columnas').on('value', snap => { ND.columnas = snap.val() || []; ndRenderTodo(); });
+            rtdb.ref('no_despachado/lotes').on('value', snap => { ND.lotes = snap.val() || {}; ndRenderPanelCargas(); });
+        }
+        ndRenderTodo();
+    }
+
+    function cerrarModalNoDespachado() {
+        document.getElementById('modalNoDespachado').style.display = 'none';
+        ndCerrarPop();
+        if (ND.escuchando) {
+            rtdb.ref('no_despachado/filas').off();
+            rtdb.ref('no_despachado/columnas').off();
+            rtdb.ref('no_despachado/lotes').off();
+            ND.escuchando = false;
+        }
+    }
+
+    // ---------- Subir y leer Excel ----------
+    function ndLeerArchivo(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const matriz = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false, blankrows: false });
+                if (!matriz.length) throw new Error('El archivo está vacío.');
+                // encabezados: se descartan columnas sin título (ej. "Columna1" vacía)
+                const heads = matriz[0].map(h => ndSanKey(h));
+                const idx = [];
+                heads.forEach((h, i) => {
+                    if (!h) return;
+                    const tieneDatos = matriz.slice(1).some(r => String(r[i] == null ? '' : r[i]).trim() !== '');
+                    if (tieneDatos || !/^columna\d+$/i.test(h)) idx.push(i);
+                });
+                const cols = idx.map(i => heads[i]);
+                const nRastreo = cols.find(c => ndNorm(c) === 'numrastreo');
+                const nOrden = cols.find(c => ndNorm(c) === 'numeroorder');
+                const filas = {};
+                let repetidas = 0, sinClave = 0, n = 0;
+                matriz.slice(1).forEach(r => {
+                    const o = {};
+                    let vacia = true;
+                    idx.forEach(i => { const v = String(r[i] == null ? '' : r[i]).trim(); o[heads[i]] = v; if (v) vacia = false; });
+                    if (vacia) return;
+                    let clave = ndSanKey((nRastreo && o[nRastreo]) || (nOrden && o[nOrden]) || '');
+                    if (!clave) { sinClave++; clave = 'f_' + Date.now().toString(36) + '_' + n; }
+                    if (filas[clave]) repetidas++;
+                    o._n = n++;
+                    filas[clave] = o;
+                });
+                const claves = Object.keys(filas);
+                if (!claves.length) throw new Error('No se encontraron filas con datos.');
+                const existentes = claves.filter(k => ND.filas[k]).length;
+                ND.pendiente = { archivo: file.name, cols, filas, total: claves.length, nuevas: claves.length - existentes, existentes, repetidas, sinClave };
+                ndRenderPreview();
+            } catch (err) {
+                alert('No se pudo leer el Excel: ' + err.message);
+            }
+            input.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function ndRenderPreview() {
+        const box = document.getElementById('ndPreview');
+        const p = ND.pendiente;
+        if (!p) { box.style.display = 'none'; box.innerHTML = ''; return; }
+        const muestra = Object.values(p.filas).slice(0, 6);
+        const colsMuestra = p.cols.filter(c => ND_VISIBLES.includes(ndNorm(c))).slice(0, 9);
+        const th = colsMuestra.map(c => '<th style="padding:4px 8px; text-align:left; font-size:10px; white-space:nowrap;">' + ndEsc(c) + '</th>').join('');
+        const tr = muestra.map(r => '<tr>' + colsMuestra.map(c => '<td style="padding:3px 8px; font-size:11px; white-space:nowrap; max-width:200px; overflow:hidden; text-overflow:ellipsis;">' + ndEsc(r[c]) + '</td>').join('') + '</tr>').join('');
+        box.style.display = 'block';
+        box.innerHTML =
+            '<div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">' +
+            '<div style="font-size:12px;"><b>📄 ' + ndEsc(p.archivo) + '</b> — ' + p.total + ' filas leídas · <span style="color:var(--success); font-weight:800;">' + p.nuevas + ' nuevas</span> · <span style="color:var(--warning); font-weight:800;">' + p.existentes + ' ya existían (se actualizan)</span>' +
+            (p.repetidas ? ' · ' + p.repetidas + ' repetidas dentro del archivo' : '') + '</div>' +
+            '<div style="display:flex; gap:6px;"><button id="ndBtnGuardar" onclick="ndGuardarPendiente()" style="background:var(--success); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">☁ Agregar a la tabla y guardar en la nube</button>' +
+            '<button onclick="ndCancelarPendiente()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:8px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Cancelar</button></div></div>' +
+            '<div style="overflow:auto; margin-top:8px; border:1px solid var(--border); border-radius:6px;"><table style="border-collapse:collapse; width:100%;"><thead style="background:var(--bg);"><tr>' + th + '</tr></thead><tbody>' + tr + '</tbody></table></div>' +
+            '<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Vista previa de las primeras filas. Las filas con el mismo num_rastreo se actualizan en lugar de duplicarse.</div>';
+    }
+
+    function ndCancelarPendiente() { ND.pendiente = null; ndRenderPreview(); }
+
+    async function ndGuardarPendiente() {
+        const p = ND.pendiente;
+        if (!p) return;
+        const btn = document.getElementById('ndBtnGuardar');
+        btn.disabled = true; btn.textContent = '⏳ Guardando en la nube...';
+        try {
+            const ahora = Date.now();
+            const loteId = rtdb.ref('no_despachado/lotes').push().key;
+            const claves = Object.keys(p.filas);
+            for (let i = 0; i < claves.length; i += 400) {
+                const upd = {};
+                claves.slice(i, i + 400).forEach(k => {
+                    upd['no_despachado/filas/' + k] = Object.assign({}, p.filas[k], { _lote: loteId, _archivo: p.archivo, _ts: ahora });
+                });
+                await rtdb.ref().update(upd);
+            }
+            // mantener el orden de las columnas (sin repetir las que ya existían)
+            const colsFinal = (ND.columnas || []).slice();
+            p.cols.forEach(c => { if (!colsFinal.includes(c)) colsFinal.push(c); });
+            await rtdb.ref().update({
+                'no_despachado/columnas': colsFinal,
+                ['no_despachado/lotes/' + loteId]: { archivo: p.archivo, ts: ahora, total: p.total, nuevas: p.nuevas, actualizadas: p.existentes }
+            });
+            ND.pendiente = null;
+            ndRenderPreview();
+            showToast();
+        } catch (err) {
+            alert('Error al guardar en la nube: ' + err.message + '\n\nSi dice "permission denied", agrega el nodo "no_despachado" a las Reglas de Firebase.');
+            btn.disabled = false; btn.textContent = '☁ Reintentar guardar';
+        }
+    }
+
+    // ---------- Datos / filtros ----------
+    function ndColumnasActivas() {
+        let cols = (ND.columnas || []).slice();
+        if (!cols.length) {
+            const set = new Set();
+            Object.values(ND.filas).forEach(f => Object.keys(f).forEach(k => { if (k[0] !== '_') set.add(k); }));
+            cols = Array.from(set);
+        }
+        const lista = cols.map(c => ({ key: c, label: c, n: ndNorm(c) }));
+        lista.push({ key: '_archivo', label: 'Archivo', n: 'archivo' });
+        return lista;
+    }
+
+    function ndVal(f, key) { const v = f[key]; return v == null ? '' : String(v); }
+
+    // excluir = clave de columna cuyo filtro no se aplica (para armar su lista de valores, como en Excel)
+    function ndFilasFiltradas(excluir) {
+        const q = ndNorm(ND.busqueda);
+        let arr = Object.values(ND.filas);
+        const act = Object.entries(ND.filtros).filter(([k, v]) => k !== excluir && Array.isArray(v)).map(([k, v]) => [k, new Set(v)]);
+        if (act.length) arr = arr.filter(f => act.every(([k, set]) => set.has(ndVal(f, k))));
+        if (q) arr = arr.filter(f => ndNorm(Object.keys(f).filter(k => k[0] !== '_').map(k => f[k]).join(' ')).includes(q));
+        arr.sort((a, b) => (b._ts || 0) - (a._ts || 0) || (a._n || 0) - (b._n || 0));
+        return arr;
+    }
+
+    function ndBuscarCambio(v) { ND.busqueda = v; ndRenderTabla(); ndRenderFiltros(); }
+    function ndLimpiarFiltros() { ND.filtros = {}; ND.busqueda = ''; ND.limite = 5000; document.getElementById('ndBuscar').value = ''; ndCerrarPop(); ndRenderTodo(); }
+    function ndMasFilas() { ND.limite += 5000; ndRenderTabla(); }
+    function ndRenderTodo() { ndRenderFiltros(); ndRenderTabla(); ndRenderPanelCargas(); }
+
+    // chips de filtros activos
+    function ndRenderFiltros() {
+        const cont = document.getElementById('ndFiltros');
+        if (!cont) return;
+        cont.innerHTML = Object.entries(ND.filtros).filter(([, v]) => Array.isArray(v)).map(([k, v]) =>
+            '<span style="background:var(--primary); color:#fff; font-size:10px; font-weight:800; padding:3px 4px 3px 9px; border-radius:12px; display:inline-flex; gap:5px; align-items:center;">' + ndEsc(k === '_archivo' ? 'Archivo' : k) + ': ' + v.length + ' valor(es)' +
+            '<button onclick="ndQuitarFiltro(decodeURIComponent(\'' + encodeURIComponent(k) + '\'))" style="background:rgba(255,255,255,.25); border:none; color:#fff; width:16px; height:16px; border-radius:50%; cursor:pointer; font-size:11px; line-height:1;">&times;</button></span>').join('');
+    }
+    function ndQuitarFiltro(k) { delete ND.filtros[k]; ndRenderTodo(); }
+
+    // ---------- Tabla estilo Excel ----------
+    function ndAnchoDe(c) { return ND.anchos[c.key] || (c.n === 'descripcion' ? 300 : (c.n === 'comentarioil' || c.n === 'motivonocarga' || c.n === 'concatenar' || c.n === 'tipodevolucion') ? 190 : 125); }
+
+    function ndRenderTabla() {
+        const wrap = document.getElementById('ndTablaWrap');
+        if (!wrap) return;
+        const total = Object.keys(ND.filas).length;
+        if (!total) {
+            document.getElementById('ndResumen').textContent = '';
+            wrap.innerHTML = '<div style="padding:50px; text-align:center; color:var(--text-muted); font-size:14px; font-weight:700;">Aún no hay datos.<br>Usa “⬆ Subir Excel” o <u>arrastra tu archivo NO_DESPACHADO</u> a esta ventana.</div>';
+            return;
+        }
+        const filtradas = ndFilasFiltradas();
+        document.getElementById('ndResumen').textContent = 'Mostrando ' + Math.min(ND.limite, filtradas.length) + ' de ' + filtradas.length + ' filtradas · ' + total + ' registros en la nube';
+        const cols = ndColumnasActivas();
+        ND._cols = cols;
+        const anchoTotal = 46 + cols.reduce((a, c) => a + ndAnchoDe(c), 0);
+        const borde = '1px solid var(--border)';
+        const colgroup = '<colgroup><col style="width:46px">' + cols.map(c => '<col style="width:' + ndAnchoDe(c) + 'px">').join('') + '</colgroup>';
+        const th = '<tr><th style="position:sticky; top:0; left:0; z-index:4; background:var(--border); color:var(--text-muted); border:' + borde + '; padding:6px 4px; font-size:10px;">#</th>' +
+            cols.map((c, i) => {
+                const activo = Array.isArray(ND.filtros[c.key]);
+                return '<th style="position:sticky; top:0; z-index:3; background:var(--border); color:var(--text-main); border:' + borde + '; padding:5px 6px; font-size:10px; text-align:left; text-transform:uppercase; letter-spacing:.3px; overflow:hidden;">' +
+                    '<div style="display:flex; align-items:center; gap:4px;"><span title="' + ndEsc(c.label) + '" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + ndEsc(c.label) + '</span>' +
+                    '<button onclick="ndAbrirFiltro(event,' + i + ')" title="Filtrar" style="flex:none; border:1px solid ' + (activo ? 'var(--primary)' : 'var(--border)') + '; background:' + (activo ? 'var(--primary)' : 'var(--card-bg)') + '; color:' + (activo ? '#fff' : 'var(--text-main)') + '; width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">' + (activo ? '⧩' : '▼') + '</button></div>' +
+                    '<span onmousedown="ndIniciarResize(event,' + i + ')" style="position:absolute; top:0; right:0; bottom:0; width:6px; cursor:col-resize;"></span></th>';
+            }).join('') + '</tr>';
+        const cuerpo = filtradas.slice(0, ND.limite).map((f, i) =>
+            '<tr style="' + (i % 2 ? 'background:rgba(100,116,139,0.07);' : '') + '"><td style="position:sticky; left:0; z-index:1; background:var(--border); color:var(--text-muted); border:' + borde + '; padding:3px 4px; font-size:10px; text-align:center;">' + (i + 1) + '</td>' +
+            cols.map(c => { const v = ndVal(f, c.key); return '<td title="' + ndEsc(v) + '" style="border:' + borde + '; padding:3px 7px; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + ndEsc(v) + '</td>'; }).join('') + '</tr>'
+        ).join('');
+        const mas = filtradas.length > ND.limite ? '<div style="padding:10px; text-align:center;"><button onclick="ndMasFilas()" style="background:var(--primary); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mostrar más filas</button></div>' : '';
+        const sinRes = filtradas.length ? '' : '<div style="padding:30px; text-align:center; color:var(--text-muted); font-weight:700;">Ningún registro coincide con los filtros.</div>';
+        const scrollX = wrap.scrollLeft, scrollY = wrap.scrollTop;
+        wrap.innerHTML = '<table id="ndTabla" style="border-collapse:separate; border-spacing:0; table-layout:fixed; width:' + anchoTotal + 'px;">' + colgroup + '<thead>' + th + '</thead><tbody>' + cuerpo + '</tbody></table>' + sinRes + mas;
+        wrap.scrollLeft = scrollX; wrap.scrollTop = scrollY;
+    }
+
+    // redimensionar columnas arrastrando el borde del encabezado
+    function ndIniciarResize(e, i) {
+        e.preventDefault(); e.stopPropagation();
+        const c = ND._cols[i];
+        const tabla = document.getElementById('ndTabla');
+        const colEl = tabla.querySelectorAll('col')[i + 1];
+        const x0 = e.clientX, w0 = ndAnchoDe(c);
+        const mover = ev => {
+            const w = Math.max(50, w0 + ev.clientX - x0);
+            ND.anchos[c.key] = w; colEl.style.width = w + 'px';
+            tabla.style.width = (46 + ND._cols.reduce((a, k) => a + ndAnchoDe(k), 0)) + 'px';
+        };
+        const soltar = () => { document.removeEventListener('mousemove', mover); document.removeEventListener('mouseup', soltar); };
+        document.addEventListener('mousemove', mover);
+        document.addEventListener('mouseup', soltar);
+    }
+
+    // ---------- Filtro por columna (lista con casillas, como Excel) ----------
+    function ndCerrarPop() { const p = document.getElementById('ndPop'); if (p) p.remove(); }
+
+    function ndAbrirFiltro(ev, i) {
+        ev.stopPropagation();
+        ndCerrarPop();
+        const c = ND._cols[i];
+        const conteo = {};
+        ndFilasFiltradas(c.key).forEach(f => { const v = ndVal(f, c.key); conteo[v] = (conteo[v] || 0) + 1; });
+        const vals = Object.keys(conteo).sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
+        const actual = ND.filtros[c.key];
+        ND._pop = { key: c.key, label: c.label, vals, conteo, sel: new Set(Array.isArray(actual) ? actual.filter(v => vals.includes(v)) : vals), q: '' };
+        const pop = document.createElement('div');
+        pop.id = 'ndPop';
+        pop.style.cssText = 'position:fixed; z-index:9100; width:260px; background:var(--card-bg); color:var(--text-main); border:1px solid var(--border); border-radius:8px; box-shadow:0 12px 30px rgba(0,0,0,.3); padding:10px; font-family:inherit;';
+        pop.onclick = e => e.stopPropagation();
+        const r = ev.currentTarget.getBoundingClientRect();
+        pop.style.left = Math.max(6, Math.min(r.left, window.innerWidth - 270)) + 'px';
+        pop.style.top = Math.min(r.bottom + 4, window.innerHeight - 380) + 'px';
+        pop.innerHTML = '<div style="font-size:11px; font-weight:900; margin-bottom:6px;">' + ndEsc(c.label) + '</div>' +
+            '<input type="search" placeholder="Buscar valor..." oninput="ndPopBuscar(this.value)" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:12px; margin-bottom:6px;">' +
+            '<label style="display:flex; gap:6px; align-items:center; font-size:12px; font-weight:800; padding:3px 2px; border-bottom:1px solid var(--border); cursor:pointer;"><input type="checkbox" id="ndPopTodo" onchange="ndPopTodo(this.checked)"> (Seleccionar todo)</label>' +
+            '<div id="ndPopLista" style="max-height:240px; overflow:auto; margin:4px 0;"></div>' +
+            '<div style="display:flex; gap:6px;"><button onclick="ndPopAplicar()" style="flex:1; background:var(--primary); color:#fff; border:none; padding:7px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Aceptar</button>' +
+            '<button onclick="ndPopLimpiar()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Limpiar</button></div>';
+        document.body.appendChild(pop);
+        ndPopRenderLista();
+    }
+
+    function ndPopVisibles() { const P = ND._pop, q = ndNorm(P.q); return P.vals.filter(v => !q || ndNorm(v).includes(q)); }
+
+    function ndPopRenderLista() {
+        const P = ND._pop; if (!P) return;
+        const vis = ndPopVisibles();
+        document.getElementById('ndPopLista').innerHTML = vis.map(v => {
+            const i = P.vals.indexOf(v);
+            return '<label style="display:flex; gap:6px; align-items:center; font-size:12px; padding:3px 2px; cursor:pointer;"><input type="checkbox" ' + (P.sel.has(v) ? 'checked' : '') + ' onchange="ndPopToggle(' + i + ',this.checked)"><span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (v === '' ? '<i>(vacío)</i>' : ndEsc(v)) + '</span><span style="color:var(--text-muted); font-size:10px;">' + P.conteo[v] + '</span></label>';
+        }).join('') || '<div style="font-size:11px; color:var(--text-muted); padding:6px;">Sin resultados</div>';
+        document.getElementById('ndPopTodo').checked = vis.length > 0 && vis.every(v => P.sel.has(v));
+    }
+
+    function ndPopBuscar(q) { ND._pop.q = q; ndPopRenderLista(); }
+    function ndPopToggle(i, on) { const v = ND._pop.vals[i]; on ? ND._pop.sel.add(v) : ND._pop.sel.delete(v); ndPopRenderLista(); }
+    function ndPopTodo(on) { ndPopVisibles().forEach(v => on ? ND._pop.sel.add(v) : ND._pop.sel.delete(v)); ndPopRenderLista(); }
+    function ndPopAplicar() {
+        const P = ND._pop;
+        if (P.sel.size === P.vals.length) delete ND.filtros[P.key]; else ND.filtros[P.key] = Array.from(P.sel);
+        ndCerrarPop(); ndRenderTodo();
+    }
+    function ndPopLimpiar() { delete ND.filtros[ND._pop.key]; ndCerrarPop(); ndRenderTodo(); }
+
+    // ---------- Arrastrar y soltar el Excel ----------
+    function ndInitDragDrop() {
+        const modal = document.getElementById('modalNoDespachado');
+        const ov = document.getElementById('ndDropOverlay');
+        let n = 0;
+        const esArchivo = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+        modal.addEventListener('dragenter', e => { if (!esArchivo(e)) return; e.preventDefault(); n++; ov.style.display = 'flex'; });
+        modal.addEventListener('dragover', e => { if (esArchivo(e)) e.preventDefault(); });
+        modal.addEventListener('dragleave', e => { if (!esArchivo(e)) return; n = Math.max(0, n - 1); if (!n) ov.style.display = 'none'; });
+        modal.addEventListener('drop', e => {
+            if (!esArchivo(e)) return;
+            e.preventDefault(); n = 0; ov.style.display = 'none';
+            const f = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (!f) return;
+            if (!/\.(xlsx|xls|csv)$/i.test(f.name)) { alert('Suelta un archivo Excel (.xlsx, .xls) o .csv'); return; }
+            ndLeerArchivo({ files: [f], value: '' });
+        });
+        document.addEventListener('click', ndCerrarPop);
+    }
+
+    // ---------- Exportar ----------
+    function ndExportar() {
+        const filtradas = ndFilasFiltradas();
+        if (!filtradas.length) { alert('No hay filas para exportar.'); return; }
+        const cols = ndColumnasActivas();
+        const datos = filtradas.map(f => { const o = {}; cols.forEach(c => { o[c.label] = c.key === '_archivo' ? (f._archivo || '') : (f[c.key] || ''); }); return o; });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'No despachado');
+        XLSX.writeFile(wb, 'NO_DESPACHADO_filtrado.xlsx');
+    }
+
+    // ---------- Historial de cargas ----------
+    function ndTogglePanelCargas() {
+        const p = document.getElementById('ndPanelCargas');
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        ndRenderPanelCargas();
+    }
+
+    function ndRenderPanelCargas() {
+        const p = document.getElementById('ndPanelCargas');
+        if (!p || p.style.display === 'none') return;
+        const conteo = {};
+        Object.values(ND.filas).forEach(f => { conteo[f._lote] = (conteo[f._lote] || 0) + 1; });
+        const lotes = Object.entries(ND.lotes).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
+        const filas = lotes.map(([id, l]) => '<tr style="border-bottom:1px solid var(--border);"><td style="padding:5px 8px; font-size:12px; font-weight:700;">' + ndEsc(l.archivo) + '</td><td style="padding:5px 8px; font-size:11px;">' + new Date(l.ts).toLocaleString('es-PE') + '</td><td style="padding:5px 8px; font-size:11px;">' + (l.nuevas || 0) + ' nuevas / ' + (l.actualizadas || 0) + ' actualizadas</td><td style="padding:5px 8px; font-size:11px;">' + (conteo[id] || 0) + ' filas vigentes</td><td style="padding:5px 8px;"><button onclick="ndQuitarCarga(\'' + id + '\')" style="background:rgba(239,68,68,0.1); color:var(--danger); border:none; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:800; cursor:pointer;">Quitar carga</button></td></tr>').join('');
+        p.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><b style="font-size:12px;">🗂 Historial de cargas</b><button onclick="ndVaciarTodo()" style="background:var(--danger); color:#fff; border:none; padding:5px 10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">🗑 Vaciar toda la tabla</button></div>' +
+            (lotes.length ? '<table style="width:100%; border-collapse:collapse;">' + filas + '</table>' : '<div style="font-size:12px; color:var(--text-muted);">Sin cargas todavía.</div>');
+    }
+
+    async function ndQuitarCarga(id) {
+        const keys = Object.keys(ND.filas).filter(k => ND.filas[k]._lote === id);
+        if (!confirm('¿Quitar esta carga? Se eliminarán ' + keys.length + ' filas de la nube.')) return;
+        try {
+            for (let i = 0; i < keys.length; i += 400) {
+                const upd = {};
+                keys.slice(i, i + 400).forEach(k => { upd['no_despachado/filas/' + k] = null; });
+                await rtdb.ref().update(upd);
+            }
+            await rtdb.ref('no_despachado/lotes/' + id).remove();
+        } catch (err) { alert('Error: ' + err.message); }
+    }
+
+    async function ndVaciarTodo() {
+        if (!confirm('¿Vaciar TODA la tabla No Despachado de la nube? Esta acción no se puede deshacer.')) return;
+        try { await rtdb.ref('no_despachado').remove(); } catch (err) { alert('Error: ' + err.message); }
     }
 
     function abrirModalCargosManuales() {

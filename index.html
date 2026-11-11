@@ -1206,92 +1206,17 @@
     </div>
 </div>
 
-<div id="modalLiquidacionGraficos" class="modal" style="z-index: 6645;">
-    <div class="modal-content" style="max-width: 1100px; width: 96%; max-height: 92vh; display:flex; flex-direction:column;">
-        <div class="desktop-panel-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--warning); padding-bottom:8px; margin-bottom:10px;">
-            <span style="color:var(--warning);">📊 LIQUIDACIÓN · GRÁFICOS</span>
-            <button onclick="cerrarModalLiquidacionGraficosLQG()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
-        </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; align-items:center;">
-            <input type="text" id="lqgRuta" placeholder="Ruta" oninput="renderizarLiquidacionGraficosLQG()" style="flex:1; min-width:90px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <select id="lqgDia" onchange="renderizarLiquidacionGraficosLQG()" style="flex:1; min-width:100px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;"><option value="">Todos los días</option></select>
-            <input type="text" id="lqgFechaCarga" placeholder="Fecha carga (dd/mm/aaaa)" oninput="renderizarLiquidacionGraficosLQG()" style="flex:1.2; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <input type="text" id="lqgFechaEscaneo" placeholder="Fecha escaneo (dd/mm/aaaa)" oninput="renderizarLiquidacionGraficosLQG()" style="flex:1.2; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:var(--text-muted);">Días mín.
-                <input type="number" id="lqgMinDias" value="1" min="1" oninput="renderizarLiquidacionGraficosLQG()" style="width:54px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            </label>
-            <label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:var(--text-muted);">Salidas &gt;
-                <input type="number" id="lqgSalidas" value="3" min="1" oninput="renderizarLiquidacionGraficosLQG()" style="width:54px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            </label>
-            <select id="lqgPoblacion" onchange="renderizarLiquidacionGraficosLQG()" style="min-width:150px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-                <option value="todos">Salidas: toda la Base Ruta</option>
-                <option value="liq">Salidas: solo folios en liquidación</option>
-            </select>
-            <button onclick="exportarLiquidacionGraficosLQG()" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">📥 Excel</button>
-        </div>
-        <div style="overflow-y:auto; flex:1; min-height:200px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-                <div style="flex:1; min-width:150px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqgKpiLiq" style="font-size:22px; font-weight:900; color:var(--warning);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">FOLIOS EN LIQUIDACIÓN</div></div>
-                <div style="flex:1; min-width:150px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqgKpiMas" style="font-size:22px; font-weight:900; color:var(--danger);">0</div><div id="lqgKpiMasLbl" style="font-size:10px; font-weight:800; color:var(--text-muted);">FOLIOS CON MÁS DE 3 SALIDAS</div></div>
-                <div style="flex:1; min-width:150px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqgKpiAmbos" style="font-size:22px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">DE ESOS, TAMBIÉN EN LIQUIDACIÓN</div></div>
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:10px;">
-                <div style="border:1px solid var(--border); border-radius:8px; padding:8px;"><div style="font-size:11px; font-weight:900; margin-bottom:4px;">Folios en liquidación por día de escaneo</div><div style="position:relative; height:220px;"><canvas id="lqgChartDias"></canvas></div></div>
-                <div style="border:1px solid var(--border); border-radius:8px; padding:8px;"><div style="font-size:11px; font-weight:900; margin-bottom:4px;">Folios según cantidad de salidas</div><div style="position:relative; height:220px;"><canvas id="lqgChartSalidas"></canvas></div></div>
-                <div style="border:1px solid var(--border); border-radius:8px; padding:8px;"><div style="font-size:11px; font-weight:900; margin-bottom:4px;">Folios en liquidación según su último registro</div><div style="position:relative; height:220px;"><canvas id="lqgChartMarca"></canvas></div></div>
-                <div style="border:1px solid var(--border); border-radius:8px; padding:8px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; margin-bottom:4px;">Top 10 rutas con más folios en liquidación</div><div style="position:relative; height:240px;"><canvas id="lqgChartRutas"></canvas></div></div>
-            </div>
-            <div id="lqgNota" style="font-size:10px; color:var(--text-muted); margin-top:8px;"></div>
-        </div>
-    </div>
-</div>
-
-<div id="modalNoLiquidacion" class="modal" style="z-index: 6638;">
-    <div class="modal-content" style="max-width: 1000px; width: 96%; max-height: 92vh; display:flex; flex-direction:column;">
-        <div class="desktop-panel-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--primary); padding-bottom:8px; margin-bottom:10px;">
-            <span style="color:var(--primary);">🚫 NO LIQUIDACIÓN</span>
-            <button onclick="cerrarModalNoLiquidacionLQN()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
-        </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Escaneos del <b>Escaneo General</b> que <b>no</b> se consideran liquidación, con el motivo de cada uno. Usa el mismo criterio de <b>Días mín.</b> que la vista Liquidación.</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiTotal" style="font-size:20px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">ESCANEOS NO LIQUIDACIÓN</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiSinBase" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">NO ESTÁ EN BASE RUTA</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiMisma" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">MISMA JORNADA / DENTRO DEL PLAZO</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiYaLiq" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">YA LIQUIDADA (REINVENTARIADO)</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqnKpiOtros" style="font-size:20px; font-weight:900;">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">NO EVALUABLES / ANTES DE LA CARGA</div></div>
-        </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-            <input type="text" id="lqnBuscar" placeholder="Buscar guía o ruta" oninput="renderizarNoLiquidacionLQN()" style="flex:1.4; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <input type="text" id="lqnFechaEscaneo" placeholder="Fecha escaneo (dd/mm/aaaa)" oninput="renderizarNoLiquidacionLQN()" style="flex:1; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <select id="lqnMotivo" onchange="renderizarNoLiquidacionLQN()" style="flex:1.2; min-width:150px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-                <option value="">Todos los motivos</option>
-                <option value="SIN_BASE">No está en Base Ruta</option>
-                <option value="MISMA">Misma jornada / dentro del plazo</option>
-                <option value="SIN_FECHA">No evaluable (falta fecha)</option>
-                <option value="ANTES">Escaneo anterior a la carga</option>
-                <option value="YA_LIQ">Ya liquidada anteriormente (reinventariado)</option>
-            </select>
-            <label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:var(--text-muted);">Días mín.
-                <input type="number" id="lqnMinDias" value="1" min="1" oninput="renderizarNoLiquidacionLQN()" style="width:56px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            </label>
-            <button onclick="exportarNoLiquidacionLQN()" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">📥 Excel</button>
-        </div>
-        <div id="lqnTablaWrap" style="overflow:auto; flex:1; min-height:160px; border:1px solid var(--border); border-radius:8px;"></div>
-        <div id="lqnNota" style="font-size:10px; color:var(--text-muted); margin-top:6px;"></div>
-    </div>
-</div>
-
 <div id="modalLiquidacion" class="modal" style="z-index: 6640;">
     <div class="modal-content" style="max-width: 1000px; width: 96%; max-height: 92vh; display:flex; flex-direction:column;">
         <div class="desktop-panel-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid var(--warning); padding-bottom:8px; margin-bottom:10px;">
             <span style="color:var(--warning);">💸 LIQUIDACIÓN</span>
             <button onclick="cerrarModalLiquidacionLQ()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
         </div>
-        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Guías escaneadas en el <b>Escaneo General</b> que están en la <b>Base de Ruta</b> y cuyo escaneo ocurrió días <b>después</b> de la jornada en que se cargó esa base. Se marcan automáticamente con la observación <b>LIQUIDACIÓN</b>. La jornada corta a las 8:00 AM (la madrugada cuenta como el día anterior). <b>Se conservan aunque limpies el historial</b>; solo se borran con el botón 🗑️ de esta vista.</p>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Guías escaneadas en el <b>Escaneo General</b> que están en la <b>Base de Ruta</b> y cuyo escaneo ocurrió días <b>después</b> de la jornada en que se cargó esa base. Solo se registran si el escaneo se hizo con el check <b>Reconocer liquidación</b> activo. Se marcan con la observación <b>LIQUIDACIÓN</b>. La jornada corta a las 8:00 AM (la madrugada cuenta como el día anterior). <b>Se conservan aunque limpies el historial</b>; solo se borran con el botón 🗑️ de esta vista.</p>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiTotal" style="font-size:20px; font-weight:900; color:var(--warning);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">GUÍAS EN LIQUIDACIÓN</div></div>
             <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiRutas" style="font-size:20px; font-weight:900; color:var(--primary);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">RUTAS AFECTADAS</div></div>
-            <div style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiSinFecha" style="font-size:20px; font-weight:900; color:var(--text-muted);">0</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">BASE RUTA SIN FECHA DE CARGA</div><button onclick="asignarFechaCargaSinFechaLQ()" style="margin-top:6px; background:var(--warning); color:#fff; border:none; padding:5px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;">📅 Asignar fecha</button></div>
+            <div id="lqCardCarga" style="flex:1; min-width:110px; border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center;"><div id="lqKpiFechaCarga" style="font-size:16px; font-weight:900; color:var(--primary); line-height:1.6;">—</div><div style="font-size:10px; font-weight:800; color:var(--text-muted);">FECHA DE CARGA BASE RUTA</div><div id="lqKpiFechaCargaDet" style="font-size:9px; color:var(--text-muted); margin-top:2px;"></div><div id="lqSinFechaWrap" style="display:none; margin-top:6px; font-size:10px; font-weight:800; color:var(--danger);"><span id="lqKpiSinFecha">0</span> registros sin fecha <button onclick="asignarFechaCargaSinFechaLQ()" style="margin-left:4px; background:var(--warning); color:#fff; border:none; padding:5px 8px; border-radius:6px; font-weight:800; font-size:10px; cursor:pointer;">📅 Asignar fecha</button></div></div>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
             <input type="text" id="lqBuscar" placeholder="Buscar guía o ruta" oninput="renderizarLiquidacionLQ()" style="flex:1.4; min-width:130px; padding:7px; border:1px solid var(--border); border-radius:6px; font-size:12px;">
@@ -1308,6 +1233,13 @@
             <button onclick="document.getElementById('lqRestaurarFile').click()" title="Restaurar desde un backup .json" style="background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">📂 Restaurar</button>
             <input type="file" id="lqRestaurarFile" accept=".json,application/json" style="display:none;" onchange="restaurarBackupLiquidacionLQ(event)">
             <button onclick="borrarLiquidacionesLQ()" title="Borra solo las liquidaciones; no toca el historial" style="background:var(--danger); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">🗑️ Borrar</button>
+        </div>
+        <div id="lqAccionesSel" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+            <span id="lqSelInfo" style="font-size:11px; font-weight:800; color:var(--text-muted);">0 seleccionadas</span>
+            <button onclick="seleccionarFiltradasLQ(true)" style="background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:6px 10px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">☑️ Seleccionar filtradas</button>
+            <button onclick="seleccionarFiltradasLQ(false)" style="background:var(--bg); color:var(--text-main); border:1px solid var(--border); padding:6px 10px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">⬜ Quitar selección</button>
+            <button id="lqBtnElimSel" onclick="eliminarSeleccionLQ()" style="background:var(--danger); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">🗑️ Eliminar selección</button>
+            <button id="lqBtnElimFiltro" onclick="eliminarFiltradasLQ()" style="background:var(--danger); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-weight:800; font-size:11px; cursor:pointer;">🗑️ Borrar filtradas</button>
         </div>
         <div id="lqTablaWrap" style="overflow:auto; flex:1; min-height:160px; border:1px solid var(--border); border-radius:8px;"></div>
         <div id="lqNota" style="font-size:10px; color:var(--text-muted); margin-top:6px;"></div>
@@ -1754,8 +1686,6 @@
             <button class="btn-header" id="btnTrazabilidadDesk" onclick="abrirModalTrazabilidad();" style="display:flex; padding: 8px 12px; font-size: 12px;">🧭 Trazabilidad de Ruta</button>
             <button class="btn-header" id="btnLiberarZonasDesk" onclick="abrirModalLiberarZonasCS();" style="display:none; padding: 8px 12px; font-size: 12px;">🔓 Liberar Zonas (PL)</button>
             <button class="btn-header" id="btnLiquidacionDesk" onclick="abrirModalLiquidacionLQ();" style="display:none; padding: 8px 12px; font-size: 12px;">💸 Liquidación</button>
-            <button class="btn-header" id="btnLiquidacionGraficosDesk" onclick="abrirModalLiquidacionGraficosLQG();" style="display:none; padding: 8px 12px; font-size: 12px;">📊 Liquidación · Gráficos</button>
-            <button class="btn-header" id="btnNoLiquidacionDesk" onclick="abrirModalNoLiquidacionLQN();" style="display:none; padding: 8px 12px; font-size: 12px;">🚫 No Liquidación</button>
             <button class="btn-header" id="btnCruceILDesk" onclick="abrirModalCruceIL();" style="display:flex; padding: 8px 12px; font-size: 12px;">🔀 Cruce de Datos IL</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 8px 12px; font-size: 12px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
@@ -3866,8 +3796,6 @@
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = "flex";
             { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "flex"; }
             { const _bq = document.getElementById('btnLiquidacionDesk'); if (_bq) _bq.style.display = "flex"; }
-            { const _bg = document.getElementById('btnLiquidacionGraficosDesk'); if (_bg) _bg.style.display = "flex"; }
-            { const _bn = document.getElementById('btnNoLiquidacionDesk'); if (_bn) _bn.style.display = "flex"; }
             if (btnCruceIL) btnCruceIL.style.display = "flex";
             if (btnCruceILDesk) btnCruceILDesk.style.display = "flex";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = "flex";
@@ -3950,8 +3878,6 @@
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = p.trazabilidad ? "flex" : "none";
             { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "none"; }
             { const _bq = document.getElementById('btnLiquidacionDesk'); if (_bq) _bq.style.display = "none"; }
-            { const _bg = document.getElementById('btnLiquidacionGraficosDesk'); if (_bg) _bg.style.display = "none"; }
-            { const _bn = document.getElementById('btnNoLiquidacionDesk'); if (_bn) _bn.style.display = "none"; }
             if (btnCruceIL) btnCruceIL.style.display = p.cruce_il ? "flex" : "none";
             if (btnCruceILDesk) btnCruceILDesk.style.display = p.cruce_il ? "flex" : "none";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = p.vista_global ? "flex" : "none";
@@ -3999,8 +3925,6 @@
             if (btnTrazabilidadDesk) btnTrazabilidadDesk.style.display = "none";
             { const _bl = document.getElementById('btnLiberarZonasDesk'); if (_bl) _bl.style.display = "none"; }
             { const _bq = document.getElementById('btnLiquidacionDesk'); if (_bq) _bq.style.display = "none"; }
-            { const _bg = document.getElementById('btnLiquidacionGraficosDesk'); if (_bg) _bg.style.display = "none"; }
-            { const _bn = document.getElementById('btnNoLiquidacionDesk'); if (_bn) _bn.style.display = "none"; }
             if (btnCruceIL) btnCruceIL.style.display = "none";
             if (btnCruceILDesk) btnCruceILDesk.style.display = "none";
             if (btnVistaGlobalDesk) btnVistaGlobalDesk.style.display = "none";
@@ -5246,6 +5170,10 @@
     // escaneos del historial anteriores a ese momento ya no generan liquidación
     // (si no, reaparecerían al recalcularse desde el historial que sigue ahí).
     let liqCorteLQ = 0;
+    // Guías eliminadas a mano de la vista (Firebase: liquidaciones_excluidas/{clave} = momento de eliminación).
+    // Los escaneos anteriores a ese momento ya no vuelven a generar esa liquidación.
+    let liqExcluidasLQ = {};
+    let liqSeleccionLQ = new Set();
     let liqRegistroListoLQ = false, liqCorteListoLQ = false, liqAutoOcupadoLQ = false;
 
     function escucharLiquidacionesPersistidasLQ() {
@@ -5254,6 +5182,10 @@
             liqRegistroListoLQ = true;
             refrescarLiquidacionSiAbierto();
         }, err => console.error('liquidaciones_registro:', err));
+        rtdb.ref('liquidaciones_excluidas').on('value', snap => {
+            liqExcluidasLQ = snap.val() || {};
+            refrescarLiquidacionSiAbierto();
+        }, err => console.error('liquidaciones_excluidas:', err));
         rtdb.ref('liquidaciones_config/corte').on('value', snap => {
             liqCorteLQ = Number(snap.val()) || 0;
             liqCorteListoLQ = true;
@@ -5356,6 +5288,12 @@
         return true;
     }
 
+    // El escaneo solo puede ser liquidación si se hizo con el check "Reconocer liquidación"
+    // activo: la terminal RF guarda entonces liquidada:true (y marca RET/DEV si se eligió).
+    function pasoCheckLiqLQ(sc) {
+        return !!(sc && (sc.liquidada || sc.marca));
+    }
+
     function calcularLiquidacionLQ(minDias) {
         const porGuia = {};
         let sinFecha = 0;
@@ -5387,9 +5325,12 @@
             const g = String(sc.guiaOriginal || sc.guia || '');
             const cargas = porGuia[g];
             if (!cargas) return;
+            if (!pasoCheckLiqLQ(sc)) return; // sin el check "Reconocer liquidación" activo no se registra
             const fe = parsearHoraAObj(sc.hora);
             if (!fe.getTime()) return;
             if (liqCorteLQ && fe.getTime() <= liqCorteLQ) return; // anterior al último borrado de Liquidación
+            const exc = liqExcluidasLQ[claveGuiaLQ(g)];
+            if (exc && fe.getTime() <= Number(exc)) return; // guía eliminada a mano de la vista
             const jScan = fechaJornadaLQ(fe);
             let mejor = null, mejorJ = null;
             cargas.forEach(r => {
@@ -5448,11 +5389,11 @@
     // Resultado memorizado (scans y la Base Ruta se reemplazan en cada cambio de Firebase)
     function liquidacionCacheLQ() {
         const c = _liqCacheLQ;
-        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.persRef !== liqPersistidasLQ || c.corte !== liqCorteLQ || c.min !== liqMinDiasLQ || !c.res) {
+        if (c.scansRef !== scans || c.baseRef !== baseDatosRutaNube || c.persRef !== liqPersistidasLQ || c.excRef !== liqExcluidasLQ || c.corte !== liqCorteLQ || c.min !== liqMinDiasLQ || !c.res) {
             c.res = calcularLiquidacionLQ(liqMinDiasLQ);
             c.mapa = new Map();
             c.res.filas.forEach(f => { if (f.key) c.mapa.set(f.key, f); });
-            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.persRef = liqPersistidasLQ; c.corte = liqCorteLQ; c.min = liqMinDiasLQ;
+            c.scansRef = scans; c.baseRef = baseDatosRutaNube; c.persRef = liqPersistidasLQ; c.excRef = liqExcluidasLQ; c.corte = liqCorteLQ; c.min = liqMinDiasLQ;
         }
         return c;
     }
@@ -5519,13 +5460,11 @@
     function refrescarLiquidacionSiAbierto() {
         programarConservarAutoLQ();
         const abierto = id => { const el = document.getElementById(id); return !!el && el.style.display === 'flex'; };
-        const a = abierto('modalLiquidacion'), b = abierto('modalLiquidacionGraficos'), c = abierto('modalNoLiquidacion');
-        if (!a && !b && !c) return;
+        const a = abierto('modalLiquidacion');
+        if (!a) return;
         clearTimeout(refrescarLiquidacionSiAbierto._t);
         refrescarLiquidacionSiAbierto._t = setTimeout(() => {
             if (a) renderizarLiquidacionLQ();
-            if (b) renderizarLiquidacionGraficosLQG();
-            if (c) renderizarNoLiquidacionLQN();
         }, 400);
     }
 
@@ -5550,6 +5489,22 @@
         document.getElementById('lqKpiTotal').textContent = liquidacionFiltradasLQ.length;
         document.getElementById('lqKpiRutas').textContent = new Set(liquidacionFiltradasLQ.map(f => f.ruta)).size;
         document.getElementById('lqKpiSinFecha').textContent = r.sinFecha;
+        document.getElementById('lqSinFechaWrap').style.display = r.sinFecha ? 'block' : 'none';
+        // Fecha de la carga de Base Ruta (la que se hace desde Validar Ruta / Cargas realizadas)
+        (function () {
+            const cargas = Object.values(cargasRutaCache || {}).filter(c => c && c.fecha && !String(c.nombreArchivo || '').startsWith('Fecha asignada'));
+            cargas.sort((a, b) => b.fecha - a.fecha);
+            let ult = cargas[0] ? { t: Number(cargas[0].fecha), arch: cargas[0].nombreArchivo || '', usu: cargas[0].usuario || '' } : null;
+            if (!ult) {
+                const mx = (baseDatosRutaNube || []).reduce((m, x) => Math.max(m, Number(x && x._loteFecha) || 0), 0);
+                if (mx) ult = { t: mx, arch: '', usu: '' };
+            }
+            const el = document.getElementById('lqKpiFechaCarga'), det = document.getElementById('lqKpiFechaCargaDet');
+            if (!ult) { el.textContent = 'Sin cargas'; det.textContent = ''; el.parentNode.title = ''; return; }
+            el.textContent = fmtFechaHoraLQ(new Date(ult.t));
+            det.textContent = [ult.arch, ult.usu].filter(Boolean).join(' · ') + (cargas.length > 1 ? ` · ${cargas.length} cargas` : '');
+            el.parentNode.title = cargas.slice(0, 8).map(c => fmtFechaHoraLQ(new Date(Number(c.fecha))) + ' — ' + (c.nombreArchivo || '') + (c.usuario ? ' (' + c.usuario + ')' : '')).join('\n');
+        })();
 
         const LIMITE = 300;
         if (liquidacionFiltradasLQ.length === 0) {
@@ -5558,20 +5513,90 @@
             const th = 'style="text-align:left; padding:7px 8px; font-size:10px; color:var(--text-muted); position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--border); white-space:nowrap;"';
             const td = 'style="padding:6px 8px; font-size:11px; border-bottom:1px solid var(--border); white-space:nowrap;"';
             const filas = liquidacionFiltradasLQ.slice(0, LIMITE).map(f => `<tr>
+                <td ${td}><input type="checkbox" data-g="${escLZ(f.guia)}" ${liqSeleccionLQ.has(f.guia) ? 'checked' : ''} onchange="toggleSeleccionLQ(this.dataset.g, this.checked)"></td>
                 <td ${td}><b>${escLZ(f.guia)}</b></td><td ${td}>${f.marca ? `<b>${escLZ(f.guiaRegistrada)}</b>` : '<span style="color:var(--text-muted);">—</span>'}</td><td ${td}>${escLZ(f.dia)}</td><td ${td}>${escLZ(f.ruta)}</td><td ${td}>${escLZ(f.sec)}</td>
                 <td ${td}>${escLZ(f.cargaTxt)}</td><td ${td}>${escLZ(f.escaneoTxt)}<br><span style="font-size:9px; color:var(--text-muted);">${escLZ(f.usuarioEscaneo)}</span></td>
                 <td ${td}>+${f.dias} d</td>
                 <td ${td} title="${escLZ(f.fechasRuteo)}"><b>${f.vecesRuteada}</b> <span style="font-size:9px; color:var(--text-muted);">${escLZ(f.fechasRuteo)}</span></td>
                 <td ${td}><b>${f.vecesVolvio}</b></td>
                 <td ${td}><span style="background:rgba(185,133,47,0.15); color:var(--warning); padding:2px 8px; border-radius:10px; font-weight:900; font-size:10px;">${f.observacion}</span>${f.persistida ? '<br><span title="Conservada aunque se borró el historial" style="font-size:9px; color:var(--text-muted);">📌 conservada</span>' : ''}</td>
+                <td ${td}><button data-g="${escLZ(f.guia)}" onclick="eliminarGuiasLQ([this.dataset.g])" title="Eliminar esta guía de Liquidación" style="background:none; border:1px solid var(--border); border-radius:6px; padding:3px 7px; cursor:pointer;">🗑️</button></td>
             </tr>`).join('');
             wrap.innerHTML = `<table style="width:100%; border-collapse:collapse;"><thead><tr>
-                <th ${th}>SEGUIMIENTO</th><th ${th}>REGISTRADO COMO</th><th ${th}>DÍA</th><th ${th}>RUTA</th><th ${th}>SEC</th><th ${th}>CARGA BASE RUTA</th><th ${th}>ESCANEO GENERAL</th><th ${th}>TRANSCURRIDO</th><th ${th}>VECES RUTEADA</th><th ${th}>VECES QUE VOLVIÓ</th><th ${th}>OBSERVACIÓN</th>
+                <th ${th}><input type="checkbox" id="lqChkTodos" title="Seleccionar / quitar todas las filtradas" onchange="seleccionarFiltradasLQ(this.checked)"></th><th ${th}>SEGUIMIENTO</th><th ${th}>REGISTRADO COMO</th><th ${th}>DÍA</th><th ${th}>RUTA</th><th ${th}>SEC</th><th ${th}>CARGA BASE RUTA</th><th ${th}>ESCANEO GENERAL</th><th ${th}>TRANSCURRIDO</th><th ${th}>VECES RUTEADA</th><th ${th}>VECES QUE VOLVIÓ</th><th ${th}>OBSERVACIÓN</th><th ${th}></th>
             </tr></thead><tbody>${filas}</tbody></table>`;
         }
         const extra = liquidacionFiltradasLQ.length > LIMITE ? `Mostrando ${LIMITE} de ${liquidacionFiltradasLQ.length}; el Excel incluye todas. ` : '';
         document.getElementById('lqNota').textContent = extra + (liqCorteLQ ? `Liquidación borrada el ${fmtFechaHoraLQ(new Date(liqCorteLQ))}: no se toman en cuenta escaneos anteriores. ` : '') + (r.sinFecha ? `${r.sinFecha} registros de Base Ruta no tienen fecha de carga (se cargaron antes de esta función) y no se pueden evaluar.` : '');
+        actualizarSeleccionLQ();
         if (document.getElementById('modalRegistros') && document.getElementById('modalRegistros').style.display === 'flex') actualizarListaTarjetas();
+    }
+
+    // ---- Selección y eliminación (por línea, por selección o por filtro) ----
+    function actualizarSeleccionLQ() {
+        const existentes = new Set((liquidacionCacheLQ().res.filas || []).map(f => f.guia));
+        liqSeleccionLQ.forEach(g => { if (!existentes.has(g)) liqSeleccionLQ.delete(g); });
+        const info = document.getElementById('lqSelInfo');
+        if (info) info.textContent = liqSeleccionLQ.size + ' seleccionadas';
+        const b1 = document.getElementById('lqBtnElimSel'), b2 = document.getElementById('lqBtnElimFiltro');
+        if (b1) { b1.textContent = '🗑️ Eliminar selección (' + liqSeleccionLQ.size + ')'; b1.disabled = !liqSeleccionLQ.size; b1.style.opacity = liqSeleccionLQ.size ? '1' : '0.5'; }
+        if (b2) { b2.textContent = '🗑️ Borrar filtradas (' + liquidacionFiltradasLQ.length + ')'; b2.disabled = !liquidacionFiltradasLQ.length; b2.style.opacity = liquidacionFiltradasLQ.length ? '1' : '0.5'; }
+        const t = document.getElementById('lqChkTodos');
+        if (t) {
+            const n = liquidacionFiltradasLQ.filter(f => liqSeleccionLQ.has(f.guia)).length;
+            t.checked = n > 0 && n === liquidacionFiltradasLQ.length;
+            t.indeterminate = n > 0 && n < liquidacionFiltradasLQ.length;
+        }
+    }
+
+    function toggleSeleccionLQ(guia, marcado) {
+        if (marcado) liqSeleccionLQ.add(guia); else liqSeleccionLQ.delete(guia);
+        actualizarSeleccionLQ();
+    }
+
+    // true = selecciona todas las filtradas (aunque la tabla muestre solo 300); false = limpia la selección
+    function seleccionarFiltradasLQ(marcar) {
+        if (marcar) liquidacionFiltradasLQ.forEach(f => liqSeleccionLQ.add(f.guia)); else liqSeleccionLQ.clear();
+        renderizarLiquidacionLQ();
+    }
+
+    async function eliminarGuiasLQ(guias) {
+        if (!esAdmin()) { alert('Solo el administrador puede eliminar Liquidación.'); return; }
+        guias = Array.from(new Set(guias || []));
+        if (!guias.length) { alert('No hay guías para eliminar.'); return; }
+        const msg = guias.length === 1
+            ? `🗑️ Se eliminará la guía ${guias[0]} de Liquidación (también si estaba conservada). No se toca el Historial ni la Base de Ruta.\n\n¿Continuar?`
+            : `🚨 Se eliminarán ${guias.length} guías de Liquidación (también las conservadas). No se toca el Historial ni la Base de Ruta.\n\nAntes se guardará un backup automático (archivo + nube).\n\n¿Continuar?`;
+        if (!confirm(msg)) return;
+        if (guias.length > 20 && prompt('Para confirmar escribe BORRAR:') !== 'BORRAR') { alert('Cancelado.'); return; }
+        try {
+            if (guias.length > 1 && !(await guardarBackupLiquidacionLQ(true))) return;
+            const ahora = Date.now();
+            for (let i = 0; i < guias.length; i += 200) {
+                const upd = {};
+                guias.slice(i, i + 200).forEach(g => {
+                    const k = claveGuiaLQ(g);
+                    upd['liquidaciones_registro/' + k] = null;
+                    upd['liquidaciones_excluidas/' + k] = ahora;
+                });
+                await rtdb.ref().update(upd);
+            }
+            guias.forEach(g => liqSeleccionLQ.delete(g));
+            renderizarLiquidacionLQ();
+        } catch (err) {
+            console.error(err);
+            alert('❌ No se pudo eliminar: ' + err.message);
+        }
+    }
+
+    function eliminarSeleccionLQ() {
+        if (!liqSeleccionLQ.size) { alert('No hay guías seleccionadas.'); return; }
+        eliminarGuiasLQ(Array.from(liqSeleccionLQ));
+    }
+
+    function eliminarFiltradasLQ() {
+        if (!liquidacionFiltradasLQ.length) { alert('No hay guías filtradas para borrar.'); return; }
+        eliminarGuiasLQ(liquidacionFiltradasLQ.map(f => f.guia));
     }
 
     function exportarLiquidacionLQ() {
@@ -5629,6 +5654,9 @@
                 const upd = {};
                 filas.forEach(f => { upd[claveGuiaLQ(f.guia)] = filaARegistroLQ(f); });
                 await escribirRegistroLQ(upd);
+                const quitar = {};
+                filas.forEach(f => { quitar['liquidaciones_excluidas/' + claveGuiaLQ(f.guia)] = null; });
+                await rtdb.ref().update(quitar);
                 alert(`✅ ${filas.length} guías restauradas.`);
             } catch (err) {
                 console.error(err);
@@ -5647,7 +5675,7 @@
         if (prompt('Para confirmar escribe BORRAR:') !== 'BORRAR') { alert('Cancelado.'); return; }
         try {
             if (!(await guardarBackupLiquidacionLQ(true))) return;
-            await rtdb.ref().update({ 'liquidaciones_registro': null, 'liquidaciones_config/corte': Date.now() });
+            await rtdb.ref().update({ 'liquidaciones_registro': null, 'liquidaciones_excluidas': null, 'liquidaciones_config/corte': Date.now() });
             alert('✅ Liquidación borrada. El backup quedó descargado y en la nube.');
         } catch (err) {
             console.error(err);
@@ -5655,301 +5683,6 @@
         }
     }
 
-
-    // ======================================
-    // LIQUIDACIÓN · GRÁFICOS (solo admin)
-    // Salidas = en cuántas cargas distintas de Base Ruta aparece el folio.
-    // ======================================
-    let lqgCharts = {};
-    let lqgExport = [];
-    let _lqgUniv = { baseRef: null, res: null };
-
-    function universoFoliosLQG() {
-        if (_lqgUniv.baseRef === baseDatosRutaNube && _lqgUniv.res) return _lqgUniv.res;
-        const porGuia = {};
-        (baseDatosRutaNube || []).forEach(r => {
-            if (!r || !r.seguimiento || !r._loteFecha) return;
-            (porGuia[r.seguimiento] = porGuia[r.seguimiento] || []).push(r);
-        });
-        const folios = Object.keys(porGuia).map(g => {
-            const cargas = {};
-            porGuia[g].forEach(r => { cargas[r._loteId || ('t' + r._loteFecha)] = r; });
-            const lista = Object.values(cargas).sort((a, b) => a._loteFecha - b._loteFecha);
-            const ult = lista[lista.length - 1];
-            return {
-                guia: g, salidas: lista.length,
-                fechas: lista.map(r => fechaJornadaLQ(new Date(r._loteFecha)).txt),
-                rutas: lista.map(r => String(r.ruta || '').toUpperCase()),
-                dias: lista.map(r => String(r.dia || '')),
-                ultRuta: ult.ruta || '', ultDia: ult.dia || ''
-            };
-        });
-        _lqgUniv = { baseRef: baseDatosRutaNube, res: folios };
-        return folios;
-    }
-
-    function calcularGraficosLQG(fl) {
-        const universo = universoFoliosLQG().filter(f =>
-            (!fl.ruta || f.rutas.some(r => r.includes(fl.ruta))) &&
-            (!fl.dia || f.dias.includes(fl.dia)) &&
-            (!fl.fCarga || f.fechas.some(x => x.includes(fl.fCarga))));
-        const enUniverso = new Set(universo.map(f => f.guia));
-        const filasLiq = liquidacionCacheLQ().res.filas.filter(x =>
-            enUniverso.has(x.guia) && (!fl.fEsc || x.escaneoJornada.includes(fl.fEsc)));
-        const liqGuias = new Set(filasLiq.map(x => x.guia));
-        const poblacion = fl.poblacion === 'liq' ? universo.filter(f => liqGuias.has(f.guia)) : universo;
-        const masN = poblacion.filter(f => f.salidas > fl.salidas);
-
-        // Folios únicos en liquidación por jornada de escaneo
-        const porDia = {};
-        filasLiq.forEach(x => { (porDia[x.escaneoJornada] = porDia[x.escaneoJornada] || new Set()).add(x.guia); });
-        const parse = t => { const p = t.split('/').map(Number); return Date.UTC(p[2], p[1] - 1, p[0]); };
-        const dias = Object.keys(porDia).sort((a, b) => parse(a) - parse(b)).slice(-31).map(d => ({ d, n: porDia[d].size }));
-
-        // Distribución por número de salidas
-        const maxB = Math.max(5, fl.salidas + 2);
-        const dist = new Array(maxB).fill(0);
-        poblacion.forEach(f => { dist[Math.min(f.salidas, maxB) - 1]++; });
-
-        // Top rutas por folios únicos en liquidación
-        const porRuta = {};
-        const visto = new Set();
-        filasLiq.forEach(x => {
-            if (visto.has(x.guia)) return; visto.add(x.guia);
-            const r = x.ruta || 'S/R'; porRuta[r] = (porRuta[r] || 0) + 1;
-        });
-        const rutas = Object.keys(porRuta).map(r => ({ r, n: porRuta[r] })).sort((a, b) => b.n - a.n).slice(0, 10);
-
-        // Cómo quedó registrado cada folio (según su escaneo de liquidación más reciente)
-        const marcas = { RET: 0, DEV: 0, SIN: 0 };
-        const contado = new Set();
-        filasLiq.forEach(x => {
-            if (contado.has(x.guia)) return; contado.add(x.guia);
-            marcas[x.marca === 'RET' ? 'RET' : (x.marca === 'DEV' ? 'DEV' : 'SIN')]++;
-        });
-
-        return { universo, poblacion, liqGuias, masN, dias, dist, maxB, rutas, filasLiq, marcas,
-                 enLiqYMas: masN.filter(f => liqGuias.has(f.guia)).length };
-    }
-
-    function leerFiltrosLQG() {
-        const minDias = Math.max(1, parseInt(document.getElementById('lqgMinDias').value, 10) || 1);
-        liqMinDiasLQ = minDias;
-        const otro = document.getElementById('lqMinDias'); if (otro) otro.value = minDias;
-        return {
-            ruta: document.getElementById('lqgRuta').value.toUpperCase().trim(),
-            dia: document.getElementById('lqgDia').value,
-            fCarga: document.getElementById('lqgFechaCarga').value.trim(),
-            fEsc: document.getElementById('lqgFechaEscaneo').value.trim(),
-            salidas: Math.max(1, parseInt(document.getElementById('lqgSalidas').value, 10) || 3),
-            poblacion: document.getElementById('lqgPoblacion').value
-        };
-    }
-
-    function abrirModalLiquidacionGraficosLQG() {
-        if (!esAdmin()) { alert('Solo el administrador puede ver esta vista.'); return; }
-        document.getElementById('lqgMinDias').value = liqMinDiasLQ;
-        document.getElementById('modalLiquidacionGraficos').style.display = 'flex';
-        renderizarLiquidacionGraficosLQG();
-    }
-
-    function cerrarModalLiquidacionGraficosLQG() {
-        document.getElementById('modalLiquidacionGraficos').style.display = 'none';
-        Object.values(lqgCharts).forEach(c => { try { c.destroy(); } catch (e) {} });
-        lqgCharts = {};
-    }
-
-    function dibujarGraficoLQG(id, config) {
-        if (lqgCharts[id]) { try { lqgCharts[id].destroy(); } catch (e) {} }
-        const cv = document.getElementById(id);
-        if (!cv) return;
-        lqgCharts[id] = new Chart(cv.getContext('2d'), config);
-    }
-
-    function renderizarLiquidacionGraficosLQG() {
-        const nota = document.getElementById('lqgNota');
-        if (typeof Chart === 'undefined') { nota.textContent = 'No se pudo cargar la librería de gráficos (Chart.js). Revisa la conexión a internet.'; return; }
-        const fl = leerFiltrosLQG();
-
-        // Lista de días de la Base Ruta (conserva la selección)
-        const selDia = document.getElementById('lqgDia');
-        const previo = selDia.value;
-        const diasBase = Array.from(new Set(universoFoliosLQG().flatMap(f => f.dias).filter(Boolean))).sort();
-        selDia.innerHTML = '<option value="">Todos los días</option>' + diasBase.map(d => `<option value="${escLZ(d)}">${escLZ(d)}</option>`).join('');
-        if (diasBase.includes(previo)) selDia.value = previo;
-        fl.dia = selDia.value;
-
-        const r = calcularGraficosLQG(fl);
-        document.getElementById('lqgKpiLiq').textContent = r.liqGuias.size;
-        document.getElementById('lqgKpiMas').textContent = r.masN.length;
-        document.getElementById('lqgKpiMasLbl').textContent = `FOLIOS CON MÁS DE ${fl.salidas} SALIDAS`;
-        document.getElementById('lqgKpiAmbos').textContent = r.enLiqYMas;
-
-        const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-        dibujarGraficoLQG('lqgChartDias', {
-            type: 'bar',
-            data: { labels: r.dias.map(x => x.d.slice(0, 5)), datasets: [{ label: 'Folios', data: r.dias.map(x => x.n), backgroundColor: '#b9852f', borderRadius: 4 }] },
-            options: Object.assign({}, base, { scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } })
-        });
-        dibujarGraficoLQG('lqgChartSalidas', {
-            type: 'bar',
-            data: {
-                labels: r.dist.map((_, i) => (i + 1 === r.maxB ? (i + 1) + '+' : String(i + 1)) + (i === 0 ? ' salida' : ' salidas')),
-                datasets: [{ label: 'Folios', data: r.dist, backgroundColor: r.dist.map((_, i) => (i + 1 > fl.salidas ? '#b2453f' : '#3d5a80')), borderRadius: 4 }]
-            },
-            options: Object.assign({}, base, { scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } })
-        });
-        dibujarGraficoLQG('lqgChartRutas', {
-            type: 'bar',
-            data: { labels: r.rutas.map(x => x.r), datasets: [{ label: 'Folios', data: r.rutas.map(x => x.n), backgroundColor: '#b9852f', borderRadius: 4 }] },
-            options: Object.assign({}, base, { indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } } })
-        });
-
-        dibujarGraficoLQG('lqgChartMarca', {
-            type: 'bar',
-            data: { labels: ['Con RET', 'Con DEV', 'Sin marca'], datasets: [{ label: 'Folios', data: [r.marcas.RET, r.marcas.DEV, r.marcas.SIN], backgroundColor: ['#3d5a80', '#b9852f', '#8a8f98'], borderRadius: 4 }] },
-            options: Object.assign({}, base, { scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } })
-        });
-
-        const sinFecha = (baseDatosRutaNube || []).filter(x => x && !x._loteFecha).length;
-        nota.textContent = `Se cuentan folios únicos. Barras en rojo: folios con más de ${fl.salidas} salidas.` +
-            (sinFecha ? ` ${sinFecha} registros de Base Ruta sin fecha de carga no se pueden evaluar.` : '');
-
-        const volvio = {};
-        liquidacionCacheLQ().res.filas.forEach(x => { volvio[x.guia] = x.vecesVolvio; });
-        lqgExport = r.poblacion.slice().sort((a, b) => b.salidas - a.salidas).map(f => ({
-            'Seguimiento': f.guia, 'Ruta (última carga)': f.ultRuta, 'Día': f.ultDia,
-            'Salidas (veces ruteada)': f.salidas, 'Fechas de ruteo': f.fechas.join(', '),
-            ['Más de ' + fl.salidas + ' salidas']: f.salidas > fl.salidas ? 'SI' : 'NO',
-            'En liquidación': r.liqGuias.has(f.guia) ? 'SI' : 'NO', 'Veces que volvió': volvio[f.guia] || 0
-        }));
-    }
-
-    function exportarLiquidacionGraficosLQG() {
-        if (lqgExport.length === 0) { alert('No hay datos para exportar.'); return; }
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(lqgExport), 'Folios');
-        XLSX.writeFile(wb, `Liquidacion_Salidas_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    }
-
-
-    // ======================================
-    // NO LIQUIDACIÓN (solo admin)
-    // Escaneos generales que NO cumplen la regla de Liquidación, con su motivo.
-    // ======================================
-    let noLiqFiltradasLQN = [];
-    const MOTIVOS_LQN = {
-        SIN_BASE: 'No está en Base Ruta',
-        MISMA: 'Misma jornada / dentro del plazo',
-        SIN_FECHA: 'No evaluable (falta fecha)',
-        ANTES: 'Escaneo anterior a la carga',
-        YA_LIQ: 'Ya liquidada anteriormente (reinventariado)'
-    };
-
-    function calcularNoLiquidacionLQN() {
-        const liq = liquidacionCacheLQ().mapa;
-        const base = {};
-        (baseDatosRutaNube || []).forEach(r => {
-            if (!r || !r.seguimiento) return;
-            (base[r.seguimiento] = base[r.seguimiento] || []).push(r);
-        });
-        const filas = [];
-        (scans || []).forEach(sc => {
-            if (!esEscaneoGeneralLQ(sc)) return;
-            if (sc.key && liq.has(sc.key)) return;
-            const g = String(sc.guiaOriginal || sc.guia || '');
-            const fe = parsearHoraAObj(sc.hora);
-            const jS = fe.getTime() ? fechaJornadaLQ(fe).dia : null;
-            const regs = base[g];
-            let motivo, carga = '', ruta = '', dia = '';
-            if (!regs) {
-                motivo = 'SIN_BASE';
-            } else {
-                const fechadas = regs.filter(r => r._loteFecha);
-                if (!fechadas.length || jS === null) {
-                    motivo = 'SIN_FECHA'; ruta = regs[0].ruta || ''; dia = regs[0].dia || '';
-                } else {
-                    const ult = fechadas.reduce((a, b) => (b._loteFecha > a._loteFecha ? b : a));
-                    carga = fmtFechaHoraLQ(new Date(ult._loteFecha)); ruta = ult.ruta || ''; dia = ult.dia || '';
-                    const diffs = fechadas.map(r => jS - fechaJornadaLQ(new Date(r._loteFecha)).dia);
-                    motivo = diffs.every(d => d < 0) ? 'ANTES' : (diffs.some(d => d >= liqMinDiasLQ) ? 'YA_LIQ' : 'MISMA');
-                }
-            }
-            filas.push({
-                guia: g, registrada: sc.guia || '', hora: fe.getTime() ? fmtFechaHoraLQ(fe) : String(sc.hora || ''),
-                jornada: fe.getTime() ? fechaJornadaLQ(fe).txt : '', usuario: sc.usuario || '',
-                ubic: sc.ubic || '', zona: sc.zona || '', cat: sc.cat || '',
-                ruta, dia, carga, motivo, ts: fe.getTime() || 0
-            });
-        });
-        filas.sort((a, b) => b.ts - a.ts);
-        return filas;
-    }
-
-    function abrirModalNoLiquidacionLQN() {
-        if (!esAdmin()) { alert('Solo el administrador puede ver esta vista.'); return; }
-        document.getElementById('lqnMinDias').value = liqMinDiasLQ;
-        document.getElementById('modalNoLiquidacion').style.display = 'flex';
-        renderizarNoLiquidacionLQN();
-    }
-
-    function cerrarModalNoLiquidacionLQN() {
-        document.getElementById('modalNoLiquidacion').style.display = 'none';
-    }
-
-    function renderizarNoLiquidacionLQN() {
-        const wrap = document.getElementById('lqnTablaWrap');
-        if (!wrap) return;
-        const minDias = Math.max(1, parseInt(document.getElementById('lqnMinDias').value, 10) || 1);
-        liqMinDiasLQ = minDias;
-        ['lqMinDias', 'lqgMinDias'].forEach(id => { const el = document.getElementById(id); if (el) el.value = minDias; });
-        const fBuscar = document.getElementById('lqnBuscar').value.toUpperCase().trim();
-        const fEsc = document.getElementById('lqnFechaEscaneo').value.trim();
-        const fMotivo = document.getElementById('lqnMotivo').value;
-
-        const todas = calcularNoLiquidacionLQN().filter(f =>
-            (!fBuscar || f.guia.includes(fBuscar) || String(f.ruta).toUpperCase().includes(fBuscar)) &&
-            (!fEsc || f.jornada.includes(fEsc)));
-        const cuenta = m => todas.filter(f => f.motivo === m).length;
-        document.getElementById('lqnKpiTotal').textContent = todas.length;
-        document.getElementById('lqnKpiSinBase').textContent = cuenta('SIN_BASE');
-        document.getElementById('lqnKpiMisma').textContent = cuenta('MISMA');
-        document.getElementById('lqnKpiYaLiq').textContent = cuenta('YA_LIQ');
-        document.getElementById('lqnKpiOtros').textContent = cuenta('SIN_FECHA') + cuenta('ANTES');
-
-        noLiqFiltradasLQN = fMotivo ? todas.filter(f => f.motivo === fMotivo) : todas;
-
-        const LIMITE = 300;
-        if (noLiqFiltradasLQN.length === 0) {
-            wrap.innerHTML = '<div class="resumen-vacio" style="padding:14px;">No hay escaneos con estos filtros.</div>';
-        } else {
-            const th = 'style="text-align:left; padding:7px 8px; font-size:10px; color:var(--text-muted); position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--border); white-space:nowrap;"';
-            const td = 'style="padding:6px 8px; font-size:11px; border-bottom:1px solid var(--border); white-space:nowrap;"';
-            const filas = noLiqFiltradasLQN.slice(0, LIMITE).map(f => `<tr>
-                <td ${td}><b>${escLZ(f.guia)}</b></td>
-                <td ${td}>${escLZ(f.hora)}<br><span style="font-size:9px; color:var(--text-muted);">${escLZ(f.usuario)}</span></td>
-                <td ${td}>${escLZ(f.ubic)} / ${escLZ(f.zona)}</td><td ${td}>${escLZ(f.cat)}</td>
-                <td ${td}>${escLZ(f.ruta) || '—'}</td><td ${td}>${escLZ(f.carga) || '—'}</td>
-                <td ${td}><span style="font-weight:800; font-size:10px;">${MOTIVOS_LQN[f.motivo]}</span></td>
-            </tr>`).join('');
-            wrap.innerHTML = `<table style="width:100%; border-collapse:collapse;"><thead><tr>
-                <th ${th}>SEGUIMIENTO</th><th ${th}>ESCANEO GENERAL</th><th ${th}>UBIC / ZONA</th><th ${th}>CATEGORÍA</th><th ${th}>RUTA (BASE)</th><th ${th}>CARGA BASE RUTA</th><th ${th}>MOTIVO</th>
-            </tr></thead><tbody>${filas}</tbody></table>`;
-        }
-        document.getElementById('lqnNota').textContent = noLiqFiltradasLQN.length > LIMITE ? `Mostrando ${LIMITE} de ${noLiqFiltradasLQN.length}; el Excel incluye todos.` : '';
-    }
-
-    function exportarNoLiquidacionLQN() {
-        if (noLiqFiltradasLQN.length === 0) { alert('No hay datos para exportar.'); return; }
-        const datos = noLiqFiltradasLQN.map(f => ({
-            'Seguimiento': f.guia, 'Registrado como': f.registrada !== f.guia ? f.registrada : '',
-            'Escaneo General': f.hora, 'Usuario': f.usuario, 'Ubicación': f.ubic, 'Zona': f.zona, 'Categoría': f.cat,
-            'Ruta (Base Ruta)': f.ruta, 'Día': f.dia, 'Carga Base Ruta': f.carga, 'Motivo': MOTIVOS_LQN[f.motivo]
-        }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'NoLiquidacion');
-        XLSX.writeFile(wb, `No_Liquidacion_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    }
 
     function cerrarModalCierreZonaCS() {
         document.getElementById('modalCierreZonaCS').style.display = 'none';
@@ -13536,7 +13269,7 @@
         btnConsolaPCDesk:'consola', btnGrupoVerBasesDesk:'database', btnVerBaseAdminDesk:'tabla',
         btnVerBaseRutaAdminDesk:'camion', btnVistaGlobalDesk:'globo', btnUsuariosOnlineDesk:'usuarios',
         btnConsultarAdminDesk:'buscar', btnTrazabilidadDesk:'ruta', btnLiberarZonasDesk:'candado',
-        btnLiquidacionDesk:'billete', btnLiquidacionGraficosDesk:'barras', btnNoLiquidacionDesk:'prohibido',
+        btnLiquidacionDesk:'billete',
         btnCruceILDesk:'cruce', btnCargosManualesDesk:'descarga', btnVistaReprosDesk:'sync',
         btnConfigImpresoraDesk:'impresora', btnEtiquetasLibresDesk:'qr', btnAdminPanelDesk:'ajustes',
         btnGrupoPanelesDesk:'barras', btnDashboardInicioMenuDesk:'tablero', btnVerDetalleHoraMenuDesk:'reloj',

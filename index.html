@@ -122,6 +122,15 @@
         #modalVistaRepros .vr-kpi { background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--kpi, var(--primary)); border-radius: 10px; padding: 12px 16px; }
         #modalVistaRepros .vr-kpi-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
         #modalVistaRepros .vr-kpi-val { font-size: 26px; font-weight: 800; color: var(--kpi, var(--primary)); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+        #modalVistaRepros .vr-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; background: var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:11px 14px; cursor:pointer; font-family:inherit; color: var(--text-main); transition: background .15s, border-color .15s; margin-bottom:12px; text-align:left; }
+        #modalVistaRepros .vr-toggle:hover { background: var(--bg); border-color: var(--primary); }
+        #modalVistaRepros .vr-toggle-l { display:flex; align-items:center; gap:9px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color: var(--text-muted); }
+        #modalVistaRepros .vr-toggle-l small { font-size:11px; font-weight:600; text-transform:none; letter-spacing:0; opacity:.8; }
+        #modalVistaRepros .vr-toggle-r { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--primary); white-space:nowrap; }
+        #modalVistaRepros .vr-toggle-r svg { transition: transform .2s ease; }
+        #modalVistaRepros .vr-toggle[aria-expanded="true"] .vr-toggle-r svg { transform: rotate(180deg); }
+        #modalVistaRepros #vrAvanceWrap[hidden] { display:none; }
         #modalVistaRepros .vr-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; margin: 0 0 10px; }
         #modalVistaRepros .vr-table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
         #modalVistaRepros .vr-table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
@@ -1570,7 +1579,7 @@
             <button class="btn-header btn-search-admin" id="btnConsultarAdmin" onclick="abrirModalConsulta();">🔍 Consultar Registros</button>
             <button class="btn-header" id="btnTrazabilidad" onclick="abrirModalTrazabilidad();">🧭 Trazabilidad de Ruta</button>
             <button class="btn-header" id="btnCruceIL" onclick="abrirModalCruceIL();">🔀 Cruce de Datos IL</button>
-            <button class="btn-header" id="btnNoDespachado" onclick="abrirModalNoDespachado();">📦 No Despachado</button>
+            <button class="btn-header" id="btnNoDespachado" onclick="abrirModalNoDespachado();">📋 Observaciones en ruta</button>
             <button class="btn-header" id="btnCargosManuales" onclick="abrirModalCargosManuales();" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosMovil" onclick="abrirModalVistaRepros();">🔄 Reprogramaciones <span id="badgeTotalReprosMenu" style="background:rgba(0,0,0,0.15); padding:1px 6px; border-radius:8px; font-size:10px; font-weight:900;">0</span></button>
             <button class="btn-header" id="btnRespaldosNubeMenu" style="display:none;" onclick="abrirModalRespaldosNube();">☁️ Respaldos en la Nube</button>
@@ -1765,7 +1774,7 @@
             <button class="btn-header" id="btnLiberarZonasDesk" onclick="abrirModalLiberarZonasCS();" style="display:none; padding: 8px 12px; font-size: 12px;">🔓 Liberar Zonas (PL)</button>
             <button class="btn-header" id="btnLiquidacionDesk" onclick="abrirModalLiquidacionLQ();" style="display:none; padding: 8px 12px; font-size: 12px;">💸 Liquidación</button>
             <button class="btn-header" id="btnCruceILDesk" onclick="abrirModalCruceIL();" style="display:flex; padding: 8px 12px; font-size: 12px;">🔀 Cruce de Datos IL</button>
-            <button class="btn-header" id="btnNoDespachadoDesk" onclick="abrirModalNoDespachado();" style="display:flex; padding: 8px 12px; font-size: 12px;">📦 No Despachado</button>
+            <button class="btn-header" id="btnNoDespachadoDesk" onclick="abrirModalNoDespachado();" style="display:flex; padding: 8px 12px; font-size: 12px;">📋 Observaciones en ruta</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 8px 12px; font-size: 12px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
             </div>
@@ -1952,7 +1961,7 @@
         <div id="ndDropOverlay" style="display:none; position:absolute; inset:0; background:rgba(61,90,128,.9); color:#fff; z-index:50; align-items:center; justify-content:center; font-size:24px; font-weight:900; pointer-events:none; border:4px dashed #fff;">⬇ Suelta aquí el Excel</div>
         <div class="table-header" style="padding: 10px 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h4 style="font-weight:900; color:var(--primary); margin:0;">📦 NO DESPACHADO <span id="ndEstadoNube" style="font-size:10px; font-weight:700; color:var(--text-muted); margin-left:6px;"></span></h4>
+                <h4 style="font-weight:900; color:var(--primary); margin:0;">📋 OBSERVACIONES EN RUTA <span id="ndEstadoNube" style="font-size:10px; font-weight:700; color:var(--text-muted); margin-left:6px;"></span></h4>
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                     <button onclick="document.getElementById('ndFile').click()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬆ Subir Excel</button>
                     <span style="font-size:10px; font-weight:700; color:var(--text-muted);">o arrastra el archivo a esta ventana</span>
@@ -2187,11 +2196,16 @@
             </div>
 
             <div class="vr-body">
+                <button type="button" class="vr-toggle" id="vrToggleAvance" onclick="toggleAvanceRepros()" aria-expanded="false" aria-controls="vrAvanceWrap">
+                    <span class="vr-toggle-l"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Avance por ruta <small>· Resumen y detalle</small></span>
+                    <span class="vr-toggle-r"><span id="vrToggleTxt">Mostrar</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                </button>
+                <div id="vrAvanceWrap" hidden>
                 <div id="resumenReprosKPIs" class="vr-kpis"></div>
 
-                <div class="vr-section-title">Avance por ruta</div>
                 <div id="contenedorVistaRepros" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start;">
                     <div class="resumen-vacio">Cargando...</div>
+                </div>
                 </div>
 
                 <div class="vr-section-title" style="margin-top:22px;">Historial de escaneos</div>
@@ -3615,31 +3629,18 @@
             toggleModoForzar();
         }
 
-        const modal = document.getElementById('modalBienvenida');
-        if (!modal) return;
-        const ahora = new Date();
-        const hora = ahora.getHours();
-        let saludo = "Buenas noches";
-        if (hora >= 5 && hora < 12) saludo = "Buenos días";
-        else if (hora >= 12 && hora < 19) saludo = "Buenas tardes";
-        const txt = document.getElementById('txtBienvenidaSaludo');
-        if (txt) txt.textContent = saludo;
-        const nom = document.getElementById('txtBienvenidaNombre');
-        if (nom) nom.textContent = String(usuarioActivo || "").replace(/^@/, "");
-        const est = document.getElementById('txtBienvenidaEstado');
-        if (est) {
-            let fecha = "";
-            try { fecha = ahora.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) {}
-            est.textContent = "Sesión iniciada" + (fecha ? " · " + fecha : "");
-        }
-        modal.classList.remove('bv-salida', 'bv-activo');
-        void modal.offsetWidth;
-        modal.classList.add('bv-activo');
-        modal.style.display = 'flex';
-        clearTimeout(window._bvT1); clearTimeout(window._bvT2);
-        const cerrarBv = () => { clearTimeout(window._bvT1); clearTimeout(window._bvT2); modal.classList.add('bv-salida'); setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('bv-salida', 'bv-activo'); }, 300); };
-        modal.onclick = cerrarBv;
-        window._bvT1 = setTimeout(cerrarBv, 5000);
+        // Sin pantalla de bienvenida: entra directo a la app.
+    }
+
+    function toggleAvanceRepros() {
+        const w = document.getElementById('vrAvanceWrap');
+        const b = document.getElementById('vrToggleAvance');
+        if (!w || !b) return;
+        const abrir = w.hasAttribute('hidden');
+        if (abrir) w.removeAttribute('hidden'); else w.setAttribute('hidden', '');
+        b.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+        const t = document.getElementById('vrToggleTxt');
+        if (t) t.textContent = abrir ? 'Ocultar' : 'Mostrar';
     }
 
     function cerrarSesion() {
@@ -11483,7 +11484,7 @@
         const cols = ndColumnasActivas();
         const datos = filtradas.map(f => { const o = {}; cols.forEach(c => { o[c.label] = c.key === '_archivo' ? (f._archivo || '') : (f[c.key] || ''); }); return o; });
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'No despachado');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'Observaciones en ruta');
         XLSX.writeFile(wb, 'NO_DESPACHADO_filtrado.xlsx');
     }
 
@@ -11519,7 +11520,7 @@
     }
 
     async function ndVaciarTodo() {
-        if (!confirm('¿Vaciar TODA la tabla No Despachado de la nube? Esta acción no se puede deshacer.')) return;
+        if (!confirm('¿Vaciar TODA la tabla de Observaciones en ruta de la nube? Esta acción no se puede deshacer.')) return;
         try { await rtdb.ref('no_despachado').remove(); } catch (err) { alert('Error: ' + err.message); }
     }
 
@@ -13751,6 +13752,7 @@
         actividad: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
         capas:     '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
         papelera:  '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+        notas:     '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
         carpeta:   '<path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>'
     };
     var POR_ID = {
@@ -13758,7 +13760,7 @@
         btnVerBaseRutaAdminDesk:'camion', btnVistaGlobalDesk:'globo', btnUsuariosOnlineDesk:'usuarios',
         btnConsultarAdminDesk:'buscar', btnTrazabilidadDesk:'ruta', btnLiberarZonasDesk:'candado',
         btnLiquidacionDesk:'billete',
-        btnCruceILDesk:'cruce', btnCargosManualesDesk:'descarga', btnVistaReprosDesk:'sync',
+        btnCruceILDesk:'cruce', btnNoDespachadoDesk:'notas', btnCargosManualesDesk:'descarga', btnVistaReprosDesk:'sync',
         btnConfigImpresoraDesk:'impresora', btnEtiquetasLibresDesk:'qr', btnAdminPanelDesk:'ajustes',
         btnGrupoPanelesDesk:'barras', btnDashboardInicioMenuDesk:'tablero', btnVerDetalleHoraMenuDesk:'reloj',
         btnProductividadPausasMenuDesk:'actividad', btnDashboardGeneralMenuDesk:'capas',

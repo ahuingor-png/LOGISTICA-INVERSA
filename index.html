@@ -1227,12 +1227,52 @@
         #modalVistaSender .vr-row-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
         #modalVistaSender .vr-row-del:hover { background: rgba(178,69,63,.12); color: var(--danger); }
         #modalVistaSender .vr-empty { text-align: center; color: var(--text-muted); padding: 28px 12px !important; font-style: italic; }
+        @media (max-width: 900px) {
             #modalVistaSender .vr-filters, #modalVistaSender .vr-kpis { grid-template-columns: repeat(2, 1fr); }
             #modalVistaSender .vr-head { padding: 12px 14px; }
             #modalVistaSender .vr-body { padding: 14px; }
             #modalVistaSender .vr-title p { display: none; }
+            #modalVistaSender .sd-grid { grid-template-columns: 1fr; }
+        }
         #modalVistaSender .vr-chk { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
         #modalVistaSender .vr-th-chk, #modalVistaSender .vr-td-chk { width: 34px; text-align: center; }
+
+        /* ===== Vista Sender: rediseño + panel de seguimiento ===== */
+        #modalVistaSender .vr-filters { grid-template-columns: repeat(5, minmax(0,1fr)); }
+        #modalVistaSender .vr-filters .custom-filter-btn { background: var(--bg); border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-main); transition: border-color .15s, background .15s; }
+        #modalVistaSender .vr-filters .custom-filter-btn:hover { border-color: var(--primary); background: var(--card-bg); }
+        #modalVistaSender .vr-title-ico { box-shadow: 0 2px 6px rgba(61,90,128,.28); }
+        #modalVistaSender .vr-kpis { grid-template-columns: repeat(4, 1fr); margin-bottom: 14px; }
+        #modalVistaSender .vr-kpi { display:flex; align-items:center; gap:12px; border-top: 1px solid var(--border); border-left: 4px solid var(--kpi, var(--primary)); padding: 12px 16px; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+        #modalVistaSender .vr-kpi-val { font-size: 24px; line-height: 1.1; }
+        #modalVistaSender .sd-grid { display: grid; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); gap: 12px; margin-bottom: 16px; }
+        #modalVistaSender .sd-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(15,23,42,.04); min-width: 0; }
+        #modalVistaSender .sd-card-h { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom: 10px; }
+        #modalVistaSender .sd-card-h h5 { margin:0; font-size:12px; font-weight:800; color: var(--text-main); text-transform:uppercase; letter-spacing:.6px; }
+        #modalVistaSender .sd-card-h span { font-size:11px; color: var(--text-muted); }
+        #modalVistaSender .sd-bars { display:flex; flex-direction:column; gap:7px; max-height: 232px; overflow-y:auto; padding-right:4px; }
+        #modalVistaSender .sd-bar-row { display:grid; grid-template-columns: minmax(80px,150px) 1fr auto; align-items:center; gap:10px; font-size:12px; }
+        #modalVistaSender .sd-bar-name { font-weight:600; color: var(--text-main); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #modalVistaSender .sd-bar-track { height:10px; background: var(--bg); border-radius:999px; overflow:hidden; border:1px solid var(--border); }
+        #modalVistaSender .sd-bar-fill { height:100%; background: var(--primary); border-radius:999px; transition: width .35s ease; }
+        #modalVistaSender .sd-bar-val { font-variant-numeric: tabular-nums; font-weight:800; color: var(--text-main); min-width: 54px; text-align:right; }
+        #modalVistaSender .sd-bar-val small { font-weight:600; color: var(--text-muted); margin-left:4px; }
+        #modalVistaSender .sd-split { display:flex; height:12px; border-radius:999px; overflow:hidden; background: var(--bg); border:1px solid var(--border); margin-bottom:12px; }
+        #modalVistaSender .sd-split i { display:block; height:100%; transition: width .35s ease; }
+        #modalVistaSender .sd-leg { display:flex; flex-direction:column; gap:8px; font-size:12px; }
+        #modalVistaSender .sd-leg-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        #modalVistaSender .sd-dot { width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:7px; }
+        #modalVistaSender .sd-leg-row b { font-variant-numeric: tabular-nums; }
+        #modalVistaSender .sd-leg-row small { color: var(--text-muted); margin-left:4px; }
+        #modalVistaSender .sd-sub { margin: 14px 0 8px; font-size:10.5px; font-weight:800; color: var(--text-muted); text-transform:uppercase; letter-spacing:.6px; }
+        #modalVistaSender .sd-empty { color: var(--text-muted); font-style: italic; font-size: 12px; padding: 10px 0; }
+        #modalVistaSender #sdPanelWrap[hidden] { display:none; }
+        #modalVistaSender .vr-table tbody tr:nth-child(even) { background: rgba(100,116,139,.04); }
+        #modalVistaSender .vr-table tbody tr:hover { background: rgba(61,90,128,.09); }
+        #modalVistaSender .vr-bul { display:inline-flex; align-items:center; justify-content:center; min-width:24px; padding:1px 8px; border-radius:6px; background: rgba(61,90,128,.12); color: var(--primary); font-weight:800; font-variant-numeric: tabular-nums; }
+        #modalVistaSender .vr-table-card { box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+        #modalVistaSender .vr-table-scroll { max-height: 460px; }
+        @media (max-width: 1100px) { #modalVistaSender .vr-filters { grid-template-columns: repeat(3, minmax(0,1fr)); } }
     </style>
 </head>
 <body>
@@ -2350,6 +2390,25 @@
             </div>
 
             <div class="vr-body">
+                <button type="button" class="vr-toggle" id="sdToggle" onclick="toggleDashSender()" aria-expanded="true" aria-controls="sdPanelWrap">
+                    <span class="vr-toggle-l"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Panel de seguimiento <small>· Rutas / Tiendas y bultos</small></span>
+                    <span class="vr-toggle-r"><span id="sdToggleTxt">Ocultar</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                </button>
+                <div id="sdPanelWrap">
+                    <div id="sdKpis" class="vr-kpis"></div>
+                    <div class="sd-grid">
+                        <div class="sd-card">
+                            <div class="sd-card-h"><h5>Bultos por Ruta / Tienda</h5><span id="sdRutasInfo"></span></div>
+                            <div id="sdBarras" class="sd-bars"></div>
+                        </div>
+                        <div class="sd-card">
+                            <div class="sd-card-h"><h5>Tipo de registro</h5><span>bultos</span></div>
+                            <div id="sdTipo"></div>
+                            <div class="sd-sub">Por usuario</div>
+                            <div id="sdUsuarios" class="sd-leg"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="vr-table-card">
                     <div class="vr-table-toolbar">
                         <div class="vr-search">
@@ -11809,6 +11868,7 @@
 
     function abrirModalVistaSender() {
         document.getElementById('modalVistaSender').style.display = 'flex';
+        try { aplicarEstadoDashSender(localStorage.getItem('sender_dash_abierto') !== '0'); } catch (e) { aplicarEstadoDashSender(true); }
         try {
             poblarFiltrosVistaSender();
             renderizarVistaSender();
@@ -11904,13 +11964,68 @@
                 <td>${_escSender(s.ubic || '-')}</td>
                 <td>${_escSender(s.zona || '-')}</td>
                 <td>${_escSender(s.cat || '-')}</td>
-                <td class="vr-mute">${_escSender(s.bul || 1)}</td>
+                <td><span class="vr-bul">${_escSender(s.bul || 1)}</span></td>
                 <td>${_escSender(s.usuario)}</td>
                 ${puedeBorrar ? `<td class="vr-td-acc"><button type="button" class="vr-row-del" title="Eliminar este registro" aria-label="Eliminar" onclick="eliminarSenderUno('${s.key}')">${ico}</button></td>` : ''}
             </tr>`;
         }).join('') : `<tr><td colspan="14" class="vr-empty">Sin registros de Sender para estos filtros.</td></tr>`;
 
         actualizarControlesSeleccionSender();
+        try { pintarDashSender(filas); } catch (e) { console.error('Panel Sender:', e); }
+    }
+
+    // ---------- Panel de seguimiento (se recalcula con lo que se ve en la tabla) ----------
+    function _bultosSender(s) { const n = parseInt(s.bul, 10); return isNaN(n) || n < 1 ? 1 : n; }
+
+    function pintarDashSender(filas) {
+        const nReg = filas.length;
+        let nBul = 0, bulCon = 0, bulSin = 0;
+        const rutas = new Map(), users = new Map();
+        filas.forEach(s => {
+            const b = _bultosSender(s);
+            nBul += b;
+            if (etiquetaTipoSender(s) === 'CON BASE') bulCon += b; else bulSin += b;
+            const r = rutaTiendaSender(s);
+            const o = rutas.get(r) || { reg: 0, bul: 0 }; o.reg++; o.bul += b; rutas.set(r, o);
+            const u = s.usuario || '-';
+            const q = users.get(u) || { reg: 0, bul: 0 }; q.reg++; q.bul += b; users.set(u, q);
+        });
+        const kpi = (lbl, val, color) => `<div class="vr-kpi" style="--kpi:${color};"><div><div class="vr-kpi-label">${lbl}</div><div class="vr-kpi-val">${val}</div></div></div>`;
+        const k = document.getElementById('sdKpis');
+        if (k) k.innerHTML = kpi('Registros', nReg, 'var(--primary)') + kpi('Bultos', nBul, '#2563eb') + kpi('Rutas / Tiendas', rutas.size, 'var(--warning)') + kpi('Prom. bultos / ruta', rutas.size ? (nBul / rutas.size).toFixed(1) : '0', 'var(--success)');
+
+        const lista = Array.from(rutas.entries()).sort((a, b) => b[1].bul - a[1].bul || b[1].reg - a[1].reg);
+        const max = lista.length ? lista[0][1].bul : 1;
+        const bar = document.getElementById('sdBarras');
+        if (bar) bar.innerHTML = lista.length ? lista.map(([n, v]) =>
+            `<div class="sd-bar-row" title="${_escSender(n)}: ${v.reg} registro(s), ${v.bul} bulto(s)"><span class="sd-bar-name">${_escSender(n)}</span><span class="sd-bar-track"><span class="sd-bar-fill" style="display:block;width:${Math.max(3, Math.round(v.bul / max * 100))}%"></span></span><span class="sd-bar-val">${v.bul}<small>${v.reg} reg.</small></span></div>`).join('')
+            : '<div class="sd-empty">Sin datos para estos filtros.</div>';
+        const inf = document.getElementById('sdRutasInfo');
+        if (inf) inf.textContent = lista.length ? `${lista.length} ruta(s) / tienda(s)` : '';
+
+        const pct = v => nBul ? Math.round(v / nBul * 100) : 0;
+        const tipo = document.getElementById('sdTipo');
+        if (tipo) tipo.innerHTML = nBul
+            ? `<div class="sd-split"><i style="width:${bulCon / nBul * 100}%;background:var(--success)"></i><i style="width:${bulSin / nBul * 100}%;background:#94a3b8"></i></div>
+               <div class="sd-leg"><div class="sd-leg-row"><span><span class="sd-dot" style="background:var(--success)"></span>Con base</span><span><b>${bulCon}</b><small>${pct(bulCon)}%</small></span></div>
+               <div class="sd-leg-row"><span><span class="sd-dot" style="background:#94a3b8"></span>Sin base</span><span><b>${bulSin}</b><small>${pct(bulSin)}%</small></span></div></div>`
+            : '<div class="sd-empty">Sin datos.</div>';
+        const usr = document.getElementById('sdUsuarios');
+        if (usr) usr.innerHTML = users.size ? Array.from(users.entries()).sort((a, b) => b[1].bul - a[1].bul).slice(0, 6).map(([n, v]) =>
+            `<div class="sd-leg-row"><span>${_escSender(n)}</span><span><b>${v.bul}</b><small>${v.reg} reg.</small></span></div>`).join('') : '<div class="sd-empty">Sin datos.</div>';
+    }
+
+    function aplicarEstadoDashSender(abierto) {
+        const w = document.getElementById('sdPanelWrap'), b = document.getElementById('sdToggle'), t = document.getElementById('sdToggleTxt');
+        if (w) w.hidden = !abierto;
+        if (b) b.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+        if (t) t.textContent = abierto ? 'Ocultar' : 'Mostrar';
+    }
+    function toggleDashSender() {
+        const w = document.getElementById('sdPanelWrap');
+        const abrir = !!(w && w.hidden);
+        aplicarEstadoDashSender(abrir);
+        try { localStorage.setItem('sender_dash_abierto', abrir ? '1' : '0'); } catch (e) {}
     }
 
     function actualizarControlesSeleccionSender() {

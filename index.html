@@ -6245,6 +6245,17 @@
 
         escucharLiquidacionesPersistidasLQ();
 
+        rtdb.ref("escaneos_sender").on("value", (snapshot) => {
+            const lista = [];
+            snapshot.forEach((child) => { const n = child.val(); n.key = child.key; lista.push(n); });
+            scansSender = lista.reverse();
+            ejecutarSeguro(actualizarBadgeSender);
+            if (document.getElementById('modalVistaSender') && document.getElementById('modalVistaSender').style.display === 'flex') {
+                ejecutarSeguro(poblarFiltrosVistaSender);
+                ejecutarSeguro(renderizarVistaSender);
+            }
+        });
+
         rtdb.ref("escaneos_compartidos").on("value", (snapshot) => {
             refrescarLiquidacionSiAbierto();
             refrescarLiberarZonasCSSiAbierto();
@@ -6258,11 +6269,6 @@
             ejecutarSeguro(poblarFiltrosJornada); 
             
             ejecutarSeguro(actualizarListaTarjetas);
-            ejecutarSeguro(actualizarBadgeSender);
-            if (document.getElementById('modalVistaSender') && document.getElementById('modalVistaSender').style.display === 'flex') {
-                ejecutarSeguro(poblarFiltrosVistaSender);
-                ejecutarSeguro(renderizarVistaSender);
-            }
             if(document.getElementById('modalConsultaAdmin').style.display === 'flex') {
                 ejecutarSeguro(poblarFiltrosConsultaAdmin);
                 ejecutarSeguro(ejecutarFiltroAdmin);
@@ -11785,9 +11791,9 @@
         return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     }
 
-    function registrosSender() {
-        return (scans || []).filter(s => s && s.sender);
-    }
+    // Los registros de Sender viven en su propio nodo ("escaneos_sender"), separados del historial general.
+    let scansSender = [];
+    function registrosSender() { return scansSender; }
 
     function etiquetaTipoSender(s) { return s.senderModo === 'SIN_BASE' ? 'SIN BASE' : 'CON BASE'; }
     function rutaTiendaSender(s) { return String(s.tienda || s.ruta || '-').toUpperCase(); }
@@ -11932,13 +11938,11 @@
         actualizarControlesSeleccionSender();
     }
 
-    // Borra por claves, conservando antes las guías en liquidación (igual que el resto de borrados).
+    // Borra por claves del nodo escaneos_sender (no toca el historial general).
     async function borrarClavesSender(claves) {
-        const ok = await confirmarPreservarLQ(new Set(claves));
-        if (!ok) return false;
         for (let i = 0; i < claves.length; i += 400) {
             const lote = {};
-            claves.slice(i, i + 400).forEach(k => { lote['escaneos_compartidos/' + k] = null; });
+            claves.slice(i, i + 400).forEach(k => { lote['escaneos_sender/' + k] = null; });
             await rtdb.ref().update(lote);
         }
         claves.forEach(k => senderSeleccion.delete(k));

@@ -1164,6 +1164,75 @@
         [data-theme="dark"] #panelMenuAdminDesk .btn-delete-db,
         [data-theme="dark"] #panelMenuAdminDesk .btn-delete-db:hover { color: #e8a9a5; }
 
+        #modalVistaSender .vr-content { padding: 0 !important; background: var(--bg) !important; overflow: hidden; }
+        #modalVistaSender .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 1480px; margin: 0 auto; }
+        #modalVistaSender .vr-head { background: var(--card-bg); padding: 16px 22px 14px; border-bottom: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15,23,42,.05); }
+        #modalVistaSender .vr-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        #modalVistaSender .vr-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        #modalVistaSender .vr-title-ico { width: 38px; height: 38px; border-radius: 10px; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #modalVistaSender .vr-title-ico svg { width: 20px; height: 20px; }
+        #modalVistaSender .vr-title h4 { margin: 0; font-size: 17px; font-weight: 800; color: var(--text-main); letter-spacing: .1px; }
+        #modalVistaSender .vr-title p { margin: 2px 0 0; font-size: 12px; color: var(--text-muted); }
+        #modalVistaSender .vr-count { background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 11px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+        #modalVistaSender .vr-close { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 20px; line-height: 1; cursor: pointer; }
+        #modalVistaSender .vr-close:hover { background: var(--bg); color: var(--text-main); }
+        #modalVistaSender .vr-filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        #modalVistaSender .vr-filters .custom-filter-wrapper { width: 100%; }
+        #modalVistaSender .vr-filters .custom-filter-btn { width: 100%; padding: 10px 12px; font-size: 12px; font-weight: 600; text-align: left; border-radius: 8px; }
+        #modalVistaSender .vr-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; margin-top: 14px; }
+        #modalVistaSender .vr-action-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        #modalVistaSender .vr-group-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; margin-right: 2px; }
+        #modalVistaSender .vr-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid transparent; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s; font-family: inherit; }
+        #modalVistaSender .vr-btn svg { flex-shrink: 0; }
+        #modalVistaSender .vr-btn-ghost { background: var(--card-bg); color: var(--text-main); border-color: var(--border); }
+        #modalVistaSender .vr-btn-ghost:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+        #modalVistaSender .vr-btn-danger-ghost { background: var(--card-bg); color: var(--danger); border-color: rgba(178,69,63,.35); }
+        #modalVistaSender .vr-btn-danger-ghost:hover { background: rgba(178,69,63,.08); }
+        #modalVistaSender .vr-btn-primary { background: var(--primary); color: #fff; }
+        #modalVistaSender .vr-btn-primary:hover { background: var(--primary-hover); }
+        #modalVistaSender .vr-btn-danger { background: var(--danger); color: #fff; }
+        #modalVistaSender .vr-btn-danger:hover { filter: brightness(.92); }
+        #modalVistaSender .vr-btn:disabled { opacity: .45; cursor: not-allowed; }
+        #modalVistaSender .vr-body { flex: 1; overflow-y: auto; padding: 18px 22px 28px; }
+        #modalVistaSender .vr-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        #modalVistaSender .vr-kpi { background: var(--card-bg); border: 1px solid var(--border); border-top: 3px solid var(--kpi, var(--primary)); border-radius: 10px; padding: 12px 16px; }
+        #modalVistaSender .vr-kpi-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+        #modalVistaSender .vr-kpi-val { font-size: 26px; font-weight: 800; color: var(--kpi, var(--primary)); margin-top: 2px; font-variant-numeric: tabular-nums; }
+        #modalVistaSender .vr-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; background: var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:11px 14px; cursor:pointer; font-family:inherit; color: var(--text-main); transition: background .15s, border-color .15s; margin-bottom:12px; text-align:left; }
+        #modalVistaSender .vr-toggle:hover { background: var(--bg); border-color: var(--primary); }
+        #modalVistaSender .vr-toggle-l { display:flex; align-items:center; gap:9px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color: var(--text-muted); }
+        #modalVistaSender .vr-toggle-l small { font-size:11px; font-weight:600; text-transform:none; letter-spacing:0; opacity:.8; }
+        #modalVistaSender .vr-toggle-r { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--primary); white-space:nowrap; }
+        #modalVistaSender .vr-toggle-r svg { transition: transform .2s ease; }
+        #modalVistaSender .vr-toggle[aria-expanded="true"] .vr-toggle-r svg { transform: rotate(180deg); }
+        #modalVistaSender #vrAvanceWrap[hidden] { display:none; }
+        #modalVistaSender .vr-section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; margin: 0 0 10px; }
+        #modalVistaSender .vr-table-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        #modalVistaSender .vr-table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+        #modalVistaSender .vr-search { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 240px; padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text-muted); }
+        #modalVistaSender .vr-search input { flex: 1; border: none; outline: none; background: transparent; padding: 9px 0; font-size: 12px; color: var(--text-main); font-family: inherit; }
+        #modalVistaSender .vr-visible-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+        #modalVistaSender .vr-visible-count b { color: var(--text-main); }
+        #modalVistaSender .vr-table-scroll { overflow: auto; max-height: 520px; }
+        #modalVistaSender .vr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        #modalVistaSender .vr-table th { position: sticky; top: 0; z-index: 1; background: var(--bg); text-align: left; padding: 10px 12px; font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        #modalVistaSender .vr-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text-main); white-space: nowrap; }
+        #modalVistaSender .vr-table tbody tr:hover { background: rgba(61,90,128,.05); }
+        #modalVistaSender .vr-table td.vr-cod { font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+        #modalVistaSender .vr-table td.vr-mute { color: var(--text-muted); }
+        #modalVistaSender .vr-th-acc, #modalVistaSender .vr-td-acc { width: 44px; text-align: center; }
+        #modalVistaSender .vr-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: rgba(100,116,139,.14); color: var(--text-muted); }
+        #modalVistaSender .vr-pill.ok { background: rgba(63,136,98,.14); color: var(--success); }
+        #modalVistaSender .vr-pill.warn { background: rgba(185,133,47,.16); color: var(--warning); }
+        #modalVistaSender .vr-row-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        #modalVistaSender .vr-row-del:hover { background: rgba(178,69,63,.12); color: var(--danger); }
+        #modalVistaSender .vr-empty { text-align: center; color: var(--text-muted); padding: 28px 12px !important; font-style: italic; }
+            #modalVistaSender .vr-filters, #modalVistaSender .vr-kpis { grid-template-columns: repeat(2, 1fr); }
+            #modalVistaSender .vr-head { padding: 12px 14px; }
+            #modalVistaSender .vr-body { padding: 14px; }
+            #modalVistaSender .vr-title p { display: none; }
+        #modalVistaSender .vr-chk { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+        #modalVistaSender .vr-th-chk, #modalVistaSender .vr-td-chk { width: 34px; text-align: center; }
     </style>
 </head>
 <body>
@@ -1582,6 +1651,7 @@
             <button class="btn-header" id="btnNoDespachado" onclick="abrirModalNoDespachado();">📋 Observaciones en ruta</button>
             <button class="btn-header" id="btnCargosManuales" onclick="abrirModalCargosManuales();" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosMovil" onclick="abrirModalVistaRepros();">🔄 Reprogramaciones <span id="badgeTotalReprosMenu" style="background:rgba(0,0,0,0.15); padding:1px 6px; border-radius:8px; font-size:10px; font-weight:900;">0</span></button>
+            <button class="btn-header" id="btnVistaSenderMovil" onclick="abrirModalVistaSender();">📤 Sender <span id="badgeTotalSenderMenu" style="background:rgba(0,0,0,0.15); padding:1px 6px; border-radius:8px; font-size:10px; font-weight:900;">0</span></button>
             <button class="btn-header" id="btnRespaldosNubeMenu" style="display:none;" onclick="abrirModalRespaldosNube();">☁️ Respaldos en la Nube</button>
             <button class="btn-header btn-admin-panel" id="btnAdminPanel" onclick="abrirModalAdmin();">⚙️ Panel de Control</button>
             <div class="custom-filter-wrapper">
@@ -1777,6 +1847,7 @@
             <button class="btn-header" id="btnNoDespachadoDesk" onclick="abrirModalNoDespachado();" style="display:flex; padding: 8px 12px; font-size: 12px;">📋 Observaciones en ruta</button>
             <button class="btn-header" id="btnCargosManualesDesk" onclick="abrirModalCargosManuales();" style="display:flex; padding: 8px 12px; font-size: 12px;" title="Abrir panel de Cargos Manuales">📥 Cargos Manuales</button>
             <button class="btn-header" id="btnVistaReprosDesk" onclick="abrirModalVistaRepros();" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">🔄 Reprogramaciones <span style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">Todos</span></button>
+            <button class="btn-header" id="btnVistaSenderDesk" onclick="abrirModalVistaSender();" style="display:flex; padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items:center;">📤 Sender <span id="badgeTotalSenderDesk" style="background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px;">0</span></button>
             </div>
             <div class="admin-group-label" role="button" tabindex="0" onclick="toggleSeccionAdmin(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSeccionAdmin(this);}"><span>Impresión</span><span class="admin-chev">▸</span></div>
             <div class="admin-seccion-body">
@@ -2227,6 +2298,78 @@
                                 </tr>
                             </thead>
                             <tbody id="tbodyHistorialRepros"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VISTA SENDER: solo los registros marcados como Sender (campo sender:true de
+     "escaneos_compartidos", escritos por el módulo Sender de indexFR.html).
+     Filtros, búsqueda, descarga, eliminar por línea y eliminación masiva. ===== -->
+<div id="modalVistaSender" class="modal" style="z-index: 8500;">
+    <div class="modal-content vr-content">
+        <div class="vr-shell">
+            <div class="vr-head">
+                <div class="vr-titlebar">
+                    <div class="vr-title">
+                        <span class="vr-title-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></span>
+                        <div>
+                            <h4>Vista de Sender</h4>
+                            <p>Registros de escaneos Sender (con y sin base de datos)</p>
+                        </div>
+                        <span id="tTotalVistaSender" class="vr-count" title="Total de registros Sender">0</span>
+                    </div>
+                    <button class="vr-close" onclick="cerrarModalVistaSender()" aria-label="Cerrar">&times;</button>
+                </div>
+
+                <div class="vr-filters">
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroSenderModoBtn" onclick="toggleDateDropdown('filtroSenderModoMenu', event)">Tipo (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroSenderModoMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroSenderRutaBtn" onclick="toggleDateDropdown('filtroSenderRutaMenu', event)">Ruta / Tienda (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroSenderRutaMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroSenderZonaBtn" onclick="toggleDateDropdown('filtroSenderZonaMenu', event)">Zona (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroSenderZonaMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroSenderUsuarioBtn" onclick="toggleDateDropdown('filtroSenderUsuarioMenu', event)">Usuario (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroSenderUsuarioMenu"></div>
+                    </div>
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroSenderTurnoBtn" onclick="toggleDateDropdown('filtroSenderTurnoMenu', event)">Jornada (Todos) ▼</button>
+                        <div class="custom-filter-menu" id="filtroSenderTurnoMenu"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vr-body">
+                <div class="vr-table-card">
+                    <div class="vr-table-toolbar">
+                        <div class="vr-search">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                            <input type="text" id="inpBuscarSender" placeholder="Buscar por código, ruta, zona, ubicación, usuario…  (separa con coma para buscar varios)" oninput="filtrarVistaSenderTexto()">
+                        </div>
+                        <span class="vr-visible-count"><b id="lblSenderVisibles">0</b> registro(s) en pantalla</span>
+                        <button class="vr-btn vr-btn-primary" onclick="descargarSenderFiltrado()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
+                        <button class="vr-btn vr-btn-danger" id="btnEliminarSenderSel" onclick="eliminarSenderSeleccionados()" style="display:none;" title="Elimina solo las filas marcadas"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg> <span id="lblSenderSel">Eliminar seleccionados</span></button>
+                        <button class="vr-btn vr-btn-danger" id="btnEliminarSenderFiltrados" onclick="eliminarSenderFiltrados()" title="Elimina todo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg> Eliminar filtrados</button>
+                    </div>
+                    <div class="vr-table-scroll">
+                        <table class="vr-table" id="tablaVistaSender">
+                            <thead>
+                                <tr>
+                                    <th class="vr-th-chk"><input type="checkbox" class="vr-chk" id="chkSenderTodos" onchange="toggleSenderTodos(this.checked)" title="Seleccionar todo lo visible"></th>
+                                    <th>Fecha</th><th>Hora</th><th>Código</th><th>Tipo</th><th>Ruta / Tienda</th><th>Día</th><th>Sec</th><th>Ubicación</th><th>Zona</th><th>Opción</th><th>Bul.</th><th>Usuario</th><th class="vr-th-acc"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyVistaSender"></tbody>
                         </table>
                     </div>
                 </div>
@@ -6115,6 +6258,11 @@
             ejecutarSeguro(poblarFiltrosJornada); 
             
             ejecutarSeguro(actualizarListaTarjetas);
+            ejecutarSeguro(actualizarBadgeSender);
+            if (document.getElementById('modalVistaSender') && document.getElementById('modalVistaSender').style.display === 'flex') {
+                ejecutarSeguro(poblarFiltrosVistaSender);
+                ejecutarSeguro(renderizarVistaSender);
+            }
             if(document.getElementById('modalConsultaAdmin').style.display === 'flex') {
                 ejecutarSeguro(poblarFiltrosConsultaAdmin);
                 ejecutarSeguro(ejecutarFiltroAdmin);
@@ -11623,6 +11771,236 @@
             const buscar = fila.getAttribute('data-buscar') || '';
             fila.style.display = buscar.includes(texto) ? 'flex' : 'none';
         });
+    }
+
+
+    // =====================================================================
+    // VISTA SENDER: solo registros de "escaneos_compartidos" con sender:true
+    // =====================================================================
+    let senderVistaFilas = [];       // tras los filtros de los desplegables
+    let senderVistaVisibles = [];    // tras la búsqueda de texto (lo que se ve en la tabla)
+    const senderSeleccion = new Set();
+
+    function _escSender(v) {
+        return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function registrosSender() {
+        return (scans || []).filter(s => s && s.sender);
+    }
+
+    function etiquetaTipoSender(s) { return s.senderModo === 'SIN_BASE' ? 'SIN BASE' : 'CON BASE'; }
+    function rutaTiendaSender(s) { return String(s.tienda || s.ruta || '-').toUpperCase(); }
+    function jornadaSender(s) { return s.hora ? obtenerJornadaLogica(parsearHoraAObj(s.hora)) : ''; }
+
+    function actualizarBadgeSender() {
+        const n = registrosSender().length;
+        ['badgeTotalSenderMenu', 'badgeTotalSenderDesk'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = n;
+        });
+    }
+
+    function abrirModalVistaSender() {
+        document.getElementById('modalVistaSender').style.display = 'flex';
+        try {
+            poblarFiltrosVistaSender();
+            renderizarVistaSender();
+        } catch (e) {
+            console.error('Error al abrir Vista de Sender:', e);
+            const tb = document.getElementById('tbodyVistaSender');
+            if (tb) tb.innerHTML = `<tr><td colspan="14" class="vr-empty" style="color:var(--danger);">Ocurrió un error al cargar la vista. Detalle: ${_escSender(e.message)}</td></tr>`;
+        }
+    }
+
+    function cerrarModalVistaSender() {
+        document.getElementById('modalVistaSender').style.display = 'none';
+    }
+
+    function poblarFiltrosVistaSender() {
+        const tipos = new Set(), rutas = new Set(), zonas = new Set(), usuarios = new Set(), turnos = new Set();
+        registrosSender().forEach(s => {
+            tipos.add(etiquetaTipoSender(s));
+            rutas.add(rutaTiendaSender(s));
+            if (s.zona && s.zona !== '-') zonas.add(String(s.zona).toUpperCase());
+            if (s.usuario) usuarios.add(s.usuario);
+            const j = jornadaSender(s); if (j) turnos.add(j);
+        });
+        poblarMenuMultiSelect('filtroSenderModoMenu', 'filtroSenderModoBtn', tipos, 'Tipo', renderizarVistaSender);
+        poblarMenuMultiSelect('filtroSenderRutaMenu', 'filtroSenderRutaBtn', rutas, 'Ruta / Tienda', renderizarVistaSender);
+        poblarMenuMultiSelect('filtroSenderZonaMenu', 'filtroSenderZonaBtn', zonas, 'Zona', renderizarVistaSender);
+        poblarMenuMultiSelect('filtroSenderUsuarioMenu', 'filtroSenderUsuarioBtn', usuarios, 'Usuario', renderizarVistaSender);
+        poblarMenuMultiSelect('filtroSenderTurnoMenu', 'filtroSenderTurnoBtn', turnos, 'Jornada', renderizarVistaSender);
+    }
+
+    // Si no hay nada marcado en un desplegable, no filtra por ese criterio.
+    function renderizarVistaSender() {
+        const fTipo = leerJornadasSeleccionadas('filtroSenderModoMenu');
+        const fRuta = leerJornadasSeleccionadas('filtroSenderRutaMenu');
+        const fZona = leerJornadasSeleccionadas('filtroSenderZonaMenu');
+        const fUser = leerJornadasSeleccionadas('filtroSenderUsuarioMenu');
+        const fTurno = leerJornadasSeleccionadas('filtroSenderTurnoMenu');
+
+        const todos = registrosSender();
+        const t = document.getElementById('tTotalVistaSender');
+        if (t) t.textContent = todos.length;
+
+        senderVistaFilas = todos.filter(s =>
+            (!fTipo.length || fTipo.includes(etiquetaTipoSender(s))) &&
+            (!fRuta.length || fRuta.includes(rutaTiendaSender(s))) &&
+            (!fZona.length || fZona.includes(String(s.zona || '').toUpperCase())) &&
+            (!fUser.length || fUser.includes(s.usuario)) &&
+            (!fTurno.length || fTurno.includes(jornadaSender(s)))
+        );
+        // Limpia de la selección lo que ya no existe
+        const vivas = new Set(todos.map(s => s.key));
+        Array.from(senderSeleccion).forEach(k => { if (!vivas.has(k)) senderSeleccion.delete(k); });
+        filtrarVistaSenderTexto();
+    }
+
+    function filtrarVistaSenderTexto() {
+        const inp = document.getElementById('inpBuscarSender');
+        const terminos = (inp ? inp.value : '').toUpperCase().split(',').map(x => x.trim()).filter(Boolean);
+        if (!terminos.length) { pintarTablaVistaSender(senderVistaFilas); return; }
+        const filas = senderVistaFilas.filter(s => {
+            const pajar = [s.guia, s.guiaOriginal, s.tienda, s.ruta, s.dia, s.sec, s.ubic, s.zona, s.cat, s.usuario, etiquetaTipoSender(s)]
+                .map(x => String(x == null ? '' : x).toUpperCase()).join(' | ');
+            return terminos.some(q => pajar.includes(q));
+        });
+        pintarTablaVistaSender(filas);
+    }
+
+    function pintarTablaVistaSender(filas) {
+        senderVistaVisibles = filas;
+        const tbody = document.getElementById('tbodyVistaSender');
+        if (!tbody) return;
+        const puedeBorrar = puedeBorrarHistorial();
+        const lbl = document.getElementById('lblSenderVisibles');
+        if (lbl) lbl.textContent = filas.length;
+        const btnF = document.getElementById('btnEliminarSenderFiltrados');
+        if (btnF) { btnF.style.display = puedeBorrar ? '' : 'none'; btnF.disabled = filas.length === 0; }
+        document.querySelectorAll('#tablaVistaSender .vr-th-acc, #tablaVistaSender .vr-th-chk').forEach(th => th.style.display = puedeBorrar ? '' : 'none');
+        const ico = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+
+        tbody.innerHTML = filas.length ? filas.map(s => {
+            const partes = String(s.hora || '').split(' - ');
+            const tipo = etiquetaTipoSender(s);
+            const pill = `<span class="vr-pill ${tipo === 'CON BASE' ? 'ok' : ''}">${tipo}</span>` + (s.forzado ? ' <span class="vr-pill warn">FORZADO</span>' : '');
+            return `<tr>
+                ${puedeBorrar ? `<td class="vr-td-chk"><input type="checkbox" class="vr-chk" ${senderSeleccion.has(s.key) ? 'checked' : ''} onchange="toggleSenderFila('${s.key}', this.checked)"></td>` : ''}
+                <td>${_escSender(partes[0] || '-')}</td>
+                <td class="vr-mute">${_escSender(partes[1] || '-')}</td>
+                <td class="vr-cod">${_escSender(s.guia)}</td>
+                <td>${pill}</td>
+                <td>${_escSender(rutaTiendaSender(s))}</td>
+                <td class="vr-mute">${_escSender(s.dia || '-')}</td>
+                <td class="vr-mute">${_escSender(s.sec || '-')}</td>
+                <td>${_escSender(s.ubic || '-')}</td>
+                <td>${_escSender(s.zona || '-')}</td>
+                <td>${_escSender(s.cat || '-')}</td>
+                <td class="vr-mute">${_escSender(s.bul || 1)}</td>
+                <td>${_escSender(s.usuario)}</td>
+                ${puedeBorrar ? `<td class="vr-td-acc"><button type="button" class="vr-row-del" title="Eliminar este registro" aria-label="Eliminar" onclick="eliminarSenderUno('${s.key}')">${ico}</button></td>` : ''}
+            </tr>`;
+        }).join('') : `<tr><td colspan="14" class="vr-empty">Sin registros de Sender para estos filtros.</td></tr>`;
+
+        actualizarControlesSeleccionSender();
+    }
+
+    function actualizarControlesSeleccionSender() {
+        const puedeBorrar = puedeBorrarHistorial();
+        const btn = document.getElementById('btnEliminarSenderSel');
+        const lbl = document.getElementById('lblSenderSel');
+        const n = senderSeleccion.size;
+        if (btn) btn.style.display = (puedeBorrar && n > 0) ? '' : 'none';
+        if (lbl) lbl.textContent = `Eliminar seleccionados (${n})`;
+        const chkTodos = document.getElementById('chkSenderTodos');
+        if (chkTodos) {
+            const visiblesKeys = senderVistaVisibles.map(s => s.key);
+            chkTodos.checked = visiblesKeys.length > 0 && visiblesKeys.every(k => senderSeleccion.has(k));
+        }
+    }
+
+    function toggleSenderFila(key, marcado) {
+        if (marcado) senderSeleccion.add(key); else senderSeleccion.delete(key);
+        actualizarControlesSeleccionSender();
+    }
+
+    function toggleSenderTodos(marcado) {
+        senderVistaVisibles.forEach(s => { if (marcado) senderSeleccion.add(s.key); else senderSeleccion.delete(s.key); });
+        document.querySelectorAll('#tbodyVistaSender .vr-td-chk .vr-chk').forEach(c => { c.checked = marcado; });
+        actualizarControlesSeleccionSender();
+    }
+
+    // Borra por claves, conservando antes las guías en liquidación (igual que el resto de borrados).
+    async function borrarClavesSender(claves) {
+        const ok = await confirmarPreservarLQ(new Set(claves));
+        if (!ok) return false;
+        for (let i = 0; i < claves.length; i += 400) {
+            const lote = {};
+            claves.slice(i, i + 400).forEach(k => { lote['escaneos_compartidos/' + k] = null; });
+            await rtdb.ref().update(lote);
+        }
+        claves.forEach(k => senderSeleccion.delete(k));
+        return true;
+    }
+
+    async function eliminarSenderUno(key) {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso pueden borrar historiales.');
+        const reg = registrosSender().find(s => s.key === key);
+        if (!confirm(`¿Eliminar el registro "${reg ? reg.guia : key}"? No se puede deshacer.`)) return;
+        try { await borrarClavesSender([key]); }
+        catch (err) { console.error(err); alert('❌ No se pudo eliminar el registro. Intenta de nuevo.'); }
+    }
+
+    async function eliminarSenderSeleccionados() {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso pueden borrar historiales.');
+        const existentes = new Set(registrosSender().map(s => s.key));
+        const claves = Array.from(senderSeleccion).filter(k => existentes.has(k));
+        if (!claves.length) return alert('No hay registros seleccionados.');
+        if (!confirm(`🚨 ¿Eliminar los ${claves.length} registro(s) seleccionados? No se puede deshacer.`)) return;
+        try {
+            if (await borrarClavesSender(claves)) alert(`✅ Se eliminaron ${claves.length} registro(s).`);
+        } catch (err) { console.error(err); alert('❌ Ocurrió un error durante la eliminación. Revisa la tabla y vuelve a intentar.'); }
+    }
+
+    async function eliminarSenderFiltrados() {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso pueden borrar historiales.');
+        const claves = senderVistaVisibles.map(s => s.key).filter(Boolean);
+        if (!claves.length) return alert('No hay registros en pantalla para eliminar.');
+        const esTodo = claves.length === registrosSender().length;
+        if (!confirm(`⚠️ Se eliminarán ${claves.length} registro(s) de Sender${esTodo ? ' (TODOS los registros de Sender)' : ' que coinciden con el filtro actual'}.\n\nEsta acción no se puede deshacer. ¿Continuar?`)) return;
+        try {
+            if (await borrarClavesSender(claves)) alert(`✅ Se eliminaron ${claves.length} registro(s).`);
+        } catch (err) { console.error(err); alert('❌ Ocurrió un error durante la eliminación. Revisa la tabla y vuelve a intentar.'); }
+    }
+
+    function descargarSenderFiltrado() {
+        const filas = senderVistaVisibles || [];
+        if (!filas.length) return alert('No hay registros en pantalla para descargar.');
+        const datos = filas.map(s => {
+            const p = String(s.hora || '').split(' - ');
+            return {
+                'Fecha': p[0] || '',
+                'Hora': p[1] || '',
+                'Código': s.guia || '',
+                'Tipo': etiquetaTipoSender(s),
+                'Ruta / Tienda': rutaTiendaSender(s),
+                'Día': s.dia || '-',
+                'Secuencia': s.sec || '-',
+                'Ubicación': s.ubic || '',
+                'Zona': s.zona || '',
+                'Opción': s.cat || '',
+                'Bultos': s.bul || 1,
+                'Forzado': s.forzado ? 'SÍ' : 'NO',
+                'Usuario': s.usuario || '',
+                'Jornada': jornadaSender(s)
+            };
+        });
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sender');
+        XLSX.writeFile(wb, `Sender_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
     }
 
     function abrirModalVistaRepros() {

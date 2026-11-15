@@ -2987,6 +2987,10 @@
         <input type="text" id="inpEtqLibreTexto" placeholder="Ej: A001 o 123456" autocomplete="off" autocapitalize="characters"
             style="width:100%; padding:10px; margin:4px 0 10px; font-size:15px; font-weight:800; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main);">
 
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Encabezado <span style="font-weight:600; text-transform:none;">(opcional, sale arriba en la etiqueta)</span></label>
+        <input type="text" id="inpEtqLibreEnc" placeholder="Ej: PASILLO 3" maxlength="30" autocomplete="off"
+            style="width:100%; padding:10px; margin:4px 0 10px; font-size:14px; font-weight:800; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main);">
+
         <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Tipo de etiqueta</div>
         <div style="display:flex; gap:6px; margin-bottom:10px;">
             <button type="button" class="etq-tipo-btn" data-tipo="qr" onclick="elegirTipoEtqLibre('qr')">🔳 QR</button>
@@ -3009,6 +3013,7 @@
 
         <div id="boxPreviewEtqLibre" style="display:none; background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px; margin-bottom:10px; text-align:center; overflow:hidden;">
             <div style="font-size:9px; font-weight:800; color:#64748b; margin-bottom:4px;">VISTA PREVIA (1ª etiqueta)</div>
+            <div id="txtEtqLibreEncPreview" style="display:none; font-size:13px; font-weight:900; color:#0f172a; margin-bottom:4px; word-break:break-word;"></div>
             <canvas id="cnvEtqLibreQR" style="display:none; margin:0 auto; max-width:100%;"></canvas>
             <svg id="svgEtqLibreBar" style="display:none; margin:2px auto 0; max-width:100%;"></svg>
             <div id="txtEtqLibrePreview" style="font-size:13px; font-weight:800; color:#0f172a; font-family:monospace; word-break:break-all;"></div>
@@ -8137,7 +8142,8 @@
         const base = document.getElementById('inpEtqLibreTexto').value.trim();
         const cant = Math.max(1, Math.min(500, parseInt(document.getElementById('inpEtqLibreCant').value, 10) || 1));
         const correlativo = document.getElementById('chkEtqLibreCorrelativo').checked;
-        return { base, cant, correlativo };
+        const enc = (document.getElementById('inpEtqLibreEnc').value || '').trim();
+        return { base, cant, correlativo, enc };
     }
 
     // Módulos por lado de un QR (nivel Q) según el contenido, para centrarlo y
@@ -8152,7 +8158,13 @@
         return null;
     }
 
-    function generarZPLEtiquetaLibre(texto, tipo, copias) {
+    // Layout vertical (de arriba a abajo): [encabezado] [QR] [barras] [texto].
+    // El bloque se centra en la etiqueta. Para que NUNCA se encimen QR y barras,
+    // al QR se le reserva una zona más grande que su tamaño estimado (4 módulos
+    // extra arriba y abajo, que cubren el margen de silencio y cualquier
+    // diferencia entre la versión estimada y la que elige la impresora), y la
+    // magnificación se calcula con el espacio que realmente queda libre.
+    function generarZPLEtiquetaLibre(texto, tipo, copias, encabezado) {
         const anchoMM = parseFloat(localStorage.getItem('labelWidthMM')) || 50;
         const altoMM = parseFloat(localStorage.getItem('labelHeightMM')) || 50;
         const W = mmADots(anchoMM);
@@ -8161,31 +8173,52 @@
         const anchoInterior = W - margen * 2;
         const conQR = tipo === 'qr' || tipo === 'ambos';
         const conBarras = tipo === 'barras' || tipo === 'ambos';
+        const enc = String(encabezado || '').trim();
 
+        const hueco = Math.max(6, Math.round(H * 0.03));
+        const fEnc = enc ? ajustarFuenteAAncho(enc, Math.round(H * 0.13), anchoInterior, 14) : 0;
         const fTxt = ajustarFuenteAAncho(texto, Math.round(H * (tipo === 'ambos' ? 0.10 : 0.14)), anchoInterior, 12);
-        const hueco = Math.round(H * 0.03);
 
-        let mag = 1, ladoQR = 0, wBar = 1, anchoBarras = 0, altoBarras = 0;
-        if (conQR) {
-            const mods = modulosQR(texto) || 57;
-            const ladoMax = Math.min(anchoInterior, Math.round(H * (conBarras ? 0.40 : 0.62)));
-            mag = Math.min(10, Math.max(1, Math.floor(ladoMax / mods)));
-            ladoQR = mods * mag;
-        }
+        let altoBarras = 0, wBar = 1, anchoBarras = 0;
         if (conBarras) {
             const modulos = estimarModulosCode128(texto);
             wBar = Math.max(1, Math.min(4, Math.floor(anchoInterior / (modulos * 1.04))));
             anchoBarras = Math.min(anchoInterior, modulos * wBar);
-            altoBarras = Math.round(H * (conQR ? 0.22 : 0.50));
+            altoBarras = Math.round(H * (conQR ? 0.20 : 0.45));
         }
 
-        const bloque = (conQR ? ladoQR + hueco : 0) + (conBarras ? altoBarras + hueco : 0) + fTxt;
-        let y = Math.max(margen, Math.round((H - bloque) / 2));
+        // Cuántos elementos hay en la columna (cada par consecutivo lleva un hueco)
+        const nElem = (enc ? 1 : 0) + (conQR ? 1 : 0) + (conBarras ? 1 : 0) + 1;
+        const huecos = (nElem - 1) * hueco;
+        const fijos = (enc ? fEnc : 0) + fTxt + huecos + margen * 2;
+
+        let mag = 1, mods = 0, ladoQR = 0, zonaQR = 0;
+        if (conQR) {
+            mods = modulosQR(texto) || 57;
+            const modsSeguro = mods + 8;
+            let libre = H - fijos - altoBarras;
+            // Si queda muy poco para el QR, se achica la barra antes que apretarlo
+            if (conBarras && libre < modsSeguro * 2) {
+                altoBarras = Math.max(24, Math.round(altoBarras * 0.6));
+                libre = H - fijos - altoBarras;
+            }
+            const tope = Math.min(anchoInterior, Math.round(H * (conBarras ? 0.40 : 0.62)), libre);
+            mag = Math.min(10, Math.max(1, Math.floor(tope / modsSeguro)));
+            ladoQR = mods * mag;
+            zonaQR = modsSeguro * mag;
+        }
+
+        const bloque = (enc ? fEnc : 0) + (conQR ? zonaQR : 0) + (conBarras ? altoBarras : 0) + fTxt + huecos;
+        let y = margen + Math.max(0, Math.round((H - margen * 2 - bloque) / 2));
         let zpl = `^XA\n^CI28\n^PW${W}\n^LL${H}\n`;
+        if (enc) {
+            zpl += `^FO${margen},${y}^A0N,${fEnc},${fEnc}^FB${anchoInterior},1,0,C^FD${enc}^FS\n`;
+            y += fEnc + hueco;
+        }
         if (conQR) {
             const xQR = Math.max(margen, Math.round((W - ladoQR) / 2));
-            zpl += `^FO${xQR},${y}^BQN,2,${mag}^FDQA,${texto}^FS\n`;
-            y += ladoQR + hueco;
+            zpl += `^FO${xQR},${y + 4 * mag}^BQN,2,${mag}^FDQA,${texto}^FS\n`;
+            y += zonaQR + hueco;
         }
         if (conBarras) {
             const xB = margen + Math.max(0, Math.floor((anchoInterior - anchoBarras) / 2));
@@ -8197,8 +8230,9 @@
     }
 
     // Valida y devuelve un mensaje de error (o null si todo está bien).
-    function validarEtqLibre(base, lista, tipo) {
+    function validarEtqLibre(base, lista, tipo, enc) {
         if (!base) return 'Escribe el texto o código que quieres imprimir.';
+        if (enc && /[\^~]/.test(enc)) return 'El encabezado no puede contener los caracteres ^ o ~.';
         if (/[\^~]/.test(base)) return 'El texto no puede contener los caracteres ^ o ~.';
         const conBarras = tipo === 'barras' || tipo === 'ambos';
         const conQR = tipo === 'qr' || tipo === 'ambos';
@@ -8209,11 +8243,15 @@
         const anchoInterior = mmADots(anchoMM) - Math.max(6, Math.round(mmADots(anchoMM) * 0.03)) * 2;
         if (conBarras && estimarModulosCode128(masLargo) * 1.04 > anchoInterior)
             return `"${masLargo}" es muy largo para un código de barras en una etiqueta de ${anchoMM} mm. Usa un texto más corto o solo QR.`;
+        if (enc) {
+            const wI = mmADots(anchoMM) - Math.max(6, Math.round(Math.min(mmADots(anchoMM), mmADots(parseFloat(localStorage.getItem('labelHeightMM')) || 50)) * 0.03)) * 2;
+            if (enc.length * 14 * 0.74 > wI) return `El encabezado "${enc}" es muy largo para una etiqueta de ${anchoMM} mm. Acórtalo.`;
+        }
         return null;
     }
 
     function actualizarResumenEtqLibre() {
-        const { base, cant, correlativo } = leerFormEtqLibre();
+        const { base, cant, correlativo, enc } = leerFormEtqLibre();
         const el = document.getElementById('txtEtqLibreResumen');
         const box = document.getElementById('boxPreviewEtqLibre');
         if (!base) { el.textContent = 'Escribe el texto para ver el resumen.'; box.style.display = 'none'; return; }
@@ -8226,6 +8264,8 @@
         const cnv = document.getElementById('cnvEtqLibreQR');
         const svg = document.getElementById('svgEtqLibreBar');
         document.getElementById('txtEtqLibrePreview').textContent = lista[0];
+        const encPrev = document.getElementById('txtEtqLibreEncPreview');
+        encPrev.textContent = enc; encPrev.style.display = enc ? 'block' : 'none';
         box.style.display = 'block';
         cnv.style.display = 'none'; svg.style.display = 'none';
         if ((tipoEtqLibre === 'qr' || tipoEtqLibre === 'ambos') && typeof QRious !== 'undefined') {
@@ -8238,12 +8278,13 @@
     document.getElementById('inpEtqLibreTexto').addEventListener('input', actualizarResumenEtqLibre);
     document.getElementById('inpEtqLibreCant').addEventListener('input', actualizarResumenEtqLibre);
     document.getElementById('chkEtqLibreCorrelativo').addEventListener('change', actualizarResumenEtqLibre);
+    document.getElementById('inpEtqLibreEnc').addEventListener('input', actualizarResumenEtqLibre);
 
     async function imprimirEtiquetasLibres() {
         if (imprimiendoEtqLibre) return;
-        const { base, cant, correlativo } = leerFormEtqLibre();
+        const { base, cant, correlativo, enc } = leerFormEtqLibre();
         const lista = listaEtiquetasLibres(base, cant, correlativo);
-        const error = validarEtqLibre(base, lista, tipoEtqLibre);
+        const error = validarEtqLibre(base, lista, tipoEtqLibre, enc);
         if (error) { alert('⚠️ ' + error); return; }
         if (cant > 100 && !confirm(`Se van a imprimir ${cant} etiquetas. ¿Continuar?`)) return;
 
@@ -8255,14 +8296,14 @@
             let ok = true, impresas = 0;
             if (!correlativo) {
                 // Mismo texto: un solo trabajo con N copias.
-                ok = await enviarZPLaImpresora(generarZPLEtiquetaLibre(base, tipoEtqLibre, cant));
+                ok = await enviarZPLaImpresora(generarZPLEtiquetaLibre(base, tipoEtqLibre, cant, enc));
                 if (ok) impresas = cant;
             } else {
                 // Correlativo: bloques de 25 para no saturar el mini servidor de la impresora.
                 const BLOQUE = 25;
                 for (let ini = 0; ini < lista.length; ini += BLOQUE) {
                     const fin = Math.min(lista.length, ini + BLOQUE);
-                    const zpls = lista.slice(ini, fin).map(t => generarZPLEtiquetaLibre(t, tipoEtqLibre, 1));
+                    const zpls = lista.slice(ini, fin).map(t => generarZPLEtiquetaLibre(t, tipoEtqLibre, 1, enc));
                     ok = await enviarZPLaImpresora(zpls.join('\n'));
                     if (!ok) break;
                     impresas = fin;

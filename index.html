@@ -11908,41 +11908,120 @@
         return d;
     }
 
-    function ndKpi(titulo, valor, color) {
-        return '<div style="flex:1; min-width:130px; background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ' + color + '; border-radius:8px; padding:9px 12px;"><div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.3px;">' + titulo + '</div><div style="font-size:24px; font-weight:900; color:var(--text-main);">' + valor + '</div></div>';
+    function ndFmt(n) { return Number(n).toLocaleString('es-PE'); }
+
+    function ndKpi(titulo, valor, color, icono, sub) {
+        return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:center; box-shadow:0 1px 2px rgba(15,23,42,.06);">' +
+            '<div style="flex:none; width:40px; height:40px; border-radius:10px; background:' + color + '22; color:' + color + '; display:flex; align-items:center; justify-content:center; font-size:19px;">' + (icono || '') + '</div>' +
+            '<div style="min-width:0;"><div style="font-size:11px; font-weight:700; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + titulo + '</div>' +
+            '<div style="font-size:26px; font-weight:900; line-height:1.15; color:var(--text-main); font-variant-numeric:tabular-nums;">' + valor + '</div>' +
+            (sub ? '<div style="font-size:11px; font-weight:700; color:' + color + ';">' + sub + '</div>' : '') + '</div></div>';
     }
 
-    function ndTarjetaGrafico(id, titulo, extra) {
-        return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:10px;"><div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;"><b style="font-size:12px; color:var(--text-main);">' + titulo + '</b>' + (extra || '') + '</div><div style="position:relative; height:250px;"><canvas id="' + id + '"></canvas></div></div>';
+    function ndTarjetaGrafico(id, titulo, extra, alto, nota) {
+        return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px 14px 10px; box-shadow:0 1px 2px rgba(15,23,42,.06);">' +
+            '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px;">' +
+            '<div><div style="font-size:13px; font-weight:800; color:var(--text-main);">' + titulo + '</div>' +
+            (nota ? '<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">' + nota + '</div>' : '') + '</div>' + (extra || '') + '</div>' +
+            '<div style="position:relative; height:' + (alto || 250) + 'px;"><canvas id="' + id + '"></canvas></div></div>';
     }
+
+    function ndAltoGrafico(d, tipo) {
+        if (tipo === 'barh') return Math.max(190, 46 + d.labels.length * 27);
+        return 260;
+    }
+
+    // Dibuja los números directamente sobre las barras y los % dentro de la dona (sin librerías externas)
+    const ndPluginEtiquetas = {
+        id: 'ndEtiquetas',
+        afterDatasetsDraw(chart, args, opts) {
+            if (!opts || !opts.tipo) return;
+            const ctx = chart.ctx, meta = chart.getDatasetMeta(0), datos = chart.data.datasets[0].data;
+            const total = datos.reduce((a, b) => a + b, 0) || 1;
+            const fam = (Chart.defaults.font && Chart.defaults.font.family) || 'system-ui, sans-serif';
+            ctx.save();
+            if (opts.tipo === 'doughnut') {
+                meta.data.forEach((el, i) => {
+                    const pct = datos[i] * 100 / total;
+                    if (pct < 5) return;
+                    const p = el.tooltipPosition();
+                    ctx.font = '800 12px ' + fam; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(Math.round(pct) + '%', p.x, p.y);
+                });
+                const a = chart.chartArea, cx = (a.left + a.right) / 2, cy = (a.top + a.bottom) / 2;
+                ctx.fillStyle = opts.color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = '900 24px ' + fam; ctx.fillText(ndFmt(total), cx, cy - 8);
+                ctx.fillStyle = opts.muted; ctx.font = '600 11px ' + fam; ctx.fillText('registros', cx, cy + 13);
+            } else {
+                meta.data.forEach((el, i) => {
+                    const v = datos[i];
+                    ctx.fillStyle = opts.color;
+                    if (opts.tipo === 'barh') {
+                        ctx.font = '800 12px ' + fam; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                        const t = ndFmt(v);
+                        ctx.fillText(t, el.x + 7, el.y);
+                        ctx.fillStyle = opts.muted; ctx.font = '600 11px ' + fam;
+                        ctx.fillText(Math.round(v * 100 / total) + '%', el.x + 9 + ctx.measureText(t).width + 8, el.y);
+                    } else {
+                        if (el.width < 13) return;
+                        ctx.font = '800 11px ' + fam; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                        ctx.fillText(ndFmt(v), el.x, el.y - 4);
+                    }
+                });
+            }
+            ctx.restore();
+        }
+    };
 
     function ndCrearChart(canvasId, d, tipo, key) {
         const cv = document.getElementById(canvasId);
         if (!cv) return;
         const cs = getComputedStyle(document.getElementById('modalNoDespachado'));
         const txt = cs.getPropertyValue('--text-main').trim() || '#1e293b';
+        const muted = cs.getPropertyValue('--text-muted').trim() || '#64748b';
         const grid = cs.getPropertyValue('--border').trim() || '#e2e8f0';
+        const fondo = cs.getPropertyValue('--card-bg').trim() || '#ffffff';
+        const hexFondo = /^#([0-9a-f]{6})$/i.exec(fondo);
+        let oscuro = false;
+        if (hexFondo) { const n = parseInt(hexFondo[1], 16); oscuro = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) < 110; }
         const dona = tipo === 'doughnut';
+        const horiz = tipo === 'barh';
         const sel = key && Array.isArray(ND.filtros[key]) ? new Set(ND.filtros[key]) : null;
+        const baseBarra = oscuro ? '#7da3d1' : '#3d5a80';
         const color = (i) => {
-            const base = dona ? (d.claves[i] === null ? '#94a3b8' : ND_PALETA[i % ND_PALETA.length]) : '#4f7cac';
+            const base = dona ? (d.claves[i] === null ? '#94a3b8' : ND_PALETA[i % ND_PALETA.length]) : (d.claves[i] === null ? '#94a3b8' : baseBarra);
             return (sel && !sel.has(d.claves[i])) ? base + '44' : base;
         };
         const total = d.valores.reduce((a, b) => a + b, 0) || 1;
+        if (Chart.defaults && Chart.defaults.font) Chart.defaults.font.family = getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif';
+        const ejeValor = { beginAtZero: true, border: { display: false }, ticks: { color: muted, font: { size: 11 }, precision: 0, maxTicksLimit: 6 }, grid: { color: grid } };
+        const ejeCat = { border: { color: grid }, ticks: { color: txt, font: { size: horiz ? 12 : 11 }, maxRotation: 45, autoSkip: false }, grid: { display: false } };
         ND.charts[canvasId] = new Chart(cv, {
             type: dona ? 'doughnut' : 'bar',
             data: {
-                labels: dona ? d.labels.map((l, i) => l + ' (' + d.valores[i] + ' · ' + Math.round(d.valores[i] * 100 / total) + '%)') : d.labels,
-                datasets: [{ data: d.valores, backgroundColor: d.labels.map((_, i) => color(i)), borderWidth: dona ? 1 : 0, borderColor: dona ? 'rgba(0,0,0,0)' : undefined }]
+                labels: dona ? d.labels.map((l, i) => l + '  ·  ' + d.valores[i] + ' (' + Math.round(d.valores[i] * 100 / total) + '%)') : d.labels,
+                datasets: [dona
+                    ? { data: d.valores, backgroundColor: d.labels.map((_, i) => color(i)), borderWidth: 2, borderColor: fondo, hoverOffset: 6 }
+                    : { data: d.valores, backgroundColor: d.labels.map((_, i) => color(i)), borderWidth: 0, borderRadius: 5, borderSkipped: false, maxBarThickness: horiz ? 24 : 46, barPercentage: 0.82, categoryPercentage: 0.9 }]
             },
+            plugins: [ndPluginEtiquetas],
             options: {
                 responsive: true, maintainAspectRatio: false, animation: false,
-                indexAxis: tipo === 'barh' ? 'y' : 'x',
-                plugins: { legend: { display: dona, position: 'right', labels: { color: txt, boxWidth: 12, font: { size: 11 } } } },
-                scales: dona ? {} : {
-                    x: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, maxRotation: 50, precision: 0 }, grid: { color: grid } },
-                    y: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, precision: 0 }, grid: { color: grid } }
+                indexAxis: horiz ? 'y' : 'x',
+                cutout: dona ? '62%' : undefined,
+                layout: { padding: horiz ? { right: 78 } : (dona ? 4 : { top: 20 }) },
+                plugins: {
+                    ndEtiquetas: { tipo: tipo, color: txt, muted: muted },
+                    legend: { display: dona, position: 'right', labels: { color: txt, boxWidth: 12, boxHeight: 12, padding: 10, font: { size: 11.5 } } },
+                    tooltip: {
+                        backgroundColor: oscuro ? '#0f172a' : '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', padding: 10, cornerRadius: 8, displayColors: dona,
+                        callbacks: {
+                            title: (it) => { const i = it[0].dataIndex; return d.claves[i] === null ? 'Otros' : (d.claves[i] === '' ? '(vacío)' : d.claves[i]); },
+                            label: (c) => ' ' + ndFmt(c.raw) + ' registros · ' + (c.raw * 100 / total).toFixed(1) + '%'
+                        }
+                    }
                 },
+                scales: dona ? {} : (horiz ? { x: ejeValor, y: ejeCat } : { x: ejeCat, y: ejeValor }),
                 onHover: (e, els) => { if (e.native && e.native.target) e.native.target.style.cursor = (key && els.length && d.claves[els[0].index] !== null) ? 'pointer' : 'default'; },
                 onClick: (e, els) => {
                     if (!key || !els.length) return;
@@ -11971,22 +12050,25 @@
         const distintos = c => { if (!c) return null; const s = new Set(); filas.forEach(f => { const v = ndVal(f, c.key).trim(); if (v) s.add(v); }); return s.size; };
         const cGuia = ndColPorNombre('numrastreo') || ndColPorNombre('guiatms');
         const cRuta = ndColPorNombre('nruta'), cTrans = ndColPorNombre('transportista'), cBultos = ndColPorNombre('bultos'), cResp = ndColPorNombre('responsable');
-        const fmt = n => n.toLocaleString('es-PE');
-        let kpis = ndKpi('Registros', fmt(filas.length), '#3d5a80');
-        if (cGuia) kpis += ndKpi('Guías únicas', fmt(distintos(cGuia)), '#0f766e');
-        if (cRuta) kpis += ndKpi('Rutas', fmt(distintos(cRuta)), '#6a5acd');
-        if (cTrans) kpis += ndKpi('Transportistas', fmt(distintos(cTrans)), '#b9852f');
-        if (cBultos) kpis += ndKpi('Bultos', fmt(Math.round(filas.reduce((a, f) => a + (parseFloat(ndVal(f, cBultos.key).replace(',', '.')) || 0), 0))), '#3f8862');
-        if (cResp) { const sin = filas.filter(f => !ndVal(f, cResp.key).trim()).length; kpis += ndKpi('Sin responsable', fmt(sin) + ' <span style="font-size:12px; color:var(--text-muted);">(' + Math.round(sin * 100 / filas.length) + '%)</span>', '#b2453f'); }
+        const totalNube = Object.keys(ND.filas).length;
+        let kpis = ndKpi('Registros', ndFmt(filas.length), '#3d5a80', '📋', filas.length === totalNube ? 'Todos los datos' : 'de ' + ndFmt(totalNube) + ' en la nube');
+        if (cGuia) kpis += ndKpi('Guías únicas', ndFmt(distintos(cGuia)), '#0f766e', '📦');
+        if (cRuta) kpis += ndKpi('Rutas', ndFmt(distintos(cRuta)), '#6a5acd', '🛣️');
+        if (cTrans) kpis += ndKpi('Transportistas', ndFmt(distintos(cTrans)), '#b9852f', '🚚');
+        if (cBultos) kpis += ndKpi('Bultos', ndFmt(Math.round(filas.reduce((a, f) => a + (parseFloat(ndVal(f, cBultos.key).replace(',', '.')) || 0), 0))), '#3f8862', '🧰');
+        if (cResp) { const sin = filas.filter(f => !ndVal(f, cResp.key).trim()).length; kpis += ndKpi('Sin responsable', ndFmt(sin), sin ? '#b2453f' : '#3f8862', sin ? '⚠️' : '✅', Math.round(sin * 100 / filas.length) + '% de los registros'); }
 
-        // Tarjetas de gráficos
+        // Tarjetas de gráficos (cada gráfico usa las filas con todos los filtros MENOS el de su propia columna)
         const trabajos = [];
         let tarjetas = '';
         ND_STATS.forEach((s, i) => {
             const c = ndColPorNombre(s.n); if (!c) return;
             const id = 'ndCh' + i;
-            tarjetas += ndTarjetaGrafico(id, s.t);
-            trabajos.push({ id, c, s });
+            const filasC = ndFilasFiltradas(c.key);
+            const d = ndDatosGrafico(filasC, c.key, s.top, s.orden);
+            const dist = ndConteo(filasC, c.key).length;
+            tarjetas += ndTarjetaGrafico(id, s.t, '', ndAltoGrafico(d, s.tipo), ndFmt(filasC.length) + ' registros · ' + dist + (dist === 1 ? ' valor distinto' : ' valores distintos'));
+            trabajos.push({ id, c, s, d });
         });
 
         // Registros por fecha de carga
@@ -11996,25 +12078,27 @@
         if (porDia.size) {
             const ks = Array.from(porDia.keys()).sort((a, b) => a - b);
             dDia = { labels: ks.map(k => String(k % 100).padStart(2, '0') + '/' + String(Math.floor(k / 100) % 100).padStart(2, '0')), valores: ks.map(k => porDia.get(k)), claves: ks.map(k => String(k)) };
-            tarjetas += ndTarjetaGrafico('ndChDia', 'Registros por fecha de carga');
+            tarjetas += ndTarjetaGrafico('ndChDia', 'Registros por fecha de carga', '', 260, ks.length + (ks.length === 1 ? ' día' : ' días') + ' de carga');
         }
 
         // Gráfico libre: el usuario elige la columna
         const todas = ndColumnasActivas();
         const keyLibre = (ND.statsCustom && todas.some(c => c.key === ND.statsCustom)) ? ND.statsCustom : (todas[0] ? todas[0].key : '');
+        let dLibre = null;
         if (keyLibre) {
+            dLibre = ndDatosGrafico(ndFilasFiltradas(keyLibre), keyLibre, 15);
             const opts = todas.map(c => '<option value="' + ndEsc(c.key) + '"' + (c.key === keyLibre ? ' selected' : '') + '>' + ndEsc(c.label) + '</option>').join('');
-            tarjetas += ndTarjetaGrafico('ndChLibre', '🔧 Gráfico libre', '<select onchange="ND.statsCustom=this.value; ndRenderTabla();" style="max-width:55%; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + opts + '</select>');
+            tarjetas += ndTarjetaGrafico('ndChLibre', '🔧 Gráfico libre', '<select onchange="ND.statsCustom=this.value; ndRenderTabla();" style="max-width:55%; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + opts + '</select>', ndAltoGrafico(dLibre, 'barh'), 'Elige la columna que quieres analizar');
         }
 
-        wrap.innerHTML = '<div style="padding:2px 0 8px; font-size:11px; font-weight:700; color:var(--text-muted);">💡 Haz clic en una barra o porción para filtrar por ese valor (clic otra vez para quitarlo). Las estadísticas respetan la búsqueda y los filtros activos.</div>' +
-            '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">' + kpis + '</div>' +
-            '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:10px; padding-bottom:10px;">' + tarjetas + '</div>';
+        wrap.innerHTML =
+            '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap:10px; margin-bottom:12px;">' + kpis + '</div>' +
+            '<div style="padding:0 2px 10px; font-size:11px; font-weight:600; color:var(--text-muted);">💡 Toca una barra o porción para filtrar por ese valor (toca otra vez para quitarlo). Las estadísticas respetan la búsqueda y los filtros activos.</div>' +
+            '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; padding-bottom:12px;">' + tarjetas + '</div>';
 
-        // Cada gráfico usa las filas con todos los filtros MENOS el de su propia columna, así siempre se ven las demás opciones
-        trabajos.forEach(j => ndCrearChart(j.id, ndDatosGrafico(ndFilasFiltradas(j.c.key), j.c.key, j.s.top, j.s.orden), j.s.tipo, j.c.key));
+        trabajos.forEach(j => ndCrearChart(j.id, j.d, j.s.tipo, j.c.key));
         if (dDia) ndCrearChart('ndChDia', dDia, 'bar', null);
-        if (keyLibre) ndCrearChart('ndChLibre', ndDatosGrafico(ndFilasFiltradas(keyLibre), keyLibre, 15), 'barh', keyLibre);
+        if (keyLibre) ndCrearChart('ndChLibre', dLibre, 'barh', keyLibre);
         wrap.scrollTop = sy;
     }
 

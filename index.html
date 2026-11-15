@@ -2132,6 +2132,8 @@
                     <span style="font-size:10px; font-weight:700; color:var(--text-muted);">o arrastra el archivo a esta ventana</span>
                     <button onclick="ndExportar()" style="background:var(--success); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬇ Exportar filtrado</button>
                     <button onclick="ndTogglePanelCargas()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🗂 Cargas</button>
+                    <button onclick="ndAbrirColumnas(event)" title="Elegir qué columnas ver" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">👁 Columnas<span id="ndColBadge"></span></button>
+                    <button id="ndBtnVista" onclick="ndToggleVista()" style="background:var(--warning); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📊 Estadísticas</button>
                     <button onclick="cerrarModalNoDespachado()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; cursor:pointer;">&times;</button>
                 </div>
             </div>
@@ -2155,6 +2157,7 @@
             <div id="ndResumen" style="font-size:12px; font-weight:800; color:var(--text-muted);"></div>
 
             <div id="ndTablaWrap" style="flex:1; min-height:0; overflow:auto; background:var(--card-bg); border:1px solid var(--border); border-radius:8px;"></div>
+            <div id="ndStatsWrap" style="display:none; flex:1; min-height:0; overflow:auto;"></div>
         </div>
     </div>
 </div>
@@ -11459,7 +11462,8 @@
     //    no_despachado/columnas        orden de columnas del Excel
     //    no_despachado/lotes/{id}      historial de cargas
     // =====================================================================
-    const ND = { filas: {}, columnas: [], lotes: {}, pendiente: null, filtros: {}, anchos: {}, busqueda: '', limite: 5000, escuchando: false, dragInit: false, _cols: [] };
+    const ND = { filas: {}, columnas: [], lotes: {}, pendiente: null, filtros: {}, anchos: {}, busqueda: '', limite: 5000, escuchando: false, dragInit: false, _cols: [], ocultas: new Set(), vista: 'tabla', charts: {}, statsCustom: '' };
+    ND.ocultas = ndCargarOcultas();
     const ND_VISIBLES = ['vueltas','transportista','bu','nruta','tipodevolucion','numeroorder','numrastreo','guiatms','estadodecarga','responsable','motivonocarga','comentarioil','ubicaciones','bultos','estadotms','descripcion','archivo'];
     const ND_FILTROS = [['vueltas','Vuelta'],['transportista','Transportista'],['bu','BU'],['nruta','N° Ruta'],['tipodevolucion','Tipo devolución'],['estadodecarga','Estado de carga'],['responsable','Responsable'],['motivonocarga','Motivo no carga'],['estadotms','Estado TMS'],['ubicaciones','Ubicación'],['archivo','Archivo cargado']];
 
@@ -11639,16 +11643,24 @@
     function ndRenderTabla() {
         const wrap = document.getElementById('ndTablaWrap');
         if (!wrap) return;
+        ndActualizarBadgeCols();
         const total = Object.keys(ND.filas).length;
         if (!total) {
             document.getElementById('ndResumen').textContent = '';
+            if (ND.vista === 'stats') { ndRenderStats([]); return; }
             wrap.innerHTML = '<div style="padding:50px; text-align:center; color:var(--text-muted); font-size:14px; font-weight:700;">Aún no hay datos.<br>Usa “⬆ Subir Excel” o <u>arrastra tu archivo NO_DESPACHADO</u> a esta ventana.</div>';
             return;
         }
         const filtradas = ndFilasFiltradas();
         document.getElementById('ndResumen').textContent = 'Mostrando ' + Math.min(ND.limite, filtradas.length) + ' de ' + filtradas.length + ' filtradas · ' + total + ' registros en la nube';
-        const cols = ndColumnasActivas();
+        const cols = ndColumnasVisibles();
         ND._cols = cols;
+        if (ND.vista === 'stats') {
+            document.getElementById('ndResumen').textContent = 'Estadísticas de ' + filtradas.length + ' registros filtrados · ' + total + ' registros en la nube';
+            ndRenderStats(filtradas);
+            return;
+        }
+        if (!cols.length) { wrap.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted); font-weight:700;">Todas las columnas están ocultas. Usa “👁 Columnas” para volver a mostrarlas.</div>'; return; }
         const anchoTotal = 46 + cols.reduce((a, c) => a + ndAnchoDe(c), 0);
         const borde = '1px solid var(--border)';
         const colgroup = '<colgroup><col style="width:46px">' + cols.map(c => '<col style="width:' + ndAnchoDe(c) + 'px">').join('') + '</colgroup>';
@@ -11657,7 +11669,8 @@
                 const activo = Array.isArray(ND.filtros[c.key]);
                 return '<th style="position:sticky; top:0; z-index:3; background:var(--border); color:var(--text-main); border:' + borde + '; padding:5px 6px; font-size:10px; text-align:left; text-transform:uppercase; letter-spacing:.3px; overflow:hidden;">' +
                     '<div style="display:flex; align-items:center; gap:4px;"><span title="' + ndEsc(c.label) + '" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + ndEsc(c.label) + '</span>' +
-                    '<button onclick="ndAbrirFiltro(event,' + i + ')" title="Filtrar" style="flex:none; border:1px solid ' + (activo ? 'var(--primary)' : 'var(--border)') + '; background:' + (activo ? 'var(--primary)' : 'var(--card-bg)') + '; color:' + (activo ? '#fff' : 'var(--text-main)') + '; width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">' + (activo ? '⧩' : '▼') + '</button></div>' +
+                    '<button onclick="ndAbrirFiltro(event,' + i + ')" title="Filtrar" style="flex:none; border:1px solid ' + (activo ? 'var(--primary)' : 'var(--border)') + '; background:' + (activo ? 'var(--primary)' : 'var(--card-bg)') + '; color:' + (activo ? '#fff' : 'var(--text-main)') + '; width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">' + (activo ? '⧩' : '▼') + '</button>' +
+                    '<button onclick="ndOcultarCol(' + i + ')" title="Ocultar esta columna" style="flex:none; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">✕</button></div>' +
                     '<span onmousedown="ndIniciarResize(event,' + i + ')" style="position:absolute; top:0; right:0; bottom:0; width:6px; cursor:col-resize;"></span></th>';
             }).join('') + '</tr>';
         const cuerpo = filtradas.slice(0, ND.limite).map((f, i) =>
@@ -11689,7 +11702,7 @@
     }
 
     // ---------- Filtro por columna (lista con casillas, como Excel) ----------
-    function ndCerrarPop() { const p = document.getElementById('ndPop'); if (p) p.remove(); }
+    function ndCerrarPop() { ['ndPop', 'ndColPop'].forEach(id => { const p = document.getElementById(id); if (p) p.remove(); }); }
 
     function ndAbrirFiltro(ev, i) {
         ev.stopPropagation();
@@ -11759,11 +11772,217 @@
         document.addEventListener('click', ndCerrarPop);
     }
 
+    // ---------- Columnas visibles / ocultas (se recuerdan en este navegador) ----------
+    function ndCargarOcultas() { try { return new Set(JSON.parse(localStorage.getItem('nd_cols_ocultas') || '[]')); } catch (e) { return new Set(); } }
+    function ndGuardarOcultas() { try { localStorage.setItem('nd_cols_ocultas', JSON.stringify(Array.from(ND.ocultas))); } catch (e) {} }
+    function ndColumnasVisibles() { return ndColumnasActivas().filter(c => !ND.ocultas.has(c.key)); }
+
+    function ndActualizarBadgeCols() {
+        const b = document.getElementById('ndColBadge'); if (!b) return;
+        const n = ndColumnasActivas().filter(c => ND.ocultas.has(c.key)).length;
+        b.textContent = n ? ' · ' + n + ' oculta' + (n > 1 ? 's' : '') : '';
+    }
+    function ndCambioColumnas() { ndGuardarOcultas(); ndActualizarBadgeCols(); ndRenderTabla(); ndColPopRender(); }
+    function ndOcultarCol(i) { const c = ND._cols[i]; if (!c) return; ND.ocultas.add(c.key); ndCambioColumnas(); }
+    function ndToggleCol(key, visible) { if (visible) ND.ocultas.delete(key); else ND.ocultas.add(key); ndCambioColumnas(); }
+    function ndMostrarTodasCols() { ND.ocultas.clear(); ndCambioColumnas(); }
+    function ndOcultarTodasCols() { ndColumnasActivas().forEach(c => ND.ocultas.add(c.key)); ndCambioColumnas(); }
+
+    function ndAbrirColumnas(ev) {
+        ev.stopPropagation();
+        const yaAbierto = !!document.getElementById('ndColPop');
+        ndCerrarPop();
+        if (yaAbierto) return;
+        const pop = document.createElement('div');
+        pop.id = 'ndColPop';
+        pop.style.cssText = 'position:fixed; z-index:9100; width:280px; background:var(--card-bg); color:var(--text-main); border:1px solid var(--border); border-radius:8px; box-shadow:0 12px 30px rgba(0,0,0,.3); padding:10px; font-family:inherit;';
+        pop.onclick = e => e.stopPropagation();
+        const r = ev.currentTarget.getBoundingClientRect();
+        pop.style.left = Math.max(6, Math.min(r.left, window.innerWidth - 290)) + 'px';
+        pop.style.top = Math.max(6, Math.min(r.bottom + 4, window.innerHeight - 430)) + 'px';
+        document.body.appendChild(pop);
+        ndColPopRender();
+    }
+
+    function ndColPopRender() {
+        const pop = document.getElementById('ndColPop'); if (!pop) return;
+        const prev = document.getElementById('ndColLista');
+        const sc = prev ? prev.scrollTop : 0;
+        const cols = ndColumnasActivas();
+        const vis = cols.filter(c => !ND.ocultas.has(c.key)).length;
+        const btn = 'background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:6px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;';
+        pop.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><b style="font-size:12px;">👁 Columnas visibles</b><span style="font-size:10px; font-weight:800; color:var(--text-muted);">' + vis + ' de ' + cols.length + '</span></div>' +
+            '<div style="display:flex; gap:6px; margin-bottom:6px;"><button onclick="ndMostrarTodasCols()" style="flex:1; ' + btn + '">Mostrar todas</button><button onclick="ndOcultarTodasCols()" style="flex:1; ' + btn + '">Ocultar todas</button></div>' +
+            '<div id="ndColLista" style="max-height:320px; overflow:auto; border-top:1px solid var(--border); padding-top:4px;">' +
+            (cols.length ? cols.map(c => '<label style="display:flex; gap:7px; align-items:center; font-size:12px; padding:4px 2px; cursor:pointer;"><input type="checkbox" data-key="' + ndEsc(c.key) + '" ' + (ND.ocultas.has(c.key) ? '' : 'checked') + ' onchange="ndToggleCol(this.dataset.key, this.checked)"><span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + ndEsc(c.label) + '">' + ndEsc(c.label) + '</span></label>').join('') : '<div style="font-size:11px; color:var(--text-muted); padding:6px;">Aún no hay columnas (sube un Excel primero).</div>') +
+            '</div>';
+        const lista = document.getElementById('ndColLista'); if (lista) lista.scrollTop = sc;
+    }
+
+    // ---------- Vista de estadísticas ----------
+    const ND_PALETA = ['#3d5a80', '#3f8862', '#b9852f', '#b2453f', '#6a5acd', '#0f766e', '#c2410c', '#7c3aed', '#0891b2', '#be185d', '#65a30d', '#64748b'];
+    const ND_STATS = [
+        { n: 'transportista', t: 'Registros por transportista', tipo: 'barh', top: 12 },
+        { n: 'estadodecarga', t: 'Estado de carga', tipo: 'doughnut', top: 8 },
+        { n: 'motivonocarga', t: 'Motivo de no carga', tipo: 'barh', top: 10 },
+        { n: 'tipodevolucion', t: 'Tipo de devolución', tipo: 'doughnut', top: 8 },
+        { n: 'bu', t: 'Por BU', tipo: 'bar', top: 12 },
+        { n: 'responsable', t: 'Por responsable', tipo: 'barh', top: 10 },
+        { n: 'estadotms', t: 'Estado TMS', tipo: 'doughnut', top: 8 },
+        { n: 'ubicaciones', t: 'Por ubicación', tipo: 'barh', top: 10 },
+        { n: 'vueltas', t: 'Por vuelta', tipo: 'bar', top: 30, orden: 'num' },
+        { n: 'nruta', t: 'Rutas con más registros', tipo: 'barh', top: 10 }
+    ];
+
+    function ndToggleVista() { ND.vista = ND.vista === 'stats' ? 'tabla' : 'stats'; ndAplicarVista(); ndRenderTabla(); }
+    function ndAplicarVista() {
+        const st = ND.vista === 'stats';
+        const t = document.getElementById('ndTablaWrap'), s = document.getElementById('ndStatsWrap'), b = document.getElementById('ndBtnVista');
+        if (t) t.style.display = st ? 'none' : '';
+        if (s) s.style.display = st ? 'block' : 'none';
+        if (b) b.textContent = st ? '📋 Ver tabla' : '📊 Estadísticas';
+        if (!st) ndDestruirCharts();
+    }
+    function ndDestruirCharts() { Object.values(ND.charts).forEach(c => { try { c.destroy(); } catch (e) {} }); ND.charts = {}; }
+    function ndColPorNombre(n) { return ndColumnasActivas().find(c => c.n === n); }
+
+    function ndConteo(filas, key) {
+        const m = new Map();
+        filas.forEach(f => { const v = ndVal(f, key); m.set(v, (m.get(v) || 0) + 1); });
+        return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
+    }
+
+    function ndDatosGrafico(filas, key, top, orden) {
+        let par = ndConteo(filas, key);
+        let otros = 0;
+        if (orden === 'num') {
+            par = par.slice(0, top).sort((a, b) => a[0].localeCompare(b[0], 'es', { numeric: true }));
+        } else if (top && par.length > top) {
+            otros = par.slice(top).reduce((a, p) => a + p[1], 0);
+            par = par.slice(0, top);
+        }
+        const cortar = s => s.length > 26 ? s.slice(0, 25) + '…' : s;
+        const d = { labels: par.map(p => p[0] === '' ? '(vacío)' : cortar(p[0])), valores: par.map(p => p[1]), claves: par.map(p => p[0]) };
+        if (otros) { d.labels.push('Otros'); d.valores.push(otros); d.claves.push(null); }
+        return d;
+    }
+
+    function ndKpi(titulo, valor, color) {
+        return '<div style="flex:1; min-width:130px; background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ' + color + '; border-radius:8px; padding:9px 12px;"><div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.3px;">' + titulo + '</div><div style="font-size:24px; font-weight:900; color:var(--text-main);">' + valor + '</div></div>';
+    }
+
+    function ndTarjetaGrafico(id, titulo, extra) {
+        return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:10px;"><div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;"><b style="font-size:12px; color:var(--text-main);">' + titulo + '</b>' + (extra || '') + '</div><div style="position:relative; height:250px;"><canvas id="' + id + '"></canvas></div></div>';
+    }
+
+    function ndCrearChart(canvasId, d, tipo, key) {
+        const cv = document.getElementById(canvasId);
+        if (!cv) return;
+        const cs = getComputedStyle(document.getElementById('modalNoDespachado'));
+        const txt = cs.getPropertyValue('--text-main').trim() || '#1e293b';
+        const grid = cs.getPropertyValue('--border').trim() || '#e2e8f0';
+        const dona = tipo === 'doughnut';
+        const sel = key && Array.isArray(ND.filtros[key]) ? new Set(ND.filtros[key]) : null;
+        const color = (i) => {
+            const base = dona ? (d.claves[i] === null ? '#94a3b8' : ND_PALETA[i % ND_PALETA.length]) : '#4f7cac';
+            return (sel && !sel.has(d.claves[i])) ? base + '44' : base;
+        };
+        const total = d.valores.reduce((a, b) => a + b, 0) || 1;
+        ND.charts[canvasId] = new Chart(cv, {
+            type: dona ? 'doughnut' : 'bar',
+            data: {
+                labels: dona ? d.labels.map((l, i) => l + ' (' + d.valores[i] + ' · ' + Math.round(d.valores[i] * 100 / total) + '%)') : d.labels,
+                datasets: [{ data: d.valores, backgroundColor: d.labels.map((_, i) => color(i)), borderWidth: dona ? 1 : 0, borderColor: dona ? 'rgba(0,0,0,0)' : undefined }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                indexAxis: tipo === 'barh' ? 'y' : 'x',
+                plugins: { legend: { display: dona, position: 'right', labels: { color: txt, boxWidth: 12, font: { size: 11 } } } },
+                scales: dona ? {} : {
+                    x: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, maxRotation: 50, precision: 0 }, grid: { color: grid } },
+                    y: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, precision: 0 }, grid: { color: grid } }
+                },
+                onHover: (e, els) => { if (e.native && e.native.target) e.native.target.style.cursor = (key && els.length && d.claves[els[0].index] !== null) ? 'pointer' : 'default'; },
+                onClick: (e, els) => {
+                    if (!key || !els.length) return;
+                    const v = d.claves[els[0].index];
+                    if (v === null) return;
+                    const ya = Array.isArray(ND.filtros[key]) && ND.filtros[key].length === 1 && ND.filtros[key][0] === v;
+                    if (ya) delete ND.filtros[key]; else ND.filtros[key] = [v];
+                    ND.limite = 5000;
+                    setTimeout(ndRenderTodo, 0);
+                }
+            }
+        });
+    }
+
+    function ndRenderStats(filas) {
+        const wrap = document.getElementById('ndStatsWrap');
+        if (!wrap || ND.vista !== 'stats') return;
+        const sy = wrap.scrollTop;
+        ndDestruirCharts();
+        const aviso = m => '<div style="padding:50px; text-align:center; color:var(--text-muted); font-size:14px; font-weight:700;">' + m + '</div>';
+        if (!Object.keys(ND.filas).length) { wrap.innerHTML = aviso('Aún no hay datos para mostrar estadísticas.<br>Sube primero tu Excel.'); return; }
+        if (!filas.length) { wrap.innerHTML = aviso('Ningún registro coincide con los filtros.'); return; }
+        if (typeof Chart === 'undefined') { wrap.innerHTML = aviso('No se pudo cargar la librería de gráficos (Chart.js). Revisa tu conexión a internet.'); return; }
+
+        // KPIs (sobre las filas filtradas)
+        const distintos = c => { if (!c) return null; const s = new Set(); filas.forEach(f => { const v = ndVal(f, c.key).trim(); if (v) s.add(v); }); return s.size; };
+        const cGuia = ndColPorNombre('numrastreo') || ndColPorNombre('guiatms');
+        const cRuta = ndColPorNombre('nruta'), cTrans = ndColPorNombre('transportista'), cBultos = ndColPorNombre('bultos'), cResp = ndColPorNombre('responsable');
+        const fmt = n => n.toLocaleString('es-PE');
+        let kpis = ndKpi('Registros', fmt(filas.length), '#3d5a80');
+        if (cGuia) kpis += ndKpi('Guías únicas', fmt(distintos(cGuia)), '#0f766e');
+        if (cRuta) kpis += ndKpi('Rutas', fmt(distintos(cRuta)), '#6a5acd');
+        if (cTrans) kpis += ndKpi('Transportistas', fmt(distintos(cTrans)), '#b9852f');
+        if (cBultos) kpis += ndKpi('Bultos', fmt(Math.round(filas.reduce((a, f) => a + (parseFloat(ndVal(f, cBultos.key).replace(',', '.')) || 0), 0))), '#3f8862');
+        if (cResp) { const sin = filas.filter(f => !ndVal(f, cResp.key).trim()).length; kpis += ndKpi('Sin responsable', fmt(sin) + ' <span style="font-size:12px; color:var(--text-muted);">(' + Math.round(sin * 100 / filas.length) + '%)</span>', '#b2453f'); }
+
+        // Tarjetas de gráficos
+        const trabajos = [];
+        let tarjetas = '';
+        ND_STATS.forEach((s, i) => {
+            const c = ndColPorNombre(s.n); if (!c) return;
+            const id = 'ndCh' + i;
+            tarjetas += ndTarjetaGrafico(id, s.t);
+            trabajos.push({ id, c, s });
+        });
+
+        // Registros por fecha de carga
+        const porDia = new Map();
+        filas.forEach(f => { if (!f._ts) return; const dt = new Date(f._ts); const k = dt.getFullYear() * 10000 + (dt.getMonth() + 1) * 100 + dt.getDate(); porDia.set(k, (porDia.get(k) || 0) + 1); });
+        let dDia = null;
+        if (porDia.size) {
+            const ks = Array.from(porDia.keys()).sort((a, b) => a - b);
+            dDia = { labels: ks.map(k => String(k % 100).padStart(2, '0') + '/' + String(Math.floor(k / 100) % 100).padStart(2, '0')), valores: ks.map(k => porDia.get(k)), claves: ks.map(k => String(k)) };
+            tarjetas += ndTarjetaGrafico('ndChDia', 'Registros por fecha de carga');
+        }
+
+        // Gráfico libre: el usuario elige la columna
+        const todas = ndColumnasActivas();
+        const keyLibre = (ND.statsCustom && todas.some(c => c.key === ND.statsCustom)) ? ND.statsCustom : (todas[0] ? todas[0].key : '');
+        if (keyLibre) {
+            const opts = todas.map(c => '<option value="' + ndEsc(c.key) + '"' + (c.key === keyLibre ? ' selected' : '') + '>' + ndEsc(c.label) + '</option>').join('');
+            tarjetas += ndTarjetaGrafico('ndChLibre', '🔧 Gráfico libre', '<select onchange="ND.statsCustom=this.value; ndRenderTabla();" style="max-width:55%; padding:4px 6px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + opts + '</select>');
+        }
+
+        wrap.innerHTML = '<div style="padding:2px 0 8px; font-size:11px; font-weight:700; color:var(--text-muted);">💡 Haz clic en una barra o porción para filtrar por ese valor (clic otra vez para quitarlo). Las estadísticas respetan la búsqueda y los filtros activos.</div>' +
+            '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">' + kpis + '</div>' +
+            '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:10px; padding-bottom:10px;">' + tarjetas + '</div>';
+
+        // Cada gráfico usa las filas con todos los filtros MENOS el de su propia columna, así siempre se ven las demás opciones
+        trabajos.forEach(j => ndCrearChart(j.id, ndDatosGrafico(ndFilasFiltradas(j.c.key), j.c.key, j.s.top, j.s.orden), j.s.tipo, j.c.key));
+        if (dDia) ndCrearChart('ndChDia', dDia, 'bar', null);
+        if (keyLibre) ndCrearChart('ndChLibre', ndDatosGrafico(ndFilasFiltradas(keyLibre), keyLibre, 15), 'barh', keyLibre);
+        wrap.scrollTop = sy;
+    }
+
     // ---------- Exportar ----------
     function ndExportar() {
         const filtradas = ndFilasFiltradas();
         if (!filtradas.length) { alert('No hay filas para exportar.'); return; }
-        const cols = ndColumnasActivas();
+        const cols = ndColumnasVisibles();
+        if (!cols.length) { alert('Todas las columnas están ocultas. Muestra al menos una para exportar.'); return; }
         const datos = filtradas.map(f => { const o = {}; cols.forEach(c => { o[c.label] = c.key === '_archivo' ? (f._archivo || '') : (f[c.key] || ''); }); return o; });
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'Observaciones en ruta');

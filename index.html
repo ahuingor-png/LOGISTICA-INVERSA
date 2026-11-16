@@ -12075,7 +12075,7 @@
         const html = '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;">' +
             '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;"><div><div style="font-size:15px; font-weight:900; color:var(--text-main);">Resumen para reunión</div><div style="font-size:11px; color:var(--text-muted);">Generado con los registros filtrados (' + ndFmt(filas.length) + ').</div></div>' +
             '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button onclick="ndInforme()" style="' + btn + ' background:var(--primary);">🖨 Informe / PDF</button><button onclick="ndCopiarResumen()" style="' + btn + ' background:var(--success);">📲 Copiar para WhatsApp</button></div></div>' +
-            (hall.length ? '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap:8px;">' + tarjH + '</div>' : '') + '</div>' +
+            '</div>' +
             (tarj ? '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; margin-bottom:12px;">' + tarj + '</div>' : '') +
             '';
         return { html, charts };

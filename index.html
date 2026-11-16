@@ -11521,6 +11521,8 @@
             rtdb.ref('no_despachado/filas').on('value', snap => { ND.filas = snap.val() || {}; document.getElementById('ndEstadoNube').textContent = '☁ sincronizado'; ndRenderTodo(); }, err => { document.getElementById('ndEstadoNube').textContent = '⚠ sin acceso a la nube'; alert('No se pudo leer la nube (no_despachado): ' + err.message + '\n\nRevisa las Reglas de Firebase.'); });
             rtdb.ref('no_despachado/columnas').on('value', snap => { ND.columnas = snap.val() || []; ndRenderTodo(); });
             rtdb.ref('no_despachado/lotes').on('value', snap => { ND.lotes = snap.val() || {}; ndRenderPanelCargas(); });
+            rtdb.ref('no_despachado/plan').on('value', snap => ndPlanSnap(snap.val()));
+            rtdb.ref('no_despachado/metas').on('value', snap => ndMetasSnap(snap.val()));
         }
         ndRenderTodo();
     }
@@ -12038,7 +12040,103 @@
 
     // ---------- Modo reunión: hallazgos, Pareto, plan de acción e informe ----------
     function ndPlanCargar() { if (ND.plan) return ND.plan; try { ND.plan = JSON.parse(localStorage.getItem('nd_plan') || '{}'); } catch (e) { ND.plan = {}; } return ND.plan; }
-    function ndPlanSet(k, campo, v) { const p = ndPlanCargar(); p[k] = p[k] || {}; p[k][campo] = v; try { localStorage.setItem('nd_plan', JSON.stringify(p)); } catch (e) {} }
+    function ndPlanSet(k, campo, v) {
+        const p = ndPlanCargar(); p[k] = p[k] || {}; p[k][campo] = v;
+        try { localStorage.setItem('nd_plan', JSON.stringify(p)); } catch (e) {}
+        ND._pt = ND._pt || {}; clearTimeout(ND._pt[k + campo]);
+        ND._pt[k + campo] = setTimeout(() => { try { rtdb.ref('no_despachado/plan/' + k + '/' + campo).set(v); } catch (e) {} }, 600);
+    }
+    function ndEditando() { const a = document.activeElement; return !!(a && a.closest && a.closest('#ndStatsWrap') && /INPUT|SELECT/.test(a.tagName)); }
+    function ndPlanSnap(v) { ND.plan = v || {}; if (ndEditando()) return; if (ND.vista === 'stats' && !ND.pres) ndRenderTabla(); }
+    function ndMetas() { return Object.assign({ sinresp: 5, motivo: 30, registros: 0 }, ND.metas || {}); }
+    function ndMetasSnap(v) { ND.metas = v || {}; if (ndEditando()) return; if (ND.vista === 'stats' && !ND.pres) ndRenderTabla(); }
+    function ndMetaSet(k, v) {
+        const n = Math.max(0, parseFloat(String(v).replace(',', '.')) || 0);
+        ND.metas = Object.assign(ND.metas || {}, { [k]: n });
+        try { rtdb.ref('no_despachado/metas/' + k).set(n); } catch (e) {}
+        ndRenderTabla();
+    }
+
+    // Semáforo con metas editables + tendencia contra la carga anterior
+    function ndSemaforoHtml(filas, ro) {
+        const n = filas.length, m = ndMetas();
+        const cR = ndColPorNombre('responsable'), cM = ndColPorNombre('motivonocarga');
+        const items = [];
+        if (cR) items.push({ k: 'sinresp', t: 'Sin responsable', v: Math.round(filas.filter(f => !ndVal(f, cR.key).trim()).length * 1000 / n) / 10, u: '%' });
+        if (cM) { const par = ndConteo(filas, cM.key).filter(p => p[0].trim() !== ''); items.push({ k: 'motivo', t: 'Peso del motivo principal', v: par.length ? Math.round(par[0][1] * 1000 / n) / 10 : 0, u: '%' }); }
+        items.push({ k: 'registros', t: 'Registros pendientes', v: n, u: '' });
+        const cards = items.map(it => {
+            const meta = m[it.k], sin = !meta;
+            const col = sin ? '#94a3b8' : (it.v <= meta ? '#3f8862' : (it.v <= meta * 1.5 ? '#b9852f' : '#b2453f'));
+            const est = sin ? 'Sin meta' : (it.v <= meta ? 'En meta' : (it.v <= meta * 1.5 ? 'Atención' : 'Crítico'));
+            const metaTxt = ro ? 'Meta ≤ ' + (sin ? '—' : ndFmt(meta) + it.u) : 'Meta ≤ <input type="number" min="0" value="' + meta + '" onchange="ndMetaSet(\'' + it.k + '\', this.value)" style="width:64px; padding:3px 5px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + it.u + ' <span style="color:var(--text-muted);">(0 = sin meta)</span>';
+            return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px; display:flex; gap:10px; align-items:center;"><div style="flex:none; width:14px; height:14px; border-radius:50%; background:' + col + '; box-shadow:0 0 0 4px ' + col + '33;"></div><div><div style="font-size:11px; font-weight:700; color:var(--text-muted);">' + it.t + '</div><div style="font-size:22px; font-weight:900; color:var(--text-main);">' + ndFmt(it.v) + it.u + ' <span style="font-size:11px; font-weight:800; color:' + col + ';">' + est + '</span></div><div style="font-size:11px; color:var(--text-muted);">' + metaTxt + '</div></div></div>';
+        }).join('');
+        return '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(230px,100%), 1fr)); gap:8px; margin-bottom:10px;">' + cards + '</div>' + ndTendenciaHtml(filas);
+    }
+
+    function ndTendenciaHtml(filas) {
+        const ids = Object.keys(ND.lotes || {}).sort((a, b) => (ND.lotes[b].ts || 0) - (ND.lotes[a].ts || 0));
+        if (ids.length < 2) return '';
+        const cur = filas.filter(f => f._lote === ids[0]), prev = filas.filter(f => f._lote === ids[1]);
+        const cR = ndColPorNombre('responsable'), cRu = ndColPorNombre('nruta'), cB = ndColPorNombre('bultos');
+        const dis = (a, c) => { const s = new Set(); a.forEach(f => { const v = ndVal(f, c.key).trim(); if (v) s.add(v); }); return s.size; };
+        const met = [{ t: 'Registros', f: a => a.length, mal: true }];
+        if (cR) met.push({ t: 'Sin responsable', f: a => a.filter(f => !ndVal(f, cR.key).trim()).length, mal: true });
+        if (cRu) met.push({ t: 'Rutas', f: a => dis(a, cRu) });
+        if (cB) met.push({ t: 'Bultos', f: a => Math.round(a.reduce((x, f) => x + (parseFloat(ndVal(f, cB.key).replace(',', '.')) || 0), 0)) });
+        const nom = i => ndEsc((ND.lotes[ids[i]].archivo || 'carga') + ' (' + new Date(ND.lotes[ids[i]].ts).toLocaleDateString('es-PE') + ')');
+        const cards = met.map(x => {
+            const a = x.f(cur), b = x.f(prev), d = a - b;
+            const txt = d === 0 ? '= igual' : (d > 0 ? '▲ ' : '▼ ') + ndFmt(Math.abs(d)) + (b ? ' (' + Math.round(Math.abs(d) * 100 / b) + '%)' : '');
+            const col = d === 0 || !x.mal ? 'var(--text-muted)' : (d > 0 ? '#b2453f' : '#3f8862');
+            return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:8px 12px;"><div style="font-size:11px; font-weight:700; color:var(--text-muted);">' + x.t + '</div><div style="font-size:20px; font-weight:900; color:var(--text-main);">' + ndFmt(a) + ' <span style="font-size:11px; font-weight:800; color:' + col + ';">' + txt + '</span></div><div style="font-size:10px; color:var(--text-muted);">antes: ' + ndFmt(b) + '</div></div>';
+        }).join('');
+        return '<div style="font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:6px;">Tendencia: ' + nom(0) + ' vs ' + nom(1) + '</div><div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(150px,100%), 1fr)); gap:8px; margin-bottom:10px;">' + cards + '</div><div style="font-size:10px; color:var(--text-muted); margin-bottom:10px;">Cuenta los registros que quedaron asociados a cada carga (si una guía se vuelve a subir, pasa a la carga más reciente).</div>';
+    }
+
+    // Modo presentación (pantalla completa, una diapositiva por gráfico)
+    function ndPresentar() {
+        if (!ND._specs || !ND._specs.length) { alert('Abre primero las estadísticas con datos.'); return; }
+        ND.pres = true; ND._pi = 0;
+        ND._slides = [{ t: 'Resumen', tipo: 'resumen' }].concat(ND._specs, [{ t: 'Plan de acción', tipo: 'plan' }]);
+        const o = document.createElement('div'); o.id = 'ndPres';
+        o.style.cssText = 'position:fixed; inset:0; z-index:99999; background:var(--bg,#f8fafc); color:var(--text-main,#1e293b); display:flex; flex-direction:column;';
+        const b = 'background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:6px 14px; border-radius:6px; font-size:14px; font-weight:800; cursor:pointer;';
+        o.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 16px; background:var(--card-bg); border-bottom:1px solid var(--border);"><b id="ndPresT" style="font-size:17px;"></b><div style="display:flex; gap:8px; align-items:center;"><span id="ndPresN" style="font-size:12px; font-weight:700; color:var(--text-muted);"></span><button style="' + b + '" onclick="ndPresIr(-1)">◀</button><button style="' + b + '" onclick="ndPresIr(1)">▶</button><button style="' + b + '" onclick="ndPresCerrar()">✕</button></div></div><div id="ndPresC" style="flex:1; min-height:0; padding:16px; overflow:auto;"></div>';
+        document.body.appendChild(o);
+        ND._k = e => { if (e.key === 'ArrowRight' || e.key === ' ') ndPresIr(1); else if (e.key === 'ArrowLeft') ndPresIr(-1); else if (e.key === 'Escape') ndPresCerrar(); };
+        document.addEventListener('keydown', ND._k);
+        let x0 = 0; o.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+        o.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 70) ndPresIr(dx < 0 ? 1 : -1); }, { passive: true });
+        try { if (o.requestFullscreen) o.requestFullscreen(); } catch (e) {}
+        ndPresIr(0);
+    }
+    function ndPresIr(dx) {
+        const L = ND._slides, c = document.getElementById('ndPresC'); if (!L || !c) return;
+        ND._pi = Math.max(0, Math.min(L.length - 1, ND._pi + dx)); const s = L[ND._pi];
+        if (ND.charts.ndPresCv) { try { ND.charts.ndPresCv.destroy(); } catch (e) {} delete ND.charts.ndPresCv; }
+        document.getElementById('ndPresT').textContent = s.t;
+        document.getElementById('ndPresN').textContent = (ND._pi + 1) + ' / ' + L.length;
+        const h = ND._hall || [], p = ndPlanCargar();
+        if (s.tipo === 'resumen') {
+            c.innerHTML = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(190px,100%), 1fr)); gap:10px; margin-bottom:12px;">' + (ND._kpis || '') + '</div>' + ndSemaforoHtml(ND._filasStats, true) +
+                h.map(x => '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:8px; font-size:16px; font-weight:600; line-height:1.4;">' + ndEsc(x.txt) + '</div>').join('');
+        } else if (s.tipo === 'plan') {
+            c.innerHTML = '<table style="border-collapse:collapse; width:100%; font-size:15px;"><tr style="text-align:left; color:var(--text-muted);"><th style="padding:8px;">Hallazgo</th><th style="padding:8px;">Acción</th><th style="padding:8px;">Responsable</th><th style="padding:8px;">Fecha</th></tr>' +
+                h.map(x => { const q = p[x.k] || {}; return '<tr style="border-top:1px solid var(--border);"><td style="padding:8px;">' + ndEsc(x.txt) + '</td><td style="padding:8px;">' + ndEsc(q.acc != null ? q.acc : x.acc) + '</td><td style="padding:8px;">' + ndEsc(q.resp || '—') + '</td><td style="padding:8px;">' + ndEsc(q.fecha || '—') + '</td></tr>'; }).join('') + '</table>';
+        } else {
+            c.innerHTML = '<div style="position:relative; height:calc(100vh - 110px); background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px; box-sizing:border-box;"><canvas id="ndPresCv"></canvas></div>';
+            if (s.pareto) ndCrearPareto('ndPresCv', s.d); else ndCrearChart('ndPresCv', s.d, s.tipo, null);
+        }
+    }
+    function ndPresCerrar() {
+        if (ND._k) document.removeEventListener('keydown', ND._k);
+        if (ND.charts.ndPresCv) { try { ND.charts.ndPresCv.destroy(); } catch (e) {} delete ND.charts.ndPresCv; }
+        const o = document.getElementById('ndPres'); if (o) o.remove();
+        try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {}
+        ND.pres = false; ndRenderTabla();
+    }
 
     function ndHallazgos(filas) {
         const out = [], n = filas.length;
@@ -12065,7 +12163,7 @@
         const inp = 'width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;';
         const pares = [['motivonocarga', 'ndPar1', 'Pareto: motivos de no carga'], ['transportista', 'ndPar2', 'Pareto: transportistas']];
         const charts = []; let tarj = '';
-        pares.forEach(([nom, id, t]) => { const c = ndColPorNombre(nom); if (!c) return; const d = ndDatosGrafico(filas, c.key, 8); tarj += ndTarjetaGrafico(id, t, '', 270, 'Las barras son registros; la línea roja es el % acumulado.'); charts.push({ id, d }); });
+        pares.forEach(([nom, id, t]) => { const c = ndColPorNombre(nom); if (!c) return; const d = ndDatosGrafico(filas, c.key, 8); tarj += ndTarjetaGrafico(id, t, '', 270, 'Las barras son registros; la línea roja es el % acumulado.'); charts.push({ id, d, t }); });
         const cols = ['#b2453f', '#b9852f', '#3d5a80'];
         const tarjH = hall.map((h, i) => '<div style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ' + cols[(h.c || 3) - 1] + '; border-radius:8px; padding:10px 12px; font-size:12px; font-weight:600; color:var(--text-main); line-height:1.4;">' + ndEsc(h.txt) + '</div>').join('');
         const filasPlan = hall.map((h, i) => { const p = plan[h.k] || {}; return '<tr><td style="padding:6px; font-size:11px; vertical-align:top; min-width:160px;">' + ndEsc(h.txt) + '</td>' +
@@ -12074,10 +12172,10 @@
             '<td style="padding:6px; min-width:120px;"><input type="date" style="' + inp + '" value="' + ndEsc(p.fecha || '') + '" oninput="ndPlanSet(\'' + h.k + '\',\'fecha\',this.value)"></td></tr>'; }).join('');
         const html = '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;">' +
             '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;"><div><div style="font-size:15px; font-weight:900; color:var(--text-main);">Resumen para reunión</div><div style="font-size:11px; color:var(--text-muted);">Generado con los registros filtrados (' + ndFmt(filas.length) + ').</div></div>' +
-            '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button onclick="ndInforme()" style="' + btn + ' background:var(--primary);">🖨 Informe / PDF</button><button onclick="ndCopiarResumen()" style="' + btn + ' background:var(--success);">📲 Copiar para WhatsApp</button></div></div>' +
-            (hall.length ? '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap:8px;">' + tarjH + '</div>' : '') + '</div>' +
+            '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button onclick="ndInforme()" style="' + btn + ' background:var(--primary);">🖨 Informe / PDF</button><button onclick="ndPresentar()" style="' + btn + ' background:#6a5acd;">🎞 Presentar</button><button onclick="ndCopiarResumen()" style="' + btn + ' background:var(--success);">📲 Copiar para WhatsApp</button></div></div>' +
+            ndSemaforoHtml(filas) + (hall.length ? '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap:8px;">' + tarjH + '</div>' : '') + '</div>' +
             (tarj ? '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; margin-bottom:12px;">' + tarj + '</div>' : '') +
-            (hall.length ? '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;"><div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:2px;">Plan de acción</div><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Edita la acción, asigna responsable y fecha; se guarda en este dispositivo.</div><div style="overflow:auto;"><table style="border-collapse:collapse; width:100%;"><thead><tr style="text-align:left; font-size:11px; color:var(--text-muted);"><th style="padding:6px;">Hallazgo</th><th style="padding:6px;">Acción</th><th style="padding:6px;">Responsable</th><th style="padding:6px;">Fecha límite</th></tr></thead><tbody>' + filasPlan + '</tbody></table></div></div>' : '');
+            (hall.length ? '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;"><div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:2px;">Plan de acción</div><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Edita la acción, asigna responsable y fecha; se guarda en la nube y se comparte entre dispositivos.</div><div style="overflow:auto;"><table style="border-collapse:collapse; width:100%;"><thead><tr style="text-align:left; font-size:11px; color:var(--text-muted);"><th style="padding:6px;">Hallazgo</th><th style="padding:6px;">Acción</th><th style="padding:6px;">Responsable</th><th style="padding:6px;">Fecha límite</th></tr></thead><tbody>' + filasPlan + '</tbody></table></div></div>' : '');
         return { html, charts };
     }
 
@@ -12131,7 +12229,7 @@
 
     function ndRenderStats(filas) {
         const wrap = document.getElementById('ndStatsWrap');
-        if (!wrap || ND.vista !== 'stats') return;
+        if (!wrap || ND.vista !== 'stats' || ND.pres) return;
         const sy = wrap.scrollTop;
         ndDestruirCharts();
         const aviso = m => '<div style="padding:50px; text-align:center; color:var(--text-muted); font-size:14px; font-weight:700;">' + m + '</div>';
@@ -12191,6 +12289,10 @@
             '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; padding-bottom:12px;">' + tarjetas + '</div>';
 
         reu.charts.forEach(j => ndCrearPareto(j.id, j.d));
+        ND._specs = reu.charts.map(j => ({ t: j.t, d: j.d, pareto: true })).concat(trabajos.map(j => ({ t: j.s.t, d: j.d, tipo: j.s.tipo })));
+        if (dDia) ND._specs.push({ t: 'Registros por fecha de carga', d: dDia, tipo: 'bar' });
+        if (dLibre) ND._specs.push({ t: 'Gráfico libre', d: dLibre, tipo: 'barh' });
+        ND._kpis = kpis; ND._filasStats = filas;
         trabajos.forEach(j => ndCrearChart(j.id, j.d, j.s.tipo, j.c.key));
         if (dDia) ndCrearChart('ndChDia', dDia, 'bar', null);
         if (keyLibre) ndCrearChart('ndChLibre', dLibre, 'barh', keyLibre);

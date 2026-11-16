@@ -12036,6 +12036,99 @@
         });
     }
 
+    // ---------- Modo reunión: hallazgos, Pareto, plan de acción e informe ----------
+    function ndPlanCargar() { if (ND.plan) return ND.plan; try { ND.plan = JSON.parse(localStorage.getItem('nd_plan') || '{}'); } catch (e) { ND.plan = {}; } return ND.plan; }
+    function ndPlanSet(k, campo, v) { const p = ndPlanCargar(); p[k] = p[k] || {}; p[k][campo] = v; try { localStorage.setItem('nd_plan', JSON.stringify(p)); } catch (e) {} }
+
+    function ndHallazgos(filas) {
+        const out = [], n = filas.length;
+        const pct = x => Math.round(x * 100 / n);
+        [['motivonocarga', 'Motivo de no carga', 'Revisar con el área la causa «{v}» y fijar fecha de solución.'],
+         ['transportista', 'Transportista', 'Reunión con «{v}»: revisar compromisos y casos pendientes.'],
+         ['nruta', 'Ruta', 'Revisar la ruta «{v}»: carga, horarios y entregas.'],
+         ['bu', 'BU', 'Coordinar con la BU «{v}» las causas más frecuentes.']].forEach(([nom, tit, acc]) => {
+            const c = ndColPorNombre(nom); if (!c) return;
+            const par = ndConteo(filas, c.key).filter(p => p[0].trim() !== '');
+            if (!par.length) return;
+            const top3 = par.slice(0, 3).reduce((a, p) => a + p[1], 0);
+            out.push({ k: nom, c: nom === 'motivonocarga' ? 1 : 2, txt: tit + ': «' + par[0][0] + '» es lo más frecuente con ' + ndFmt(par[0][1]) + ' registros (' + pct(par[0][1]) + '%)' + (par.length > 3 ? '; los 3 primeros suman ' + pct(top3) + '%.' : '.'), acc: acc.replace('{v}', par[0][0]) });
+        });
+        const cR = ndColPorNombre('responsable');
+        if (cR) { const sin = filas.filter(f => !ndVal(f, cR.key).trim()).length; if (sin) out.unshift({ k: 'sinresp', c: 3, txt: ndFmt(sin) + ' registros (' + pct(sin) + '%) no tienen responsable asignado.', acc: 'Asignar un responsable a cada guía pendiente.' }); }
+        return out;
+    }
+
+    function ndBloqueReunion(filas) {
+        const hall = ndHallazgos(filas); ND._hall = hall;
+        const plan = ndPlanCargar();
+        const btn = 'border:none; padding:8px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer; color:#fff;';
+        const inp = 'width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;';
+        const pares = [['motivonocarga', 'ndPar1', 'Pareto: motivos de no carga'], ['transportista', 'ndPar2', 'Pareto: transportistas']];
+        const charts = []; let tarj = '';
+        pares.forEach(([nom, id, t]) => { const c = ndColPorNombre(nom); if (!c) return; const d = ndDatosGrafico(filas, c.key, 8); tarj += ndTarjetaGrafico(id, t, '', 270, 'Las barras son registros; la línea roja es el % acumulado.'); charts.push({ id, d }); });
+        const cols = ['#b2453f', '#b9852f', '#3d5a80'];
+        const tarjH = hall.map((h, i) => '<div style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ' + cols[(h.c || 3) - 1] + '; border-radius:8px; padding:10px 12px; font-size:12px; font-weight:600; color:var(--text-main); line-height:1.4;">' + ndEsc(h.txt) + '</div>').join('');
+        const filasPlan = hall.map((h, i) => { const p = plan[h.k] || {}; return '<tr><td style="padding:6px; font-size:11px; vertical-align:top; min-width:160px;">' + ndEsc(h.txt) + '</td>' +
+            '<td style="padding:6px; min-width:200px;"><input style="' + inp + '" value="' + ndEsc(p.acc != null ? p.acc : h.acc) + '" oninput="ndPlanSet(\'' + h.k + '\',\'acc\',this.value)"></td>' +
+            '<td style="padding:6px; min-width:110px;"><input style="' + inp + '" placeholder="Responsable" value="' + ndEsc(p.resp || '') + '" oninput="ndPlanSet(\'' + h.k + '\',\'resp\',this.value)"></td>' +
+            '<td style="padding:6px; min-width:120px;"><input type="date" style="' + inp + '" value="' + ndEsc(p.fecha || '') + '" oninput="ndPlanSet(\'' + h.k + '\',\'fecha\',this.value)"></td></tr>'; }).join('');
+        const html = '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;"><div><div style="font-size:15px; font-weight:900; color:var(--text-main);">Resumen para reunión</div><div style="font-size:11px; color:var(--text-muted);">Generado con los registros filtrados (' + ndFmt(filas.length) + ').</div></div>' +
+            '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button onclick="ndInforme()" style="' + btn + ' background:var(--primary);">🖨 Informe / PDF</button><button onclick="ndCopiarResumen()" style="' + btn + ' background:var(--success);">📲 Copiar para WhatsApp</button></div></div>' +
+            (hall.length ? '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap:8px;">' + tarjH + '</div>' : '') + '</div>' +
+            (tarj ? '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; margin-bottom:12px;">' + tarj + '</div>' : '') +
+            (hall.length ? '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;"><div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:2px;">Plan de acción</div><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Edita la acción, asigna responsable y fecha; se guarda en este dispositivo.</div><div style="overflow:auto;"><table style="border-collapse:collapse; width:100%;"><thead><tr style="text-align:left; font-size:11px; color:var(--text-muted);"><th style="padding:6px;">Hallazgo</th><th style="padding:6px;">Acción</th><th style="padding:6px;">Responsable</th><th style="padding:6px;">Fecha límite</th></tr></thead><tbody>' + filasPlan + '</tbody></table></div></div>' : '');
+        return { html, charts };
+    }
+
+    function ndCrearPareto(id, d) {
+        const cv = document.getElementById(id); if (!cv) return;
+        const cs = getComputedStyle(document.getElementById('modalNoDespachado'));
+        const txt = cs.getPropertyValue('--text-main').trim() || '#1e293b', muted = cs.getPropertyValue('--text-muted').trim() || '#64748b', grid = cs.getPropertyValue('--border').trim() || '#e2e8f0';
+        const hx = /^#([0-9a-f]{6})$/i.exec(cs.getPropertyValue('--card-bg').trim()); let osc = false;
+        if (hx) { const n = parseInt(hx[1], 16); osc = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) < 110; }
+        const tot = d.valores.reduce((a, b) => a + b, 0) || 1; let ac = 0;
+        const cum = d.valores.map(v => { ac += v; return Math.round(ac * 1000 / tot) / 10; });
+        ND.charts[id] = new Chart(cv, {
+            type: 'bar', plugins: [ndPluginEtiquetas],
+            data: { labels: d.labels, datasets: [
+                { type: 'bar', data: d.valores, backgroundColor: osc ? '#7da3d1' : '#3d5a80', borderRadius: 5, maxBarThickness: 46, order: 2 },
+                { type: 'line', data: cum, yAxisID: 'y1', borderColor: '#b2453f', backgroundColor: '#b2453f', tension: 0, pointRadius: 4, borderWidth: 2, order: 1 }] },
+            options: { responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { top: 20 } },
+                plugins: { ndEtiquetas: { tipo: 'bar', color: txt, muted: muted }, legend: { display: false },
+                    tooltip: { callbacks: { title: it => d.claves[it[0].dataIndex] === null ? 'Otros' : (d.claves[it[0].dataIndex] || '(vacío)'), label: c => c.datasetIndex === 1 ? ' Acumulado: ' + c.raw + '%' : ' ' + ndFmt(c.raw) + ' registros' } } },
+                scales: { x: { grid: { display: false }, ticks: { color: txt, font: { size: 11 }, maxRotation: 45, autoSkip: false } },
+                    y: { beginAtZero: true, border: { display: false }, grid: { color: grid }, ticks: { color: muted, precision: 0, maxTicksLimit: 6 } },
+                    y1: { position: 'right', min: 0, max: 100, border: { display: false }, grid: { display: false }, ticks: { color: '#b2453f', callback: v => v + '%', stepSize: 25 } } } }
+        });
+    }
+
+    function ndTextoResumen() {
+        const p = ndPlanCargar(), h = ND._hall || [];
+        let t = '*Observaciones en ruta – resumen* (' + new Date().toLocaleDateString('es-PE') + ')\n';
+        h.forEach(x => { t += '\n• ' + x.txt; });
+        t += '\n\n*Plan de acción*';
+        h.forEach(x => { const q = p[x.k] || {}; t += '\n- ' + (q.acc != null ? q.acc : x.acc) + (q.resp ? ' | Resp: ' + q.resp : '') + (q.fecha ? ' | Fecha: ' + q.fecha : ''); });
+        return t;
+    }
+    function ndCopiarResumen() {
+        const t = ndTextoResumen();
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => alert('Resumen copiado. Pégalo en WhatsApp.'), () => prompt('Copia el texto:', t));
+        else prompt('Copia el texto:', t);
+    }
+
+    function ndInforme() {
+        const w = window.open('', '_blank');
+        if (!w) { alert('Permite las ventanas emergentes para generar el informe.'); return; }
+        const fondo = getComputedStyle(document.getElementById('modalNoDespachado')).getPropertyValue('--card-bg').trim() || '#fff';
+        const p = ndPlanCargar(), h = ND._hall || [];
+        const imgs = Object.entries(ND.charts).map(([id, c]) => { const cv = document.getElementById(id); let t = ''; try { t = cv.parentElement.previousElementSibling.firstElementChild.firstElementChild.textContent; } catch (e) {} return '<div class="g"><b>' + ndEsc(t) + '</b><div style="background:' + fondo + '; border-radius:6px;"><img src="' + c.canvas.toDataURL('image/png') + '"></div></div>'; }).join('');
+        const kp = document.getElementById('ndKpis');
+        const plan = h.map(x => { const q = p[x.k] || {}; return '<tr><td>' + ndEsc(x.txt) + '</td><td>' + ndEsc(q.acc != null ? q.acc : x.acc) + '</td><td>' + ndEsc(q.resp || '') + '</td><td>' + ndEsc(q.fecha || '') + '</td></tr>'; }).join('');
+        w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Observaciones en ruta</title><style>:root{--card-bg:#fff;--border:#e2e8f0;--text-main:#1e293b;--text-muted:#64748b;--bg:#f8fafc}body{font-family:system-ui,sans-serif;color:#1e293b;margin:24px}h1{font-size:20px;margin:0}h2{font-size:15px;margin:20px 0 8px}.k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g{break-inside:avoid;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:12px}img{width:100%}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}li{margin-bottom:4px;font-size:13px}</style></head><body><h1>Observaciones en ruta</h1><div style="color:#64748b;font-size:12px">Informe del ' + new Date().toLocaleDateString('es-PE') + '</div><h2>Indicadores</h2><div class="k">' + (kp ? kp.innerHTML : '') + '</div><h2>Hallazgos</h2><ul>' + h.map(x => '<li>' + ndEsc(x.txt) + '</li>').join('') + '</ul><h2>Gráficos</h2><div class="gr">' + imgs + '</div><h2>Plan de acción</h2><table><tr><th>Hallazgo</th><th>Acción</th><th>Responsable</th><th>Fecha límite</th></tr>' + plan + '</table></body></html>');
+        w.document.close(); setTimeout(() => { try { w.print(); } catch (e) {} }, 500);
+    }
+
     function ndRenderStats(filas) {
         const wrap = document.getElementById('ndStatsWrap');
         if (!wrap || ND.vista !== 'stats') return;
@@ -12091,11 +12184,13 @@
             tarjetas += ndTarjetaGrafico('ndChLibre', '🔧 Gráfico libre', '<select onchange="ND.statsCustom=this.value; ndRenderTabla();" style="max-width:55%; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + opts + '</select>', ndAltoGrafico(dLibre, 'barh'), 'Elige la columna que quieres analizar');
         }
 
+        const reu = ndBloqueReunion(filas);
         wrap.innerHTML =
-            '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap:10px; margin-bottom:12px;">' + kpis + '</div>' +
+            '<div id="ndKpis" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap:10px; margin-bottom:12px;">' + kpis + '</div>' + reu.html +
             '<div style="padding:0 2px 10px; font-size:11px; font-weight:600; color:var(--text-muted);">💡 Toca una barra o porción para filtrar por ese valor (toca otra vez para quitarlo). Las estadísticas respetan la búsqueda y los filtros activos.</div>' +
             '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; padding-bottom:12px;">' + tarjetas + '</div>';
 
+        reu.charts.forEach(j => ndCrearPareto(j.id, j.d));
         trabajos.forEach(j => ndCrearChart(j.id, j.d, j.s.tipo, j.c.key));
         if (dDia) ndCrearChart('ndChDia', dDia, 'bar', null);
         if (keyLibre) ndCrearChart('ndChLibre', dLibre, 'barh', keyLibre);

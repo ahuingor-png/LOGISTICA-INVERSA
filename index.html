@@ -11911,6 +11911,7 @@
     function ndFmt(n) { return Number(n).toLocaleString('es-PE'); }
 
     function ndKpi(titulo, valor, color, icono, sub) {
+        if (Array.isArray(ND._kp)) ND._kp.push({ t: titulo, v: valor, s: sub || '' });
         return '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:center; box-shadow:0 1px 2px rgba(15,23,42,.06);">' +
             '<div style="flex:none; width:40px; height:40px; border-radius:10px; background:' + color + '22; color:' + color + '; display:flex; align-items:center; justify-content:center; font-size:19px;">' + (icono || '') + '</div>' +
             '<div style="min-width:0;"><div style="font-size:11px; font-weight:700; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + titulo + '</div>' +
@@ -12066,6 +12067,7 @@
         const pares = [['motivonocarga', 'ndPar1', 'Pareto: motivos de no carga'], ['transportista', 'ndPar2', 'Pareto: transportistas']];
         const charts = []; let tarj = '';
         pares.forEach(([nom, id, t]) => { const c = ndColPorNombre(nom); if (!c) return; const d = ndDatosGrafico(filas, c.key, 8); tarj += ndTarjetaGrafico(id, t, '', 270, 'Las barras son registros; la línea roja es el % acumulado.'); charts.push({ id, d }); });
+        ND._par = { n: filas.length, items: charts.map((c, i) => ({ t: pares.filter(q => ndColPorNombre(q[0]))[i][2].replace(/^Pareto:\s*/, ''), d: c.d })) };
         const cols = ['#b2453f', '#b9852f', '#3d5a80'];
         const tarjH = hall.map((h, i) => '<div style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ' + cols[(h.c || 3) - 1] + '; border-radius:8px; padding:10px 12px; font-size:12px; font-weight:600; color:var(--text-main); line-height:1.4;">' + ndEsc(h.txt) + '</div>').join('');
         const filasPlan = hall.map((h, i) => { const p = plan[h.k] || {}; return '<tr><td style="padding:6px; font-size:11px; vertical-align:top; min-width:160px;">' + ndEsc(h.txt) + '</td>' +
@@ -12104,11 +12106,27 @@
     }
 
     function ndTextoResumen() {
-        const p = ndPlanCargar(), h = ND._hall || [];
-        let t = '*Observaciones en ruta – resumen* (' + new Date().toLocaleDateString('es-PE') + ')\n';
-        h.forEach(x => { t += '\n• ' + x.txt; });
-        t += '\n\n*Plan de acción*';
-        h.forEach(x => { const q = p[x.k] || {}; t += '\n- ' + (q.acc != null ? q.acc : x.acc) + (q.resp ? ' | Resp: ' + q.resp : '') + (q.fecha ? ' | Fecha: ' + q.fecha : ''); });
+        const P = ND._par || { n: 0, items: [] };
+        const pc = (v, n) => n ? ' (' + Math.round(v * 100 / n) + '%)' : '';
+        let t = '*Observaciones en ruta – resumen* (' + new Date().toLocaleDateString('es-PE') + ')';
+        if ((ND._kp || []).length) {
+            t += '\n\n*Indicadores*';
+            ND._kp.forEach(k => { t += '\n• ' + k.t + ': ' + k.v + (k.s ? ' – ' + k.s : ''); });
+        }
+        P.items.forEach(it => {
+            const nom = it.t.charAt(0).toUpperCase() + it.t.slice(1);
+            const tot = it.d.valores.reduce((a, b) => a + b, 0) || 1; let ac = 0;
+            t += '\n\n*Pareto: ' + nom + '*';
+            it.d.valores.forEach((v, k) => {
+                ac += v;
+                const c = it.d.claves[k];
+                t += '\n' + (k + 1) + '. ' + (c === null ? 'Otros' : (c === '' ? '(vacío)' : c)) + ': ' + ndFmt(v) + pc(v, P.n) + ' | acum. ' + Math.round(ac * 100 / tot) + '%';
+            });
+        });
+        (ND._graf || []).forEach(g => {
+            t += '\n\n*' + g.t + '* (' + ndFmt(g.n) + ' registros)';
+            g.v.forEach((v, k) => { t += '\n• ' + g.l[k] + ': ' + ndFmt(v) + (g.pct ? pc(v, g.n) : ''); });
+        });
         return t;
     }
     function ndCopiarResumen() {
@@ -12124,8 +12142,18 @@
         const p = ndPlanCargar(), h = ND._hall || [];
         const imgs = Object.entries(ND.charts).map(([id, c]) => { const cv = document.getElementById(id); let t = ''; try { t = cv.parentElement.previousElementSibling.firstElementChild.firstElementChild.textContent; } catch (e) {} return '<div class="g"><b>' + ndEsc(t) + '</b><div style="background:' + fondo + '; border-radius:6px;"><img src="' + c.canvas.toDataURL('image/png') + '"></div></div>'; }).join('');
         const kp = document.getElementById('ndKpis');
-        const plan = h.map(x => { const q = p[x.k] || {}; return '<tr><td>' + ndEsc(x.txt) + '</td><td>' + ndEsc(q.acc != null ? q.acc : x.acc) + '</td><td>' + ndEsc(q.resp || '') + '</td><td>' + ndEsc(q.fecha || '') + '</td></tr>'; }).join('');
-        w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Observaciones en ruta</title><style>:root{--card-bg:#fff;--border:#e2e8f0;--text-main:#1e293b;--text-muted:#64748b;--bg:#f8fafc}body{font-family:system-ui,sans-serif;color:#1e293b;margin:24px}h1{font-size:20px;margin:0}h2{font-size:15px;margin:20px 0 8px}.k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g{break-inside:avoid;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:12px}img{width:100%}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}li{margin-bottom:4px;font-size:13px}</style></head><body><h1>Observaciones en ruta</h1><div style="color:#64748b;font-size:12px">Informe del ' + new Date().toLocaleDateString('es-PE') + '</div><h2>Indicadores</h2><div class="k">' + (kp ? kp.innerHTML : '') + '</div><h2>Hallazgos</h2><ul>' + h.map(x => '<li>' + ndEsc(x.txt) + '</li>').join('') + '</ul><h2>Gráficos</h2><div class="gr">' + imgs + '</div><h2>Plan de acción</h2><table><tr><th>Hallazgo</th><th>Acción</th><th>Responsable</th><th>Fecha límite</th></tr>' + plan + '</table></body></html>');
+        const P = ND._par || { n: 0, items: [] };
+        const pc = (v, n) => n ? Math.round(v * 100 / n) + '%' : '';
+        const tabla = (tit, filasH, cab) => '<div class="g"><b>' + ndEsc(tit) + '</b><table><tr>' + cab.map(c => '<th>' + c + '</th>').join('') + '</tr>' + filasH + '</table></div>';
+        let datos = '';
+        P.items.forEach(it => {
+            const tot = it.d.valores.reduce((a, b) => a + b, 0) || 1; let ac = 0;
+            datos += tabla('Pareto: ' + it.t, it.d.valores.map((v, k) => { ac += v; const c = it.d.claves[k]; return '<tr><td>' + ndEsc(c === null ? 'Otros' : (c === '' ? '(vacío)' : c)) + '</td><td>' + ndFmt(v) + '</td><td>' + pc(v, P.n) + '</td><td>' + Math.round(ac * 100 / tot) + '%</td></tr>'; }).join(''), ['Valor', 'Registros', '%', 'Acumulado']);
+        });
+        (ND._graf || []).forEach(g => {
+            datos += tabla(g.t + ' (' + ndFmt(g.n) + ' registros)', g.v.map((v, k) => '<tr><td>' + ndEsc(g.l[k]) + '</td><td>' + ndFmt(v) + '</td>' + (g.pct ? '<td>' + pc(v, g.n) + '</td>' : '') + '</tr>').join(''), g.pct ? ['Valor', 'Registros', '%'] : ['Valor', 'Registros']);
+        });
+        w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Observaciones en ruta</title><style>:root{--card-bg:#fff;--border:#e2e8f0;--text-main:#1e293b;--text-muted:#64748b;--bg:#f8fafc}body{font-family:system-ui,sans-serif;color:#1e293b;margin:24px}h1{font-size:20px;margin:0}h2{font-size:15px;margin:20px 0 8px}.k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gr{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g{break-inside:avoid;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:12px}img{width:100%}table{border-collapse:collapse;width:100%;font-size:12px}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}li{margin-bottom:4px;font-size:13px}</style></head><body><h1>Observaciones en ruta</h1><div style="color:#64748b;font-size:12px">Informe del ' + new Date().toLocaleDateString('es-PE') + '</div><h2>Indicadores</h2><div class="k">' + (kp ? kp.innerHTML : '') + '</div><h2>Gráficos</h2><div class="gr">' + imgs + '</div><h2>Resumen de datos</h2><div class="gr">' + datos + '</div></body></html>');
         w.document.close(); setTimeout(() => { try { w.print(); } catch (e) {} }, 500);
     }
 
@@ -12139,6 +12167,7 @@
         if (!filas.length) { wrap.innerHTML = aviso('Ningún registro coincide con los filtros.'); return; }
         if (typeof Chart === 'undefined') { wrap.innerHTML = aviso('No se pudo cargar la librería de gráficos (Chart.js). Revisa tu conexión a internet.'); return; }
 
+        ND._kp = []; ND._graf = [];
         // KPIs (sobre las filas filtradas)
         const distintos = c => { if (!c) return null; const s = new Set(); filas.forEach(f => { const v = ndVal(f, c.key).trim(); if (v) s.add(v); }); return s.size; };
         const cGuia = ndColPorNombre('numrastreo') || ndColPorNombre('guiatms');
@@ -12162,6 +12191,7 @@
             const dist = ndConteo(filasC, c.key).length;
             tarjetas += ndTarjetaGrafico(id, s.t, '', ndAltoGrafico(d, s.tipo), ndFmt(filasC.length) + ' registros · ' + dist + (dist === 1 ? ' valor distinto' : ' valores distintos'));
             trabajos.push({ id, c, s, d });
+            if (s.n !== 'transportista' && s.n !== 'motivonocarga') ND._graf.push({ t: s.t, n: filasC.length, v: d.valores, l: d.claves.map((k, q) => k === null ? 'Otros' : (k === '' ? '(vacío)' : k)), pct: true });
         });
 
         // Registros por fecha de carga
@@ -12171,6 +12201,7 @@
         if (porDia.size) {
             const ks = Array.from(porDia.keys()).sort((a, b) => a - b);
             dDia = { labels: ks.map(k => String(k % 100).padStart(2, '0') + '/' + String(Math.floor(k / 100) % 100).padStart(2, '0')), valores: ks.map(k => porDia.get(k)), claves: ks.map(k => String(k)) };
+            ND._graf.push({ t: 'Registros por fecha de carga', n: filas.length, v: dDia.valores, l: dDia.labels, pct: false });
             tarjetas += ndTarjetaGrafico('ndChDia', 'Registros por fecha de carga', '', 260, ks.length + (ks.length === 1 ? ' día' : ' días') + ' de carga');
         }
 
@@ -12180,6 +12211,7 @@
         let dLibre = null;
         if (keyLibre) {
             dLibre = ndDatosGrafico(ndFilasFiltradas(keyLibre), keyLibre, 15);
+            { const cl = todas.find(c => c.key === keyLibre); ND._graf.push({ t: 'Gráfico libre: ' + (cl ? cl.label : ''), n: ndFilasFiltradas(keyLibre).length, v: dLibre.valores, l: dLibre.claves.map(k => k === null ? 'Otros' : (k === '' ? '(vacío)' : k)), pct: true }); }
             const opts = todas.map(c => '<option value="' + ndEsc(c.key) + '"' + (c.key === keyLibre ? ' selected' : '') + '>' + ndEsc(c.label) + '</option>').join('');
             tarjetas += ndTarjetaGrafico('ndChLibre', '🔧 Gráfico libre', '<select onchange="ND.statsCustom=this.value; ndRenderTabla();" style="max-width:55%; padding:5px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:11px;">' + opts + '</select>', ndAltoGrafico(dLibre, 'barh'), 'Elige la columna que quieres analizar');
         }

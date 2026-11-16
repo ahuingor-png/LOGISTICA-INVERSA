@@ -12077,7 +12077,7 @@
             '<div style="display:flex; gap:6px; flex-wrap:wrap;"><button onclick="ndInforme()" style="' + btn + ' background:var(--primary);">🖨 Informe / PDF</button><button onclick="ndCopiarResumen()" style="' + btn + ' background:var(--success);">📲 Copiar para WhatsApp</button></div></div>' +
             (hall.length ? '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap:8px;">' + tarjH + '</div>' : '') + '</div>' +
             (tarj ? '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap:12px; margin-bottom:12px;">' + tarj + '</div>' : '') +
-            (hall.length ? '<div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px;"><div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:2px;">Plan de acción</div><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Edita la acción, asigna responsable y fecha; se guarda en este dispositivo.</div><div style="overflow:auto;"><table style="border-collapse:collapse; width:100%;"><thead><tr style="text-align:left; font-size:11px; color:var(--text-muted);"><th style="padding:6px;">Hallazgo</th><th style="padding:6px;">Acción</th><th style="padding:6px;">Responsable</th><th style="padding:6px;">Fecha límite</th></tr></thead><tbody>' + filasPlan + '</tbody></table></div></div>' : '');
+            '';
         return { html, charts };
     }
 

@@ -1354,6 +1354,10 @@
         #modalCruceGPO .cg-estados { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:12px; color:var(--text-muted); }
         #modalCruceGPO .cg-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border:1px solid var(--border); border-radius:999px; background:var(--card-bg); color:var(--text-main); font-size:12px; font-weight:600; cursor:pointer; }
         #modalCruceGPO .cg-chip input { accent-color:var(--primary); }
+        #modalCruceGPO .cg-nube { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 14px; padding:9px 14px; margin-bottom:12px; font-size:12px; color:var(--text-main); background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--primary); border-radius:10px; }
+        #modalCruceGPO .cg-nube.ok { border-left-color:var(--success); }
+        #modalCruceGPO .cg-nube.err { border-left-color:var(--danger); color:var(--danger); }
+        #modalCruceGPO .cg-nube small { color:var(--text-muted); }
         #modalCruceGPO .cg-nota { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
         #modalCruceGPO .cg-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
         #modalCruceGPO .cg-kpi { background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--kpi,var(--primary)); border-radius:10px; padding:10px 14px; }
@@ -2587,7 +2591,12 @@
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REINGRESO" checked onchange="cgRender()"> Reingreso</label>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="cgRender()"> En bodega Crossdock</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO" checked onchange="cgRender()"> Reenvío</label>
                 </div>
+            </div>
+            <div class="cg-nube" id="cgNube">
+                <span id="cgNubeTxt">☁ Comprobando si hay un cruce guardado en la nube…</span>
+                <button type="button" class="cg-btn" id="cgBtnBorrarNube" onclick="cgBorrarNube()" style="display:none;">Borrar de la nube</button>
             </div>
             <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan sin tienda.</div>
             <div id="cgResultado" hidden>
@@ -2607,6 +2616,7 @@
                         <span class="cg-count"><b id="cgLblVisibles">0</b> registro(s)</span>
                         <button type="button" class="cg-btn primary" id="cgBtnExcel" onclick="cgDescargarExcel()">Descargar Excel</button>
                         <button type="button" class="cg-btn" id="cgBtnPlantilla" onclick="cgDescargarPlantilla()" title="Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final (solo filas con tienda)">Descargar plantilla de carga</button>
+                        <button type="button" class="cg-btn primary" id="cgBtnEnviarCarga" onclick="cgEnviarPlantillaACarga()" title="Manda la plantilla directo a Cargar Bases · Base Ruta, como si hubieras subido el Excel">Enviar a Cargar Bases (Ruta)</button>
                     </div>
                     <div class="cg-scroll">
                         <table class="cg-table">
@@ -15199,11 +15209,16 @@
                 f.distrito = String(g[mg['DISTRITO CLIENTE']] || '').trim();
                 f.tienda = tiendaDe(f.forma, g[mg['DIRECCION CLIENTE']]);
             }
-            f.estadoN = norm(f.estado);
+            f.estadoN = estadoNorm(f.estado);
             f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
             filas.push(f);
         });
         return filas;
+    }
+
+    function estadoNorm(s) {
+        var n = norm(s);
+        return n === 'RE ENVIO' ? 'REENVIO' : n;
     }
 
     function estadosActivos() {
@@ -15240,6 +15255,7 @@
                     return;
                 }
                 cg[tipo] = hoja;
+                cg[tipo + 'Nombre'] = file.name;
                 marcarSlot(tipo, 'ok', '✔ ' + file.name + ' · hoja "' + hoja.hoja + '" · ' + fmt(hoja.rows.length) + ' filas');
             } catch (err) {
                 console.error('Cruce GPO: error leyendo archivo', err);
@@ -15287,7 +15303,14 @@
             alert('No se pudo realizar el cruce: ' + err.message);
             return;
         }
-        // listas de los desplegables
+        poblarDesplegables();
+        el('cgBuscar').value = '';
+        el('cgResultado').hidden = false;
+        cgRender();
+        guardarNube();
+    };
+
+    function poblarDesplegables() {
         var tiendas = {}, formas = {};
         cg.filas.forEach(function (f) { if (f.tienda) tiendas[f.tienda] = 1; if (f.forma) formas[f.forma] = 1; });
         var st = el('cgSelTienda'), sf = el('cgSelForma');
@@ -15295,10 +15318,7 @@
             Object.keys(tiendas).sort().map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join('');
         sf.innerHTML = '<option value="">Forma de entrega (todas)</option>' +
             Object.keys(formas).sort().map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join('');
-        el('cgBuscar').value = '';
-        el('cgResultado').hidden = false;
-        cgRender();
-    };
+    }
 
     function pillTienda(t) {
         if (!t) return '<span class="cg-pill">—</span>';
@@ -15373,12 +15393,17 @@
             return { 'Rastreo': f.rastreo, 'SKU': f.sku, 'Descripción': f.desc, 'Forma de entrega': f.forma, 'Estado TMS': f.estado,
                      'Nombre seller': f.seller, 'Distrito cliente': f.distrito, 'Comentario final': f.tienda };
         });
-        var resumen = {};
+        var resumen = {}, estadosRes = {};
+        cg.visibles.forEach(function (f) { if (f.estado) estadosRes[f.estado] = 1; });
+        var colsRes = Object.keys(estadosRes).sort();
         cg.visibles.forEach(function (f) {
             var t = f.tienda || 'Sin tienda (Home Delivery)';
-            resumen[t] = resumen[t] || { 'Comentario final': t, 'Reingreso': 0, 'En bodega Crossdock': 0, 'Total': 0 };
-            if (f.estadoN === 'REINGRESO') resumen[t]['Reingreso']++;
-            else if (f.estadoN === 'EN BODEGA CROSSDOCK') resumen[t]['En bodega Crossdock']++;
+            if (!resumen[t]) {
+                resumen[t] = { 'Comentario final': t };
+                colsRes.forEach(function (c) { resumen[t][c] = 0; });
+                resumen[t]['Total'] = 0;
+            }
+            if (f.estado) resumen[t][f.estado]++;
             resumen[t]['Total']++;
         });
         var wb = XLSX.utils.book_new();
@@ -15391,9 +15416,10 @@
 
     // Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final.
     // Solo filas con tienda (se omiten Home Delivery y "SIN TIENDA"), con los estados TMS marcados y sin rastreos repetidos.
-    window.cgDescargarPlantilla = function () {
-        if (!cg.filas.length) return alert('Primero realiza el cruce.');
-        if (typeof XLSX === 'undefined') return alert('La librería de Excel no está cargada.');
+    // Arma las filas de la plantilla (o devuelve null avisando por qué no hay).
+    function plantillaFilas() {
+        if (!cg.filas.length) { alert('Primero realiza el cruce.'); return null; }
+        if (typeof XLSX === 'undefined') { alert('La librería de Excel no está cargada.'); return null; }
         var act = estadosActivos(), vistos = {}, filas = [];
         cg.filas.forEach(function (f) {
             if (!act[f.estadoN] || !f.tienda || f.tienda === CG_SIN_TIENDA) return;
@@ -15402,15 +15428,155 @@
             vistos[k] = 1;
             filas.push([f.rastreo, '', f.tienda, '']);
         });
-        if (!filas.length) return alert('No hay rastreos con tienda para la plantilla.');
+        if (!filas.length) { alert('No hay rastreos con tienda para la plantilla.'); return null; }
+        return filas;
+    }
+    function libroPlantilla(filas) {
         var ws = XLSX.utils.aoa_to_sheet([['seguimiento', 'secuencia', 'ruta', 'dia']].concat(filas));
         ws['!cols'] = [{ wch: 26 }, { wch: 12 }, { wch: 34 }, { wch: 12 }];
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
-        XLSX.writeFile(wb, 'Plantilla_carga.xlsx');
+        return wb;
+    }
+    window.cgDescargarPlantilla = function () {
+        var filas = plantillaFilas();
+        if (!filas) return;
+        XLSX.writeFile(libroPlantilla(filas), 'Plantilla_carga.xlsx');
     };
 
-    window.abrirModalCruceGPO = function () { el('modalCruceGPO').style.display = 'flex'; };
+    function puedeCargarRuta() {
+        try {
+            if (typeof esAdmin === 'function' && esAdmin()) return true;
+            var u = Object.values(usuariosPermitidos).find(function (x) { return x.nombre.toLowerCase() === usuarioActivo.toLowerCase(); });
+            return !!(u && u.permisos && u.permisos.cargar_ruta);
+        } catch (e) { return false; }
+    }
+
+    // Manda la plantilla directo al flujo de "Cargar Bases · Base Ruta": se arma el .xlsx en memoria
+    // y se entrega al mismo proceso que usa el botón de elegir archivo (confirmación, historial de cargas, etc.).
+    window.cgEnviarPlantillaACarga = function () {
+        var filas = plantillaFilas();
+        if (!filas) return;
+        if (typeof cargarExcelRutaNube !== 'function' || typeof abrirModalCargarBases !== 'function') { alert('No se encontró el módulo Cargar Bases en esta versión.'); return; }
+        if (!puedeCargarRuta()) { alert('No tienes permiso para cargar Base Ruta.'); return; }
+        var buf = XLSX.write(libroPlantilla(filas), { bookType: 'xlsx', type: 'array' });
+        var nombre = 'Sender_Plantilla_carga_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+        var file = new File([buf], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        window.cerrarModalCruceGPO();
+        try { cerrarModalVistaSender(); } catch (e) {}
+        abrirModalCargarBases();
+        cargarExcelRutaNube({ target: { files: [file], value: '' } });
+    };
+
+
+    // ---------- Persistencia en la nube (Firebase: nodo "cruce_gpo") ----------
+    // El último cruce queda guardado para todos los usuarios/dispositivos hasta que alguien
+    // lo borre con "Borrar de la nube" o haga otro cruce (que lo reemplaza).
+    var NUBE = 'cruce_gpo', NUBE_BLOQUE = 1500, NUBE_MAX = 15 * 1024 * 1024;
+    cg.meta = null; cg.nubeId = null; cg.cargandoNube = false;
+
+    function nubeOk() { return typeof rtdb !== 'undefined' && rtdb && typeof rtdb.ref === 'function'; }
+    function puedeBorrarNube() {
+        try { return typeof puedeBorrarHistorial === 'function' && !!puedeBorrarHistorial(); } catch (e) { return false; }
+    }
+    function pintarNube(estado, msg) {
+        var box = el('cgNube'), txt = el('cgNubeTxt'), btn = el('cgBtnBorrarNube');
+        if (!box) return;
+        box.classList.remove('ok', 'err');
+        if (estado) box.classList.add(estado);
+        if (msg) { txt.innerHTML = msg; }
+        else if (cg.meta) {
+            var d = new Date(cg.meta.fecha);
+            txt.innerHTML = '☁ <b>Cruce guardado en la nube</b> · ' + esc(d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })) +
+                ' · por ' + esc(cg.meta.usuario || '-') + ' · ' + fmt(cg.meta.filas) + ' filas<br><small>Base: ' + esc(cg.meta.base || '-') + ' · GPO: ' + esc(cg.meta.gpo || '-') +
+                ' · Se mantiene hasta que se borre o se haga otro cruce.</small>';
+            box.classList.add('ok');
+        } else {
+            txt.innerHTML = '☁ No hay ningún cruce guardado en la nube. Carga la base y el GPO y presiona «Realizar cruce».';
+        }
+        btn.style.display = (cg.meta && puedeBorrarNube()) ? '' : 'none';
+    }
+
+    function filaACompacta(f) { return [f.rastreo, f.sku, f.desc, f.enGpo ? 1 : 0, f.forma, f.estado, f.seller, f.distrito, f.tienda]; }
+    function compactaAFila(a) {
+        var f = { rastreo: a[0] || '', sku: a[1] || '', desc: a[2] || '', enGpo: !!a[3], forma: a[4] || '', estado: a[5] || '', seller: a[6] || '', distrito: a[7] || '', tienda: a[8] || '' };
+        f.estadoN = estadoNorm(f.estado);
+        f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
+        return f;
+    }
+
+    function guardarNube() {
+        if (!nubeOk()) { pintarNube('err', '☁ No se pudo guardar en la nube: Firebase no está disponible. El cruce solo está en este dispositivo.'); return; }
+        var datos = {}, n = 0, peso = 0;
+        for (var i = 0; i < cg.filas.length; i += NUBE_BLOQUE) {
+            var txt = JSON.stringify(cg.filas.slice(i, i + NUBE_BLOQUE).map(filaACompacta));
+            peso += txt.length; datos['c' + n] = txt; n++;
+        }
+        if (peso > NUBE_MAX) { pintarNube('err', '☁ El cruce es demasiado grande para guardarlo en la nube (' + fmt(cg.filas.length) + ' filas). Solo está en este dispositivo.'); return; }
+        var meta = {
+            id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), fecha: Date.now(),
+            usuario: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '-',
+            base: cg.baseNombre || '', gpo: cg.gpoNombre || '', filas: cg.filas.length, bloques: n
+        };
+        cg.nubeId = meta.id;               // así este equipo no vuelve a descargar lo que acaba de subir
+        pintarNube('', '☁ Guardando el cruce en la nube…');
+        rtdb.ref(NUBE).set({ meta: meta, datos: datos }).catch(function (err) {
+            console.error('Cruce GPO: no se pudo guardar en la nube', err);
+            cg.nubeId = null; cg.meta = null;
+            pintarNube('err', '☁ No se pudo guardar en la nube: ' + esc(err && err.message ? err.message : err) + '. El cruce solo está en este dispositivo.');
+        });
+    }
+
+    function cargarDesdeNube() {
+        var meta = cg.meta;
+        if (!meta || !nubeOk() || cg.cargandoNube || cg.nubeId === meta.id) return;
+        cg.cargandoNube = true;
+        pintarNube('', '☁ Descargando el cruce guardado en la nube…');
+        rtdb.ref(NUBE + '/datos').once('value').then(function (snap) {
+            var d = snap.val() || {}, filas = [];
+            for (var i = 0; i < (meta.bloques || 0); i++) {
+                if (!d['c' + i]) continue;
+                JSON.parse(d['c' + i]).forEach(function (a) { filas.push(compactaAFila(a)); });
+            }
+            cg.filas = filas; cg.nubeId = meta.id;
+            poblarDesplegables();
+            el('cgBuscar').value = '';
+            el('cgResultado').hidden = !filas.length;
+            cgRender();
+            pintarNube();
+        }).catch(function (err) {
+            console.error('Cruce GPO: no se pudo leer de la nube', err);
+            pintarNube('err', '☁ No se pudo leer el cruce de la nube: ' + esc(err && err.message ? err.message : err));
+        }).then(function () { cg.cargandoNube = false; });
+    }
+
+    window.cgBorrarNube = function () {
+        if (!cg.meta || !nubeOk()) return;
+        if (!puedeBorrarNube()) { alert('No tienes permiso para borrar el cruce de la nube.'); return; }
+        if (!confirm('⚠️ Se borrará de la nube el cruce guardado (' + fmt(cg.meta.filas) + ' filas) para TODOS los usuarios.\n\nEsta acción no se puede deshacer. ¿Continuar?')) return;
+        rtdb.ref(NUBE).remove().catch(function (err) { alert('No se pudo borrar: ' + (err && err.message ? err.message : err)); });
+    };
+
+    // Escucha solo el "meta" (pequeño). Los datos se bajan al abrir el módulo o cuando cambian estando abierto.
+    if (nubeOk()) {
+        rtdb.ref(NUBE + '/meta').on('value', function (snap) {
+            var meta = snap.val();
+            cg.meta = meta || null;
+            if (!meta) {
+                // alguien borró el cruce: se limpia también la pantalla
+                if (cg.nubeId) { cg.nubeId = null; cg.filas = []; el('cgResultado').hidden = true; el('cgTbody').innerHTML = ''; el('cgTablaResumen').innerHTML = ''; el('cgKpis').innerHTML = ''; }
+                pintarNube();
+                return;
+            }
+            if (cg.nubeId === meta.id) { pintarNube(); return; }
+            pintarNube();
+            if (el('modalCruceGPO').style.display === 'flex') cargarDesdeNube();
+        }, function (err) { pintarNube('err', '☁ Sin acceso al nodo de la nube: ' + esc(err && err.message ? err.message : err)); });
+    } else {
+        pintarNube('err', '☁ Firebase no está disponible: el cruce solo se guarda en este dispositivo.');
+    }
+
+    window.abrirModalCruceGPO = function () { el('modalCruceGPO').style.display = 'flex'; pintarNube(); cargarDesdeNube(); };
     window.cerrarModalCruceGPO = function () { el('modalCruceGPO').style.display = 'none'; };
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && el('modalCruceGPO') && el('modalCruceGPO').style.display === 'flex') window.cerrarModalCruceGPO();

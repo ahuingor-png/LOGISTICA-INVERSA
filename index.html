@@ -2598,11 +2598,11 @@
             <div class="cg-bar">
                 <button type="button" class="cg-btn primary" id="cgBtnCruzar" onclick="cgEjecutarCruce()" disabled>Realizar cruce</button>
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
-                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REINGRESO" checked onchange="cgRender()"> Reingreso</label>
-                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="cgRender()"> En bodega Crossdock</label>
-                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO" checked onchange="cgRender()"> Reenvío</label>
-                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO AL CLIENTE" checked onchange="cgRender()"> Reenvío al cliente</label>
-                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO A CLIENTE" checked onchange="cgRender()"> Reenvío a cliente</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REINGRESO" checked onchange="cgRender(); cgRevisarEnvio()"> Reingreso</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="cgRender(); cgRevisarEnvio()"> En bodega Crossdock</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO" checked onchange="cgRender(); cgRevisarEnvio()"> Reenvío</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO AL CLIENTE" checked onchange="cgRender(); cgRevisarEnvio()"> Reenvío al cliente</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO A CLIENTE" checked onchange="cgRender(); cgRevisarEnvio()"> Reenvío a cliente</label>
                 </div>
             </div>
             <div class="cg-aviso" id="cgAviso" hidden></div>
@@ -6630,7 +6630,7 @@
     function cargarExcelRutaNube(e) {
         if (!usuarioActivo) return;
         // Modo silencioso (lo usa el Cruce GPO): sin confirmación y avisando el resultado por e.alTerminar(ok, detalle)
-        const _fin = (ok, detalle) => { if (typeof e.alTerminar === 'function') e.alTerminar(ok, detalle); };
+        const _fin = (ok, detalle, loteId) => { if (typeof e.alTerminar === 'function') e.alTerminar(ok, detalle, loteId); };
         const input = e.target;
         const file = input.files && input.files[0];
         if (!file) return;
@@ -6689,7 +6689,7 @@
                 // Agrega registros + una entrada al historial de cargas, sin tocar lo anterior.
                 rtdb.ref().update(mapa).then(() => {
                     _estadoCargaBases('✅ Base Ruta cargada: ' + datosMapeados.length + ' registros · ' + file.name, 'ok', 'RUTA');
-                    _fin(true, datosMapeados.length + ' registros · ' + file.name);
+                    _fin(true, datosMapeados.length + ' registros · ' + file.name, loteId);
                     input.value = "";
                 }).catch(err => { _estadoCargaBases('❌ Error al subir: ' + err.message, 'err', 'RUTA'); _fin(false, 'Error al subir: ' + err.message); });
 
@@ -6703,7 +6703,8 @@
 
     function borrarBaseRutaCompleta() {
         if (confirm("🚨 ¿Eliminar base central de rutas?")) {
-            rtdb.ref("inventario_ruta_il").remove().then(() => {
+            const _bor = {}; _bor["inventario_ruta_il"] = null; _bor["cruce_gpo_envios"] = null; // también libera el candado del Cruce GPO
+            rtdb.ref().update(_bor).then(() => {
                 alert("Base de rutas borrada.");
                 cerrarModalAdmin();
             }).catch(err => alert("Error: " + err.message));
@@ -15362,6 +15363,7 @@
         try {
             cg.filas = cruzar(cg.base, cg.gpo);
             aplicarReglas();
+            setTimeout(revisarEnvio, 0);
         } catch (err) {
             console.error('Cruce GPO:', err);
             alert('No se pudo realizar el cruce: ' + err.message);
@@ -15481,9 +15483,9 @@
     // Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final.
     // Solo filas con tienda (se omiten Home Delivery y "SIN TIENDA"), con los estados TMS marcados y sin rastreos repetidos.
     // Arma las filas de la plantilla (o devuelve null avisando por qué no hay).
-    function plantillaFilas() {
-        if (!cg.filas.length) { alert('Primero realiza el cruce.'); return null; }
-        if (typeof XLSX === 'undefined') { alert('La librería de Excel no está cargada.'); return null; }
+    function plantillaFilas(silencio) {
+        if (!cg.filas.length) { if (!silencio) alert('Primero realiza el cruce.'); return null; }
+        if (typeof XLSX === 'undefined') { if (!silencio) alert('La librería de Excel no está cargada.'); return null; }
         var act = estadosActivos(), vistos = {}, filas = [];
         cg.filas.forEach(function (f) {
             if (!act[f.estadoN] || !f.tienda || f.tienda === CG_SIN_TIENDA) return;
@@ -15492,7 +15494,7 @@
             vistos[k] = 1;
             filas.push([f.rastreo, '', f.tienda, '']);
         });
-        if (!filas.length) { alert('No hay rastreos con tienda para la plantilla.'); return null; }
+        if (!filas.length) { if (!silencio) alert('No hay rastreos con tienda para la plantilla.'); return null; }
         return filas;
     }
     function libroPlantilla(filas) {
@@ -15518,36 +15520,140 @@
 
     // Manda la plantilla directo al flujo de "Cargar Bases · Base Ruta": se arma el .xlsx en memoria
     // y se entrega al mismo proceso que usa el botón de elegir archivo (confirmación, historial de cargas, etc.).
+    // ---------- Candado entre usuarios: una misma plantilla solo se carga una vez ----------
+    // La huella sale del contenido (rastreo + tienda), así que sirve aunque cada usuario haya hecho su propio cruce.
+    var CG_ENVIOS = 'cruce_gpo_envios';
+    var CG_ENVIO_VENCE = 10 * 60 * 1000; // un envío "en curso" sin terminar se libera a los 10 min
+    function huellaPlantilla(filas) {
+        var arr = filas.map(function (r) { return clave(r[0]) + '|' + norm(r[2]); }).sort();
+        var h1 = 0xdeadbeef, h2 = 0x41c6ce57, str = arr.join(';');
+        for (var i = 0; i < str.length; i++) {
+            var ch = str.charCodeAt(i);
+            h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return 'p' + (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36) + '_' + arr.length;
+    }
+    function fmtFechaEnvio(ms) {
+        var d = new Date(ms), z = function (n) { return (n < 10 ? '0' : '') + n; };
+        return z(d.getDate()) + '/' + z(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + z(d.getHours()) + ':' + z(d.getMinutes());
+    }
+    function envioVigente(v) {
+        if (!v) return null;
+        if (v.estado === 'enviando' && Date.now() - (v.fecha || 0) > CG_ENVIO_VENCE) return null;
+        return v;
+    }
+    // El candado solo vale mientras la carga siga existiendo en "Cargas realizadas".
+    // Si alguien la borró de la base, el candado se libera y la plantilla se puede volver a cargar.
+    function envioActivo(ref, v) {
+        v = envioVigente(v);
+        if (!v) return Promise.resolve(null);
+        if (v.estado !== 'cargado' || !v.loteId) return Promise.resolve(v);
+        return rtdb.ref('cargas_ruta/' + v.loteId).once('value').then(function (sn) {
+            if (sn.val()) return v;
+            return ref.remove().catch(function () {}).then(function () { return null; });
+        });
+    }
+    function textoEnvio(v) {
+        return (v.estado === 'enviando' ? 'Otro usuario está cargando esta plantilla en este momento: ' : 'Esta plantilla ya fue cargada por ') +
+            '<b>' + esc(v.usuario || '-') + '</b> el ' + esc(fmtFechaEnvio(v.fecha || 0)) + '.';
+    }
+    function pintarAviso(clase, html) {
+        var aviso = el('cgAviso');
+        aviso.className = 'cg-aviso' + (clase ? ' ' + clase : '');
+        aviso.innerHTML = html; aviso.hidden = false;
+        try { aviso.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+    }
+    function bloquearBotonEnvio(bloquear, tip) {
+        var btn = el('cgBtnEnviarCarga');
+        if (!btn) return;
+        btn.disabled = !!bloquear;
+        btn.title = bloquear ? (tip || '') : '';
+    }
+
+    // Revisa (sin enviar) si la plantilla actual ya fue cargada por alguien y deja el botón bloqueado.
+    var cgRevTimer = null, cgRevSeq = 0;
+    function revisarEnvio() {
+        clearTimeout(cgRevTimer);
+        cgRevTimer = setTimeout(function () {
+            var seq = ++cgRevSeq;
+            if (cg.enviandoAhora) return;
+            var filas = plantillaFilas(true);
+            if (!filas || !nubeOk()) { bloquearBotonEnvio(false); return; }
+            var refR = rtdb.ref(CG_ENVIOS + '/' + huellaPlantilla(filas));
+            refR.once('value').then(function (snap) {
+                return envioActivo(refR, snap.val());
+            }).then(function (v) {
+                if (seq !== cgRevSeq) return;
+                if (v) { pintarAviso('err', '🔒 ' + textoEnvio(v) + ' No se puede volver a cargar.'); bloquearBotonEnvio(true, 'Esta plantilla ya fue cargada'); }
+                else {
+                    var av = el('cgAviso');
+                    if (av.className.indexOf('err') !== -1 && av.textContent.indexOf('🔒') === 0) av.hidden = true;
+                    bloquearBotonEnvio(false);
+                }
+            }).catch(function () {});
+        }, 350);
+    }
+
+    window.cgRevisarEnvio = revisarEnvio;
+    if (nubeOk()) {
+        // Si alguien borra una carga desde "Cargas realizadas", el botón se desbloquea solo.
+        rtdb.ref('cargas_ruta').on('value', function () { if (cg.filas.length) revisarEnvio(); });
+    }
     window.cgEnviarPlantillaACarga = function () {
         var filas = plantillaFilas();
         if (!filas) return;
         if (typeof cargarExcelRutaNube !== 'function') { alert('No se encontró el módulo Cargar Bases en esta versión.'); return; }
         if (!puedeCargarRuta()) { alert('No tienes permiso para cargar Base Ruta.'); return; }
-        // Evita mandar dos veces el mismo cruce por accidente
-        var idCruce = cg.nubeId || (cg.filas.length + '-' + (cg.baseNombre || ''));
-        if (cg.ultimoEnvio === idCruce && !confirm('Este cruce ya se envió a Cargar Bases (Ruta). Si lo envías otra vez se duplicarán los registros.\n\n¿Enviar de todos modos?')) return;
-        var btn = el('cgBtnEnviarCarga');
-        var aviso = el('cgAviso');
-        function mostrar(clase, html) { aviso.className = 'cg-aviso' + (clase ? ' ' + clase : ''); aviso.innerHTML = html; aviso.hidden = false; try { aviso.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
-        var buf = XLSX.write(libroPlantilla(filas), { bookType: 'xlsx', type: 'array' });
-        var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
-        var nombre = 'Sender_Plantilla_carga_' + d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()) + '_' + z(d.getHours()) + z(d.getMinutes()) + '.xlsx';
-        var file = new File([buf], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        btn.disabled = true;
-        mostrar('wait', '⏳ Enviando la plantilla a Base Ruta…');
-        cargarExcelRutaNube({
-            target: { files: [file], value: '' },
-            silencioso: true,
-            alTerminar: function (ok, detalle) {
-                btn.disabled = false;
-                if (ok) {
-                    cg.ultimoEnvio = idCruce;
-                    mostrar('', '✅ Listo: la plantilla ya se cargó en Base Ruta · ' + esc(detalle));
-                    setTimeout(function () { if (aviso.className.indexOf('err') === -1 && aviso.className.indexOf('wait') === -1) aviso.hidden = true; }, 12000);
-                } else {
-                    mostrar('err', '❌ No se pudo cargar: ' + esc(detalle));
-                }
+        if (!nubeOk()) { alert('Sin conexión a la nube: no se puede validar si alguien ya cargó esta plantilla.'); return; }
+
+        var ref = rtdb.ref(CG_ENVIOS + '/' + huellaPlantilla(filas));
+        var ahora = Date.now();
+        bloquearBotonEnvio(true, 'Validando…');
+        pintarAviso('wait', '⏳ Validando que nadie haya cargado esta plantilla…');
+
+        cg.enviandoAhora = true;
+        // Si la carga anterior ya fue borrada de la base, se limpia su candado y se continúa.
+        ref.once('value').then(function (snap) { return envioActivo(ref, snap.val()); }).then(function () {
+            // Reserva atómica: si dos usuarios pulsan a la vez, solo uno la consigue.
+            return ref.transaction(function (actual) {
+            if (envioVigente(actual)) return; // ya reservada o cargada -> se aborta
+            return { usuario: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '-', fecha: ahora, estado: 'enviando', cantidad: filas.length };
+            });
+        }).then(function (res) {
+            if (!res.committed) {
+                cg.enviandoAhora = false;
+                var v = res.snapshot.val();
+                pintarAviso('err', '🔒 ' + (v ? textoEnvio(v) : 'Esta plantilla ya fue cargada.') + ' No se puede volver a cargar.');
+                bloquearBotonEnvio(true, 'Esta plantilla ya fue cargada');
+                return;
             }
+            var buf = XLSX.write(libroPlantilla(filas), { bookType: 'xlsx', type: 'array' });
+            var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+            var nombre = 'Sender_Plantilla_carga_' + d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()) + '_' + z(d.getHours()) + z(d.getMinutes()) + '.xlsx';
+            var file = new File([buf], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            pintarAviso('wait', '⏳ Enviando la plantilla a Base Ruta…');
+            cargarExcelRutaNube({
+                target: { files: [file], value: '' },
+                silencioso: true,
+                alTerminar: function (ok, detalle, loteId) {
+                    cg.enviandoAhora = false;
+                    if (ok) {
+                        ref.update({ estado: 'cargado', archivo: nombre, loteId: loteId || null, fecha: Date.now() }).catch(function () {});
+                        pintarAviso('', '✅ Listo: la plantilla ya se cargó en Base Ruta · ' + esc(detalle));
+                        bloquearBotonEnvio(true, 'Esta plantilla ya fue cargada');
+                    } else {
+                        ref.remove().catch(function () {}); // libera la reserva para poder reintentar
+                        pintarAviso('err', '❌ No se pudo cargar: ' + esc(detalle));
+                        bloquearBotonEnvio(false);
+                    }
+                }
+            });
+        }).catch(function (err) {
+            cg.enviandoAhora = false;
+            pintarAviso('err', '❌ No se pudo validar la carga: ' + esc(err && err.message ? err.message : err));
+            bloquearBotonEnvio(false);
         });
     };
 
@@ -15623,6 +15729,7 @@
             }
             cg.filas = filas; cg.nubeId = meta.id;
             aplicarReglas();
+            setTimeout(revisarEnvio, 0);
             poblarDesplegables();
             el('cgBuscar').value = '';
             el('cgResultado').hidden = !filas.length;
@@ -15686,6 +15793,7 @@
             aplicarReglas();
             poblarDesplegables();
             cgRender();
+            revisarEnvio();
         }
     }
     function guardarReglas() {

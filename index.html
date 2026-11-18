@@ -1358,6 +1358,12 @@
         #modalCruceGPO .cg-nube.ok { border-left-color:var(--success); }
         #modalCruceGPO .cg-nube.err { border-left-color:var(--danger); color:var(--danger); }
         #modalCruceGPO .cg-nube small { color:var(--text-muted); }
+        #modalCruceGPO .cg-inp { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); font-family:inherit; flex:1; min-width:130px; }
+        #modalCruceGPO .cg-reglas-form { display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px; align-items:center; }
+        #modalCruceGPO .cg-reglas-list { padding:0 14px 12px; display:flex; flex-direction:column; gap:6px; font-size:12px; }
+        #modalCruceGPO .cg-regla { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
+        #modalCruceGPO .cg-regla small { color:var(--text-muted); }
+        #modalCruceGPO .cg-regla-x { border:none; background:transparent; color:var(--danger); font-size:18px; line-height:1; cursor:pointer; padding:0 6px; }
         #modalCruceGPO .cg-nota { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
         #modalCruceGPO .cg-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
         #modalCruceGPO .cg-kpi { background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--kpi,var(--primary)); border-radius:10px; padding:10px 14px; }
@@ -2592,13 +2598,26 @@
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REINGRESO" checked onchange="cgRender()"> Reingreso</label>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="cgRender()"> En bodega Crossdock</label>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO" checked onchange="cgRender()"> Reenvío</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO AL CLIENTE" checked onchange="cgRender()"> Reenvío al cliente</label>
+                    <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REENVIO A CLIENTE" checked onchange="cgRender()"> Reenvío a cliente</label>
                 </div>
             </div>
             <div class="cg-nube" id="cgNube">
                 <span id="cgNubeTxt">☁ Comprobando si hay un cruce guardado en la nube…</span>
                 <button type="button" class="cg-btn" id="cgBtnBorrarNube" onclick="cgBorrarNube()" style="display:none;">Borrar de la nube</button>
             </div>
-            <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan sin tienda.</div>
+            <div class="cg-card">
+                <div class="cg-card-h">Reglas manuales · Seller + Distrito → Comentario final (tienda)</div>
+                <div class="cg-reglas-form">
+                    <input type="text" class="cg-inp" id="cgRegSeller" placeholder="Seller (ej. VIALE)">
+                    <input type="text" class="cg-inp" id="cgRegDistrito" placeholder="Distrito (ej. SAN MIGUEL)">
+                    <input type="text" class="cg-inp" id="cgRegTienda" list="cgDlTiendas" placeholder="Comentario final / tienda">
+                    <datalist id="cgDlTiendas"></datalist>
+                    <button type="button" class="cg-btn primary" onclick="cgAgregarRegla()">Agregar regla</button>
+                </div>
+                <div class="cg-reglas-list" id="cgReglasList"></div>
+            </div>
+            <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan sin tienda, salvo que cumplan una <b>regla Seller + Distrito</b> (arriba): esas reglas se aplican cuando la dirección no da tienda y se reflejan al instante en el cruce, el resumen, el Excel y la plantilla de carga.</div>
             <div id="cgResultado" hidden>
                 <div class="cg-kpis" id="cgKpis"></div>
                 <div class="cg-card">
@@ -15182,6 +15201,40 @@
         return CG_SIN_TIENDA;
     }
 
+    // ---------- Reglas Seller + Distrito -> tienda ----------
+    // Base (siempre activas) + manuales (se guardan en la nube, nodo "cruce_gpo_reglas", compartidas entre usuarios).
+    var CG_REGLAS_BASE = [
+        { id: 'base1', seller: 'VIALE', distrito: 'INDEPENDENCIA', tienda: 'Tottus Mega Plaza', base: true },
+        { id: 'base2', seller: 'VIALE', distrito: 'SAN MIGUEL',    tienda: 'Tottus La Marina', base: true }
+    ];
+    var CG_REGLAS_LS = 'cg_reglas_manuales';
+    var cgReglasManuales = [];
+
+    function reglasActivas() { return CG_REGLAS_BASE.concat(cgReglasManuales); }
+
+    function reglaTienda(f) {
+        var s = ' ' + norm(f.seller) + ' ', d = norm(f.distrito), rs = reglasActivas();
+        for (var i = 0; i < rs.length; i++) {
+            var r = rs[i], rsel = norm(r.seller), rdis = norm(r.distrito);
+            if (!rsel || !r.tienda) continue;
+            if (s.indexOf(' ' + rsel + ' ') === -1) continue;
+            if (rdis && rdis !== d) continue;
+            return r.tienda;
+        }
+        return '';
+    }
+
+    // Recalcula la tienda de cada fila: primero la de la dirección; si no hay, la regla Seller + Distrito.
+    function aplicarReglas() {
+        cg.filas.forEach(function (f) {
+            var b = f.tiendaBase == null ? '' : f.tiendaBase;
+            var t = b;
+            if (!b || b === CG_SIN_TIENDA) t = reglaTienda(f) || b;
+            f.tienda = t;
+            f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
+        });
+    }
+
     // Núcleo del cruce: una fila por cada fila de la base (como el BUSCARV del Excel).
     function cruzar(base, gpo) {
         var idx = new Map();
@@ -15200,14 +15253,15 @@
                 rastreo: rastreo,
                 sku: kSku ? String(r[kSku] || '') : '',
                 desc: kDesc ? String(r[kDesc] || '') : '',
-                enGpo: !!g, forma: '', estado: '', seller: '', distrito: '', tienda: ''
+                enGpo: !!g, forma: '', estado: '', seller: '', distrito: '', tienda: '', tiendaBase: ''
             };
             if (g) {
                 f.forma = String(g[mg['FORMA ENTREGA']] || '').trim();
                 f.estado = String(g[mg['ESTADO TMS']] || '').trim();
                 f.seller = String(g[mg['NOMBRE SELLER']] || '').trim();
                 f.distrito = String(g[mg['DISTRITO CLIENTE']] || '').trim();
-                f.tienda = tiendaDe(f.forma, g[mg['DIRECCION CLIENTE']]);
+                f.tiendaBase = tiendaDe(f.forma, g[mg['DIRECCION CLIENTE']]);
+                f.tienda = f.tiendaBase;
             }
             f.estadoN = estadoNorm(f.estado);
             f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
@@ -15218,7 +15272,7 @@
 
     function estadoNorm(s) {
         var n = norm(s);
-        return n === 'RE ENVIO' ? 'REENVIO' : n;
+        return n.replace(/^RE ENVIO(?= |$)/, 'REENVIO');
     }
 
     function estadosActivos() {
@@ -15298,6 +15352,7 @@
         if (!(cg.base && cg.gpo)) return;
         try {
             cg.filas = cruzar(cg.base, cg.gpo);
+            aplicarReglas();
         } catch (err) {
             console.error('Cruce GPO:', err);
             alert('No se pudo realizar el cruce: ' + err.message);
@@ -15338,7 +15393,7 @@
         el('cgKpis').innerHTML = [
             ['Filas con estado elegido', fmt(base.length), 'var(--primary)'],
             ['Rastreos únicos', fmt(Object.keys(unicos).length), 'var(--primary)'],
-            ['Con tienda (Click & Collect)', fmt(conTienda), 'var(--success)'],
+            ['Con tienda', fmt(conTienda), 'var(--success)'],
             ['Sin tienda · revisar / sin GPO', fmt(revisar) + ' / ' + fmt(sinGpo), (revisar || sinGpo) ? 'var(--warning)' : 'var(--success)']
         ].map(function (k) {
             return '<div class="cg-kpi" style="--kpi:' + k[2] + ';"><div class="cg-kpi-l">' + esc(k[0]) + '</div><div class="cg-kpi-v">' + esc(k[1]) + '</div></div>';
@@ -15497,9 +15552,9 @@
         btn.style.display = (cg.meta && puedeBorrarNube()) ? '' : 'none';
     }
 
-    function filaACompacta(f) { return [f.rastreo, f.sku, f.desc, f.enGpo ? 1 : 0, f.forma, f.estado, f.seller, f.distrito, f.tienda]; }
+    function filaACompacta(f) { return [f.rastreo, f.sku, f.desc, f.enGpo ? 1 : 0, f.forma, f.estado, f.seller, f.distrito, f.tiendaBase == null ? f.tienda : f.tiendaBase]; }
     function compactaAFila(a) {
-        var f = { rastreo: a[0] || '', sku: a[1] || '', desc: a[2] || '', enGpo: !!a[3], forma: a[4] || '', estado: a[5] || '', seller: a[6] || '', distrito: a[7] || '', tienda: a[8] || '' };
+        var f = { rastreo: a[0] || '', sku: a[1] || '', desc: a[2] || '', enGpo: !!a[3], forma: a[4] || '', estado: a[5] || '', seller: a[6] || '', distrito: a[7] || '', tienda: a[8] || '', tiendaBase: a[8] || '' };
         f.estadoN = estadoNorm(f.estado);
         f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
         return f;
@@ -15539,6 +15594,7 @@
                 JSON.parse(d['c' + i]).forEach(function (a) { filas.push(compactaAFila(a)); });
             }
             cg.filas = filas; cg.nubeId = meta.id;
+            aplicarReglas();
             poblarDesplegables();
             el('cgBuscar').value = '';
             el('cgResultado').hidden = !filas.length;
@@ -15582,7 +15638,69 @@
         if (e.key === 'Escape' && el('modalCruceGPO') && el('modalCruceGPO').style.display === 'flex') window.cerrarModalCruceGPO();
     });
 
-    window.__cgTest = { norm: norm, leerHoja: leerHoja, cruzar: cruzar, tiendaDe: tiendaDe };
+    // ---------- Reglas manuales: pantalla y guardado ----------
+    function pintarReglas() {
+        var rs = reglasActivas(), box = el('cgReglasList');
+        if (!box) return;
+        box.innerHTML = rs.map(function (r) {
+            return '<div class="cg-regla"><span>Seller <b>' + esc(r.seller) + '</b>' + (r.distrito ? ' · Distrito <b>' + esc(r.distrito) + '</b>' : ' · cualquier distrito') +
+                ' → <b>' + esc(r.tienda) + '</b>' + (r.base ? ' <small>(fija)</small>' : '') + '</span>' +
+                (r.base ? '' : '<button type="button" class="cg-regla-x" title="Quitar regla" onclick="cgQuitarRegla(\'' + esc(r.id) + '\')">&times;</button>') + '</div>';
+        }).join('');
+        var tiendas = {};
+        CG_TIENDAS.forEach(function (t) { tiendas[t[1]] = 1; });
+        rs.forEach(function (r) { tiendas[r.tienda] = 1; });
+        el('cgDlTiendas').innerHTML = Object.keys(tiendas).sort().map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+    }
+    function reglasCambiaron() {
+        pintarReglas();
+        if (cg.filas.length) {
+            aplicarReglas();
+            poblarDesplegables();
+            cgRender();
+        }
+    }
+    function guardarReglas() {
+        var obj = {};
+        cgReglasManuales.forEach(function (r) { obj[r.id] = { seller: r.seller, distrito: r.distrito, tienda: r.tienda }; });
+        if (nubeOk()) {
+            rtdb.ref('cruce_gpo_reglas').set(Object.keys(obj).length ? obj : null).catch(function (err) {
+                alert('No se pudo guardar la regla en la nube: ' + (err && err.message ? err.message : err));
+            });
+        }
+        try { localStorage.setItem(CG_REGLAS_LS, JSON.stringify(cgReglasManuales)); } catch (e) {}
+    }
+    window.cgAgregarRegla = function () {
+        var seller = el('cgRegSeller').value.trim(), distrito = el('cgRegDistrito').value.trim(), tienda = el('cgRegTienda').value.trim();
+        if (!seller || !tienda) { alert('Escribe al menos el Seller y el Comentario final (tienda).'); return; }
+        var dup = reglasActivas().some(function (r) { return norm(r.seller) === norm(seller) && norm(r.distrito) === norm(distrito); });
+        if (dup && !confirm('Ya existe una regla para ese Seller y Distrito (se usará la primera). ¿Agregar de todos modos?')) return;
+        cgReglasManuales.push({ id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), seller: seller, distrito: distrito, tienda: tienda });
+        el('cgRegSeller').value = ''; el('cgRegDistrito').value = ''; el('cgRegTienda').value = '';
+        guardarReglas();
+        reglasCambiaron();
+    };
+    window.cgQuitarRegla = function (id) {
+        if (!confirm('¿Quitar esta regla? Los registros que la usaban volverán a quedar sin tienda.')) return;
+        cgReglasManuales = cgReglasManuales.filter(function (r) { return r.id !== id; });
+        guardarReglas();
+        reglasCambiaron();
+    };
+    (function iniciarReglas() {
+        try { cgReglasManuales = JSON.parse(localStorage.getItem(CG_REGLAS_LS) || '[]') || []; } catch (e) { cgReglasManuales = []; }
+        pintarReglas();
+        if (nubeOk()) {
+            rtdb.ref('cruce_gpo_reglas').on('value', function (snap) {
+                var v = snap.val() || {};
+                cgReglasManuales = Object.keys(v).map(function (k) {
+                    return { id: k, seller: v[k].seller || '', distrito: v[k].distrito || '', tienda: v[k].tienda || '' };
+                });
+                reglasCambiaron();
+            }, function (err) { console.error('Cruce GPO: reglas', err); });
+        }
+    })();
+
+    window.__cgTest = { norm: norm, leerHoja: leerHoja, cruzar: cruzar, tiendaDe: tiendaDe, aplicarReglas: aplicarReglas, reglaTienda: reglaTienda, estadoNorm: estadoNorm };
 })();
 </script>
 

@@ -2621,7 +2621,7 @@
                 </div>
                 <div class="cg-reglas-list" id="cgReglasList"></div>
             </div>
-            <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan sin tienda, salvo que cumplan una <b>regla Seller + Distrito</b> (arriba): esas reglas se aplican cuando la dirección no da tienda y se reflejan al instante en el cruce, el resumen, el Excel y la plantilla de carga.</div>
+            <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las <b>reglas Seller + Distrito</b> (arriba) también se aplican solo a Click &amp; Collect, cuando la dirección no da tienda, y se reflejan al instante en el cruce, el resumen, el Excel y la plantilla de carga.</div>
             <div id="cgResultado" hidden>
                 <div class="cg-kpis" id="cgKpis"></div>
                 <div class="cg-card">
@@ -15202,8 +15202,11 @@
         return null;
     }
 
+    // Filtro Click & Collect: solo estos pedidos pueden tener tienda (Comentario final), sea por dirección o por regla.
+    function esClickCollect(forma) { return norm(forma) === 'CLICK COLLECT'; }
+
     function tiendaDe(forma, direccion) {
-        if (norm(forma) !== 'CLICK COLLECT') return '';
+        if (!esClickCollect(forma)) return '';
         var n = ' ' + norm(direccion) + ' ';
         for (var i = 0; i < CG_TIENDAS.length; i++) {
             if (n.indexOf(' ' + CG_TIENDAS[i][0] + ' ') !== -1) return CG_TIENDAS[i][1];
@@ -15235,11 +15238,13 @@
     }
 
     // Recalcula la tienda de cada fila: primero la de la dirección; si no hay, la regla Seller + Distrito.
+    // Ambas respetan el filtro Click & Collect: un pedido que no es Click & Collect nunca queda con tienda.
     function aplicarReglas() {
         cg.filas.forEach(function (f) {
             var b = f.tiendaBase == null ? '' : f.tiendaBase;
             var t = b;
-            if (!b || b === CG_SIN_TIENDA) t = reglaTienda(f) || b;
+            if (!esClickCollect(f.forma)) t = '';
+            else if (!b || b === CG_SIN_TIENDA) t = reglaTienda(f) || b;
             f.tienda = t;
             f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
         });
@@ -15836,7 +15841,7 @@
         }
     })();
 
-    window.__cgTest = { norm: norm, leerHoja: leerHoja, cruzar: cruzar, tiendaDe: tiendaDe, aplicarReglas: aplicarReglas, reglaTienda: reglaTienda, estadoNorm: estadoNorm };
+    window.__cgTest = { norm: norm, leerHoja: leerHoja, cruzar: cruzar, tiendaDe: tiendaDe, esClickCollect: esClickCollect, aplicarReglas: aplicarReglas, reglaTienda: reglaTienda, estadoNorm: estadoNorm };
 })();
 </script>
 

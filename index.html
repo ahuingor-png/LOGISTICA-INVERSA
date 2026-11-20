@@ -2686,6 +2686,7 @@
                 </div>
             </div>
             <div class="vr-body">
+                <div class="cv-top">
                 <div class="cv-drop" id="cvDrop">
                     <div id="cvDropIdle">
                         <div class="cv-drop-t">Carga el archivo de anclaje CD VES</div>
@@ -2695,6 +2696,7 @@
                     <input type="file" id="cvInp" accept=".xlsx,.xlsm,.xls,.csv" multiple style="display:none;" onchange="cvCargarArchivo(this)">
                 </div>
                 <div id="cvCargasBox" class="cv-cargas" style="display:none;"></div>
+                </div>
                 <div id="cvArchBox" class="cv-cargas" style="display:none;"></div>
                 <div id="cvSnapBanner" style="display:none; padding:9px 12px; margin-bottom:10px; border:1px solid var(--primary); background:rgba(61,90,128,.09); border-radius:10px; font-size:12px; color:var(--text-main);"></div>
                 <div id="cvKpis" class="vr-kpis"></div>
@@ -16313,6 +16315,22 @@
         if (v.completo) return '✅ Completo' + (v.agregadoManual ? ' · ➕ agregado a ' + (v.pl || '') + (v.plOriginal ? ' (era ' + v.plOriginal + ')' : '') : (v.pl ? ' · PL ' + v.pl : '')) + (v.migrado ? ' · 📤 migrado' : '');
         return '📦 ' + (parseInt(v.bultosValidados, 10) || 0) + ' de ' + tot;
     }
+    /* ---------- Rastreos enlazados (los crea la Terminal RF en cd_ves_enlaces) ---------- */
+    var CV_ENL = 'cd_ves_enlaces', cvEnl = {};
+    function cvEnlDe(f) {
+        if (f.__ve !== undefined) return f.__ve;
+        var e = cvEnl[cvClaveVal(f)];
+        return e && e.enlazado ? String(e.enlazado) : '';
+    }
+    function cvEscucharEnl() {
+        if (!cvxNubeOk()) return;
+        try {
+            rtdb.ref(CV_ENL).on('value', function (snap) {
+                cvEnl = snap.val() || {};
+                if ($('modalCDVES') && $('modalCDVES').style.display === 'flex') cvFiltrarTexto();
+            }, function (err) { console.error('CD VES: enlaces', err); });
+        } catch (e) { console.error('CD VES: escuchar enlaces', e); }
+    }
     function cvValQuien(f) { if (f.__vq !== undefined) return f.__vq; var v = cvValDe(f); return v ? ((v.validadoPor || 'N/D') + ' · ' + (v.horaValidacion || 'N/D')) : ''; }
     function cvEscucharValid() {
         if (!cvxNubeOk()) return;
@@ -16327,7 +16345,7 @@
     window.cvFiltrarTexto = function () {
         var q = ($('cvBuscar').value || '').toUpperCase().split(',').map(function (x) { return x.trim(); }).filter(Boolean);
         var filas = !q.length ? cvBase : cvBase.filter(function (f) {
-            var pajar = cvCols.map(function (c) { return String(cvFmt(f[c])).toUpperCase(); }).join(' | ');
+            var pajar = cvCols.map(function (c) { return String(cvFmt(f[c])).toUpperCase(); }).join(' | ') + ' | ' + cvEnlDe(f).toUpperCase();
             return q.some(function (t) { return pajar.indexOf(t) >= 0; });
         });
         cvPintar(filas);
@@ -16344,16 +16362,17 @@
         }
         // Se ocultan las columnas que vienen totalmente vacías en el archivo
         var visibles = cvCols.filter(function (c) { return cvFilas.some(function (f) { return f[c] !== '' && f[c] != null; }); });
-        thead.innerHTML = '<tr><th>#</th>' + visibles.map(function (c) { return '<th>' + cvEsc(CV_LABELS[c] || c) + '</th>'; }).join('') + '<th>Validación RF</th><th>Validado por · hora</th></tr>';
+        thead.innerHTML = '<tr><th>#</th>' + visibles.map(function (c) { return '<th>' + cvEsc(CV_LABELS[c] || c) + '</th>' + (cvKey(c) === 'rastreo' ? '<th>Rastreo enlazado</th>' : ''); }).join('') + '<th>Validación RF</th><th>Validado por · hora</th></tr>';
         tbody.innerHTML = filas.length ? filas.map(function (f, i) {
             return '<tr><td class="vr-mute">' + (i + 1) + '</td>' + visibles.map(function (c) {
                 var v = cvFmt(f[c]);
                 if (c === 'bultos') return '<td><span class="vr-bul">' + cvEsc(v || 1) + '</span></td>';
                 if (cvKey(c) === 'estadorolcontainer') return '<td><span class="vr-pill ' + (/ocupado/i.test(v) ? 'warn' : 'ok') + '">' + cvEsc(v) + '</span></td>';
                 if (cvKey(c) === 'flujo') return '<td><span class=\"vr-pill ' + (v === 'Sin clasificar' ? 'warn' : (/ves/i.test(v) ? 'ok' : '')) + '\">' + cvEsc(v) + '</span></td>';
+                if (cvKey(c) === 'rastreo') { var en = cvEnlDe(f); return '<td class="vr-cod">' + cvEsc(v) + '</td><td class="vr-cod">' + (en ? '🔗 ' + cvEsc(en) : '<span class="vr-mute">—</span>') + '</td>'; }
                 return '<td class="' + (CV_MONO[c] ? 'vr-cod' : '') + '">' + cvEsc(v) + '</td>';
             }).join('') + '<td>' + cvEsc(cvValTxt(f)) + '</td><td>' + cvEsc(cvValQuien(f)) + '</td></tr>';
-        }).join('') : '<tr><td colspan="' + (visibles.length + 3) + '" class="vr-empty">Sin registros para estos filtros.</td></tr>';
+        }).join('') : '<tr><td colspan="' + (visibles.length + 4) + '" class="vr-empty">Sin registros para estos filtros.</td></tr>';
 
         var bul = 0, roles = new Set(), resp = new Set();
         filas.forEach(function (f) {
@@ -16367,7 +16386,7 @@
 
     window.cvDescargar = function () {
         if (!cvVisibles.length) return alert('No hay registros en pantalla para descargar.');
-        var datos = cvVisibles.map(function (f) { var o = {}; cvCols.forEach(function (c) { o[CV_LABELS[c] || c] = cvFmt(f[c]); }); o['Validación RF'] = cvValTxt(f); o['Validado por · hora'] = cvValQuien(f); return o; });
+        var datos = cvVisibles.map(function (f) { var o = {}; cvCols.forEach(function (c) { o[CV_LABELS[c] || c] = cvFmt(f[c]); }); o['Rastreo enlazado'] = cvEnlDe(f); o['Validación RF'] = cvValTxt(f); o['Validado por · hora'] = cvValQuien(f); return o; });
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(datos), 'CD VES');
         XLSX.writeFile(wb, 'CD-VES_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.xlsx');
@@ -16747,7 +16766,7 @@
         var viejo = Object.keys(caMetas).filter(function (id) { return String(caMetas[id].nombre).toLowerCase() === nombre.toLowerCase(); })[0];
         if (viejo && !confirm('Ya existe "' + nombre + '". ¿Reemplazarlo por esta versión?')) return;
         var cols = cvCols.slice();
-        var rows = cvFilas.map(function (f) { var o = {}; cols.forEach(function (c) { o[c] = f[c]; }); o.__vt = cvValTxt(f); o.__vq = cvValQuien(f); return o; });
+        var rows = cvFilas.map(function (f) { var o = {}; cols.forEach(function (c) { o[c] = f[c]; }); o.__vt = cvValTxt(f); o.__vq = cvValQuien(f); o.__ve = cvEnlDe(f); return o; });
         var vals = cvFilas.filter(function (f) { var v = cvValDe(f); return v && v.completo; }).length;
         var id = 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), n = Math.ceil(rows.length / CA_CHUNK);
         var meta = { id: id, nombre: nombre, fecha: Date.now(), filas: rows.length, validados: vals, usuario: cvUsuario(), cols: JSON.stringify(cols), chunks: n };
@@ -16785,6 +16804,7 @@
 
     cvEscucharNube();
     cvEscucharValid();
+    cvEscucharEnl();
     caEscuchar();
 
     // Arrastrar y soltar sobre el cuadro de carga
@@ -16796,5 +16816,37 @@
     });
 })();
 </script>
+<style>
+/* ===== CD VES: encabezado compacto (más espacio para la tabla) ===== */
+#modalCDVES .vr-head { padding: 10px 18px 10px; }
+#modalCDVES .vr-titlebar { margin-bottom: 8px; }
+#modalCDVES .vr-title p { display: none; }
+#modalCDVES .vr-title-ico { width: 32px; height: 32px; }
+#modalCDVES .vr-title h4 { font-size: 15px; }
+#modalCDVES .vr-close { width: 30px; height: 30px; }
+#modalCDVES .vr-filters { gap: 8px; }
+#modalCDVES .vr-filters .custom-filter-btn { padding: 6px 10px; font-size: 11.5px; }
+#modalCDVES .vr-body { padding: 10px 18px 16px; }
+#modalCDVES .cv-top { display: flex; gap: 10px; align-items: stretch; margin-bottom: 8px; flex-wrap: wrap; }
+#modalCDVES .cv-top .cv-drop { flex: 1 1 340px; margin: 0; padding: 8px 12px; border-width: 1px; border-radius: 10px; }
+#modalCDVES .cv-top .cv-drop #cvDropIdle { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+#modalCDVES .cv-top .cv-drop .cv-drop-t { font-size: 12.5px; }
+#modalCDVES .cv-top .cv-drop .cv-drop-s { flex: 1 1 200px; font-size: 11px; margin: 0; }
+#modalCDVES .cv-top .cv-drop .vr-btn { padding: 6px 12px; }
+#modalCDVES .cv-top .cv-cargas { flex: 1 1 340px; margin: 0; padding: 6px 12px; border-radius: 10px; max-height: 92px; overflow-y: auto; }
+#modalCDVES .cv-top .cv-cargas-h { font-size: 11.5px; padding-bottom: 3px; }
+#modalCDVES .cv-top .cv-carga { padding: 4px 0; }
+#modalCDVES .cv-top .cv-carga-t { font-size: 12px; }
+#modalCDVES .cv-top .cv-carga-s { font-size: 10.5px; margin-top: 0; }
+#modalCDVES .cv-top .cv-carga-x { padding: 3px 8px; font-size: 11px; }
+#modalCDVES .vr-kpis { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+#modalCDVES .vr-kpi { flex: 0 1 auto; padding: 4px 12px; border-radius: 8px; box-shadow: none; }
+#modalCDVES .vr-kpi > div { display: flex; align-items: baseline; gap: 8px; }
+#modalCDVES .vr-kpi-label { font-size: 10px; }
+#modalCDVES .vr-kpi-val { font-size: 16px; margin-top: 0; }
+#modalCDVES .vr-table-toolbar { padding: 8px 12px; gap: 8px; }
+#modalCDVES .vr-btn { padding: 6px 11px; }
+#modalCDVES .vr-table-scroll { max-height: calc(100vh - 250px); min-height: 300px; }
+</style>
 </body>
 </html>

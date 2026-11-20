@@ -2706,6 +2706,7 @@
                         </div>
                         <span class="vr-visible-count"><b id="cvVisibles">0</b> registro(s) en pantalla</span>
                         <button class="vr-btn vr-btn-primary" id="cvBtnDescargar" onclick="cvDescargar()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
+                        <button class="vr-btn vr-btn-primary" id="cvfBtnAbrir" onclick="cvfAbrir()" title="Llena guía, fecha de entrega, observaciones y precintos y descarga el reporte con formato" style="background:var(--success);">📝 Editar formato</button>
                         <button class="vr-btn vr-btn-ghost" id="cvxBtnAbrir" onclick="cvxAbrir()" title="Editar flujos y reglas de clasificación">Flujos y reglas <span id="cvxPend" class="cvx-badge" style="display:none;">0</span></button>
                         <button class="vr-btn vr-btn-primary" onclick="cvGuardarArchivo()" title="Guarda la tabla en la nube con el flujo y la validación RF de este momento">💾 Guardar en la nube</button>
                         <button class="vr-btn vr-btn-ghost" onclick="caToggle()" title="Ver, buscar, abrir o eliminar los archivos guardados">📂 Archivos guardados</button>
@@ -2766,6 +2767,111 @@
         <div class="cvx-body" id="cvxBody"></div>
     </div>
 </div>
+
+<!-- ===== CD VES: modal del formato del reporte (guía, fecha de entrega, observaciones, precintos) ===== -->
+<style>
+    #cvfModal .cvf-card { background: var(--card-bg); color: var(--text-main); width: min(1040px, 96vw); max-height: 92vh; border-radius: 14px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.25); overflow: hidden; }
+    #cvfModal .cvf-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    #cvfModal .cvf-head h4 { margin: 0; font-size: 16px; font-weight: 800; }
+    #cvfModal .cvf-head p { margin: 2px 0 0; font-size: 12px; color: var(--text-muted); }
+    #cvfModal .cvf-x { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    #cvfModal .cvf-body { padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    #cvfModal .cvf-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg); }
+    #cvfModal .cvf-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.6fr; gap: 12px; }
+    #cvfModal label.cvf-l { display: flex; flex-direction: column; gap: 5px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); }
+    #cvfModal input[type=text], #cvfModal input[type=date], #cvfModal input.cvf-i { font-family: inherit; font-size: 13px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--text-main); width: 100%; text-transform: none; letter-spacing: 0; font-weight: 500; }
+    #cvfModal input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+    #cvfModal .cvf-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    #cvfModal .cvf-row .grow { flex: 1; min-width: 220px; }
+    #cvfModal .cvf-b { padding: 8px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); cursor: pointer; font-family: inherit; white-space: nowrap; }
+    #cvfModal .cvf-b:hover { border-color: var(--primary); color: var(--primary); }
+    #cvfModal .cvf-b.pri { background: var(--primary); color: #fff; border-color: var(--primary); }
+    #cvfModal .cvf-b.pri:hover { filter: brightness(1.1); color: #fff; }
+    #cvfModal .cvf-b.ok { background: var(--success); color: #fff; border-color: var(--success); }
+    #cvfModal .cvf-b.ok:hover { filter: brightness(1.1); color: #fff; }
+    #cvfModal .cvf-b.del { color: var(--danger); border-color: rgba(178,69,63,.35); }
+    #cvfModal .cvf-b:disabled { opacity: .5; cursor: not-allowed; }
+    #cvfModal .cvf-aplica { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--primary); background: rgba(61,90,128,.08); border-radius: 10px; font-size: 12.5px; }
+    #cvfModal .cvf-resumen { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+    #cvfModal .cvf-resumen b { color: var(--text-main); }
+    #cvfModal .cvf-msg { font-size: 12px; font-weight: 700; color: var(--success); min-height: 16px; }
+    #cvfModal .cvf-scroll { border: 1px solid var(--border); border-radius: 10px; overflow: auto; max-height: 340px; }
+    #cvfModal table.cvf-t { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    #cvfModal table.cvf-t th { position: sticky; top: 0; background: var(--bg); text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); padding: 8px 8px; border-bottom: 1px solid var(--border); z-index: 1; }
+    #cvfModal table.cvf-t td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    #cvfModal #cvfTbody tr { cursor: pointer; }
+    #cvfModal #cvfTbody tr:hover { background: rgba(100,116,139,.08); }
+    #cvfModal #cvfTbody tr.on { background: rgba(61,90,128,.14); }
+    #cvfModal .cvf-mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+    #cvfModal .cvf-empty { padding: 18px; text-align: center; color: var(--text-muted); }
+    #cvfModal .cvf-hint { font-size: 12px; color: var(--text-muted); margin: 0; }
+    #cvfModal .cvf-flujos { display: flex; flex-wrap: wrap; gap: 8px; }
+    #cvfModal .cvf-chip { border: 1px solid var(--border); background: var(--bg); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
+    @media (max-width: 720px) { #cvfModal .cvf-grid { grid-template-columns: 1fr; } }
+</style>
+<div id="cvfModal" class="modal" style="z-index: 8900;" onclick="if(event.target===this) cvfCerrar()">
+    <div class="cvf-card">
+        <div class="cvf-head">
+            <div>
+                <h4 id="cvfTitulo">Datos del formato</h4>
+                <p id="cvfSub">Llena la guía, la fecha de entrega y las observaciones del reporte</p>
+            </div>
+            <button class="cvf-x" onclick="cvfCerrar()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="cvf-body">
+            <div id="cvfPasoA">
+                <div class="cvf-grid">
+                    <label class="cvf-l">Guía<input type="text" id="cvfGuia" placeholder="Ej. Manifiesto - 117628" autocomplete="off"></label>
+                    <label class="cvf-l">Fecha de entrega<input type="date" id="cvfFecha"></label>
+                    <label class="cvf-l">Observación<input type="text" id="cvfObs" placeholder="Ej. Sin registro" autocomplete="off"></label>
+                </div>
+                <div class="cvf-row" style="margin-top:14px;">
+                    <input type="text" id="cvfBuscar" class="grow" placeholder="🔍 Buscar rastreo… (pega varios separados por coma, espacio o salto de línea)" oninput="cvfLista()" autocomplete="off">
+                    <button type="button" class="cvf-b" onclick="cvfSelEncontrados()">Seleccionar encontrados</button>
+                    <button type="button" class="cvf-b" onclick="cvfSelLimpiar()">Quitar selección</button>
+                </div>
+                <div class="cvf-aplica" style="margin-top:12px;">
+                    <span id="cvfAlcance"></span>
+                    <span class="cvf-row">
+                        <button type="button" class="cvf-b del" onclick="cvfBorrarDatos()">Borrar datos</button>
+                        <button type="button" class="cvf-b pri" onclick="cvfAplicar()">✔ Aplicar a las columnas</button>
+                    </span>
+                </div>
+                <div class="cvf-msg" id="cvfMsg"></div>
+                <div class="cvf-resumen" id="cvfResumen"></div>
+                <div class="cvf-scroll" style="margin-top:8px;">
+                    <table class="cvf-t">
+                        <thead><tr><th style="width:34px;"><input type="checkbox" id="cvfChkTodos" onclick="cvfToggleTodos(this.checked)" title="Marcar los encontrados"></th><th>Rastreo</th><th>Flujo</th><th>Guía</th><th>Fecha entrega</th><th>Observación</th></tr></thead>
+                        <tbody id="cvfTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="cvfPasoB" style="display:none;">
+                <p class="cvf-hint" style="margin-bottom:12px;">Para terminar, llena los <b>precintos</b> del reporte (tipo y N°). Puedes poner varios números separados por guion, igual que en tu formato.</p>
+                <div class="cvf-scroll" style="max-height:none;">
+                    <table class="cvf-t"><thead><tr><th>Precintos</th><th>N°</th><th style="width:44px;"></th></tr></thead><tbody id="cvfPrecBody"></tbody></table>
+                </div>
+                <div style="margin-top:10px;"><button type="button" class="cvf-b" onclick="cvfPrecAgregar()">+ Agregar precinto</button></div>
+                <div style="margin-top:16px;">
+                    <p class="cvf-hint" style="margin-bottom:6px;">Resumen del reporte (hoja TD):</p>
+                    <div class="cvf-flujos" id="cvfFlujosResumen"></div>
+                </div>
+            </div>
+        </div>
+        <div class="cvf-foot" id="cvfFootA">
+            <span class="cvf-hint">Sin selección, lo que escribas se aplica a todos los registros del reporte.</span>
+            <span class="cvf-row">
+                <button type="button" class="cvf-b" onclick="cvfCerrar()">Cancelar</button>
+                <button type="button" class="cvf-b pri" onclick="cvfContinuar()">Continuar: llenar precintos →</button>
+            </span>
+        </div>
+        <div class="cvf-foot" id="cvfFootB" style="display:none;">
+            <button type="button" class="cvf-b" onclick="cvfPaso('A')">← Volver</button>
+            <button type="button" class="cvf-b ok" id="cvfBtnGenerar" onclick="cvfGenerar()">⬇ Generar y descargar Excel</button>
+        </div>
+    </div>
+</div>
+
 
 <!-- ===== CRUCE GPO: carga base (Hoja1) + GPO y cruza por Rastreo. Se abre desde la Vista de Sender. ===== -->
 <div id="modalCruceGPO" class="modal" style="z-index: 9300;">
@@ -16352,7 +16458,7 @@
     function cvPintar(filas) {
         cvVisibles = filas;
         $('cvVisibles').textContent = filas.length;
-        $('cvBtnDescargar').disabled = !filas.length;
+        $('cvBtnDescargar').disabled = !filas.length; var bf = $('cvfBtnAbrir'); if (bf) bf.disabled = !filas.length;
         var thead = $('cvThead'), tbody = $('cvTbody');
         if (!cvCols.length) {
             thead.innerHTML = ''; tbody.innerHTML = '<tr><td class="vr-empty">Aún no cargas ningún archivo.</td></tr>';
@@ -16390,6 +16496,254 @@
         XLSX.writeFile(wb, 'CD-VES_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.xlsx');
     };
 
+
+
+    /* ---------- Reporte con formato: GUÍA, FECHA DE ENTREGA, OBSERVACIONES y PRECINTOS ---------- */
+    var CVF_LS = 'cdves_formato_v1';
+    var cvf = { ed: {}, guia: '' };
+    var cvfPrec = [{ tipo: 'OPL', num: '' }, { tipo: 'RC1 RC2', num: '' }, { tipo: 'RC3', num: '' }];
+    var cvfFilas = [], cvfKeys = [], cvfSel = {}, cvfEncontrados = [];
+    try { var cvfG = JSON.parse(localStorage.getItem(CVF_LS) || 'null'); if (cvfG && cvfG.ed) cvf = cvfG; } catch (e) {}
+    function cvfGuardar() { try { localStorage.setItem(CVF_LS, JSON.stringify(cvf)); } catch (e) {} }
+    function cvfHoy() { var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+    function cvfDMY(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (iso || ''); }
+
+    window.cvfAbrir = function () {
+        if (!cvVisibles.length) return alert('No hay registros en pantalla para armar el formato.');
+        cvfFilas = cvVisibles.slice();
+        cvfKeys = cvfFilas.map(function (f, i) { return cvClaveVal(f) || ('i' + i); });
+        cvfSel = {};
+        $('cvfGuia').value = cvf.guia || '';
+        $('cvfFecha').value = '';
+        $('cvfObs').value = '';
+        $('cvfBuscar').value = '';
+        $('cvfMsg').textContent = '';
+        cvfPaso('A'); cvfLista();
+        $('cvfModal').style.display = 'flex';
+        cvfCargarExcelJS().catch(function () {});
+    };
+    window.cvfCerrar = function () { $('cvfModal').style.display = 'none'; };
+    window.cvfPaso = function (p) {
+        $('cvfPasoA').style.display = p === 'A' ? '' : 'none';
+        $('cvfPasoB').style.display = p === 'B' ? '' : 'none';
+        $('cvfFootA').style.display = p === 'A' ? '' : 'none';
+        $('cvfFootB').style.display = p === 'B' ? '' : 'none';
+        $('cvfTitulo').textContent = p === 'A' ? 'Datos del formato' : 'Precintos';
+        $('cvfSub').textContent = p === 'A' ? 'Llena la guía, la fecha de entrega y las observaciones del reporte' : 'Último paso: llena los precintos y descarga el reporte';
+        if (p === 'B') { cvfPrecPintar(); cvfFlujosPintar(); }
+    };
+
+    function cvfBuscados() {
+        var q = ($('cvfBuscar').value || '').toUpperCase().split(/[\s,;]+/).filter(Boolean), out = [];
+        cvfFilas.forEach(function (f, i) {
+            if (q.length) { var r = cvxRastreo(f); if (!q.some(function (t) { return r.indexOf(t) >= 0; })) return; }
+            out.push(i);
+        });
+        return out;
+    }
+    function cvfObjetivo() {
+        var sel = Object.keys(cvfSel).filter(function (k) { return cvfSel[k]; });
+        var set = {};
+        (sel.length ? sel : cvfKeys).forEach(function (k) { set[k] = 1; });
+        return { set: set, haySel: sel.length > 0 };
+    }
+    function cvfLista() {
+        cvfEncontrados = cvfBuscados();
+        var max = 400, h = '';
+        cvfEncontrados.slice(0, max).forEach(function (i) {
+            var f = cvfFilas[i], k = cvfKeys[i], e = cvf.ed[k] || {}, on = !!cvfSel[k];
+            h += '<tr data-k="' + cvEsc(k) + '" class="' + (on ? 'on' : '') + '"><td><input type="checkbox" tabindex="-1"' + (on ? ' checked' : '') + '></td>' +
+                '<td class="cvf-mono">' + cvEsc(cvxRastreo(f)) + '</td><td>' + cvEsc(cvVal(f, 'FLUJO')) + '</td><td>' + cvEsc(e.guia || '') + '</td><td>' + cvEsc(cvfDMY(e.fecha)) + '</td><td>' + cvEsc(e.obs || '') + '</td></tr>';
+        });
+        if (!cvfEncontrados.length) h = '<tr><td colspan="6" class="cvf-empty">No se encontró ningún rastreo con esa búsqueda.</td></tr>';
+        else if (cvfEncontrados.length > max) h += '<tr><td colspan="6" class="cvf-empty">Mostrando ' + max + ' de ' + cvfEncontrados.length + '. Afina la búsqueda para ver los demás.</td></tr>';
+        $('cvfTbody').innerHTML = h;
+        var todos = cvfEncontrados.length && cvfEncontrados.every(function (i) { return cvfSel[cvfKeys[i]]; });
+        $('cvfChkTodos').checked = !!todos;
+        cvfResumenPintar();
+    }
+    window.cvfLista = cvfLista;
+    function cvfResumenPintar() {
+        var obj = cvfObjetivo(), nObj = cvfKeys.filter(function (k) { return obj.set[k]; }).length;
+        $('cvfAlcance').innerHTML = obj.haySel ? 'Se aplicará a los <b>' + nObj + '</b> registro(s) seleccionado(s)' : 'Sin selección: se aplicará a <b>todos</b> los ' + cvfFilas.length + ' registros';
+        var sg = 0, sf = 0, co = 0;
+        cvfKeys.forEach(function (k) { var e = cvf.ed[k] || {}; if (!e.guia) sg++; if (!e.fecha) sf++; if (e.obs) co++; });
+        $('cvfResumen').innerHTML = '<span>Registros: <b>' + cvfFilas.length + '</b></span><span>Sin guía: <b>' + sg + '</b></span><span>Sin fecha: <b>' + sf + '</b> (se usará la de hoy)</span><span>Con observación: <b>' + co + '</b></span>';
+    }
+    $('cvfTbody').addEventListener('click', function (ev) {
+        var tr = ev.target.closest ? ev.target.closest('tr[data-k]') : null; if (!tr) return;
+        var k = tr.getAttribute('data-k'); cvfSel[k] = !cvfSel[k]; cvfLista();
+    });
+    window.cvfToggleTodos = function (on) { cvfEncontrados.forEach(function (i) { cvfSel[cvfKeys[i]] = !!on; }); cvfLista(); };
+    window.cvfSelEncontrados = function () { cvfToggleTodos(true); };
+    window.cvfSelLimpiar = function () { cvfSel = {}; cvfLista(); };
+
+    window.cvfAplicar = function () {
+        var g = $('cvfGuia').value.trim(), fe = $('cvfFecha').value, ob = $('cvfObs').value.trim();
+        if (!g && !fe && !ob) return alert('Escribe la guía, elige la fecha de entrega o escribe una observación para aplicarla.');
+        var obj = cvfObjetivo(), n = 0;
+        cvfKeys.forEach(function (k) {
+            if (!obj.set[k]) return;
+            var e = cvf.ed[k] = cvf.ed[k] || {};
+            if (g) e.guia = g; if (fe) e.fecha = fe; if (ob) e.obs = ob;
+            n++;
+        });
+        if (g) cvf.guia = g;
+        cvfGuardar();
+        $('cvfObs').value = '';
+        $('cvfMsg').textContent = '✔ Se llenaron las columnas de ' + n + ' registro(s).';
+        cvfLista();
+    };
+    window.cvfBorrarDatos = function () {
+        var obj = cvfObjetivo(), n = cvfKeys.filter(function (k) { return obj.set[k] && cvf.ed[k]; }).length;
+        if (!n) return alert('No hay datos que borrar en ese alcance.');
+        if (!confirm('¿Borrar guía, fecha y observación de ' + n + ' registro(s)?')) return;
+        cvfKeys.forEach(function (k) { if (obj.set[k]) delete cvf.ed[k]; });
+        cvfGuardar(); $('cvfMsg').textContent = '✔ Datos borrados.'; cvfLista();
+    };
+    window.cvfContinuar = function () {
+        var sg = cvfKeys.filter(function (k) { return !(cvf.ed[k] && cvf.ed[k].guia); }).length;
+        if (sg && !confirm('Hay ' + sg + ' registro(s) sin guía (saldrán con "-"). ¿Continuar con los precintos?')) return;
+        cvfPaso('B');
+    };
+
+    /* Precintos */
+    function cvfPrecPintar() {
+        $('cvfPrecBody').innerHTML = cvfPrec.map(function (p, i) {
+            return '<tr><td><input class="cvf-i" data-i="' + i + '" data-c="tipo" value="' + cvEsc(p.tipo) + '" placeholder="Ej. OPL"></td>' +
+                '<td><input class="cvf-i" data-i="' + i + '" data-c="num" value="' + cvEsc(p.num) + '" placeholder="Ej. 086088-086089-086090"></td>' +
+                '<td><button type="button" class="cvf-b del" data-del="' + i + '" title="Quitar">✕</button></td></tr>';
+        }).join('');
+    }
+    $('cvfPrecBody').addEventListener('input', function (ev) {
+        var t = ev.target, i = t.getAttribute && t.getAttribute('data-i'); if (i == null) return;
+        cvfPrec[+i][t.getAttribute('data-c')] = t.value;
+    });
+    $('cvfPrecBody').addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('[data-del]') : null; if (!b) return;
+        cvfPrec.splice(+b.getAttribute('data-del'), 1); cvfPrecPintar();
+    });
+    window.cvfPrecAgregar = function () { cvfPrec.push({ tipo: '', num: '' }); cvfPrecPintar(); };
+
+    function cvfDatos() {
+        var hoy = cvfHoy();
+        return cvfFilas.map(function (f, i) {
+            var e = cvf.ed[cvfKeys[i]] || {};
+            return { rastreo: cvxRastreo(f) || cvVal(f, 'rastreo'), enlace: cvEnlDe(f) || '-', flujo: cvVal(f, 'FLUJO') || '-', guia: e.guia || '-', fecha: e.fecha || hoy, obs: e.obs || '-' };
+        });
+    }
+    function cvfConteoFlujos(filas) {
+        var orden = [], m = {};
+        filas.forEach(function (r) { if (!(r.flujo in m)) { m[r.flujo] = 0; orden.push(r.flujo); } m[r.flujo]++; });
+        return orden.map(function (x) { return [x, m[x]]; });
+    }
+    function cvfFlujosPintar() {
+        var fl = cvfConteoFlujos(cvfDatos());
+        $('cvfFlujosResumen').innerHTML = fl.map(function (x) { return '<span class="cvf-chip">' + cvEsc(x[0]) + ': <b>' + x[1] + '</b></span>'; }).join('') + '<span class="cvf-chip">Total general: <b>' + cvfFilas.length + '</b></span>';
+    }
+
+    function cvfCargarExcelJS() {
+        return new Promise(function (res, rej) {
+            if (window.ExcelJS) return res(window.ExcelJS);
+            var sc = document.createElement('script');
+            sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'; sc.crossOrigin = 'anonymous';
+            sc.onload = function () { window.ExcelJS ? res(window.ExcelJS) : rej(new Error('ExcelJS no disponible')); };
+            sc.onerror = function () { rej(new Error('No se pudo cargar ExcelJS')); };
+            document.head.appendChild(sc);
+        });
+    }
+    function cvfNombreArchivo() { var h = cvfDMY(cvfHoy()).replace(/\//g, '-'); return 'Devoluciones_y_Rechazos_Falabella_CD_VES_' + h + '.xlsx'; }
+    function cvfDescargarBlob(blob, nombre) {
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre;
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    }
+    function cvfFechaUTC(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : iso; }
+
+    function cvfExcelConEstilo(EJ, filas, flujos, prec) {
+        var wb = new EJ.Workbook(); wb.creator = 'REVERSA';
+        var ORO = 'FFFFC000', CLARO = 'FFFFE699', thin = { style: 'thin', color: { argb: 'FF000000' } }, bord = { top: thin, left: thin, bottom: thin, right: thin };
+        function est(c, o) {
+            o = o || {};
+            c.font = { name: o.fn || 'Baskerville Old Face', size: o.sz || 11, bold: !!o.b };
+            c.alignment = { horizontal: o.h || 'center', vertical: 'middle', wrapText: !!o.w };
+            if (o.fill) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.fill } };
+            if (o.bord) c.border = bord;
+            if (o.nf) c.numFmt = o.nf;
+        }
+        /* Hoja TD (detalle por flujo + precintos) */
+        var td = wb.addWorksheet('TD', { views: [{ showGridLines: false }] });
+        [11.4, 24, 12, 3.7, 2.7, 18, 46].forEach(function (w, i) { td.getColumn(i + 1).width = w; });
+        td.mergeCells('B3:C3'); td.getCell('B3').value = 'DETALLE';
+        est(td.getCell('B3'), { b: true, fill: ORO, bord: true }); est(td.getCell('C3'), { fill: ORO, bord: true });
+        [['B5', 'FLUJO'], ['C5', 'FOLIOS'], ['F5', 'PRECINTOS'], ['G5', 'N°']].forEach(function (x) { td.getCell(x[0]).value = x[1]; est(td.getCell(x[0]), { b: true, fill: ORO, bord: true }); });
+        var r = 6;
+        flujos.forEach(function (x) {
+            td.getCell('B' + r).value = x[0]; est(td.getCell('B' + r), { bord: true });
+            td.getCell('C' + r).value = x[1]; est(td.getCell('C' + r), { bord: true });
+            r++;
+        });
+        td.getCell('B' + r).value = 'Total general'; est(td.getCell('B' + r), { b: true, fill: CLARO, bord: true });
+        td.getCell('C' + r).value = filas.length; est(td.getCell('C' + r), { b: true, fill: CLARO, bord: true });
+        prec.forEach(function (p, i) {
+            var rr = 6 + i;
+            td.getCell('F' + rr).value = p.tipo.trim(); est(td.getCell('F' + rr), { bord: true });
+            td.getCell('G' + rr).value = p.num.trim(); est(td.getCell('G' + rr), { bord: true });
+        });
+        /* Hoja BD (detalle por rastreo) */
+        var bd = wb.addWorksheet('BD', { views: [{ showGridLines: false, state: 'frozen', ySplit: 2 }] });
+        [7.3, 29.4, 30, 31.4, 26, 21.6, 41.7].forEach(function (w, i) { bd.getColumn(i + 1).width = w; });
+        bd.mergeCells('A1:G1'); bd.getCell('A1').value = 'DEVOLUCIONES Y RECHAZOS CD VES';
+        est(bd.getCell('A1'), { fn: 'Bodoni MT', sz: 12, b: true, fill: ORO }); bd.getRow(1).height = 24;
+        ['N°', 'RASTREOS', 'ENLACE DE RASTREO', 'FLUJO', 'GUIA', 'Fecha de entrega', 'Observacion'].forEach(function (t, i) {
+            var c = bd.getRow(2).getCell(i + 1); c.value = t; est(c, { fn: 'Bodoni MT', b: true, fill: ORO, bord: true });
+        });
+        filas.forEach(function (d, i) {
+            var row = bd.getRow(i + 3);
+            var vals = [String(i + 1), d.rastreo, d.enlace, d.flujo, d.guia, cvfFechaUTC(d.fecha), d.obs];
+            vals.forEach(function (v, j) {
+                var c = row.getCell(j + 1); c.value = v;
+                est(c, { fn: 'Bodoni MT', bord: true, w: j === 6, nf: j === 5 ? 'dd/mm/yyyy' : (j === 5 ? undefined : '@') });
+            });
+        });
+        return wb.xlsx.writeBuffer();
+    }
+    function cvfExcelSimple(filas, flujos, prec) {
+        var wb = XLSX.utils.book_new();
+        var td = [[], [], ['', 'DETALLE'], [], ['', 'FLUJO', 'FOLIOS', '', '', 'PRECINTOS', 'N°']];
+        var n = Math.max(flujos.length + 1, prec.length);
+        for (var i = 0; i < n; i++) {
+            var fila = ['', '', '', '', '', '', ''];
+            if (i < flujos.length) { fila[1] = flujos[i][0]; fila[2] = flujos[i][1]; } else if (i === flujos.length) { fila[1] = 'Total general'; fila[2] = filas.length; }
+            if (i < prec.length) { fila[5] = prec[i].tipo.trim(); fila[6] = prec[i].num.trim(); }
+            td.push(fila);
+        }
+        var wsT = XLSX.utils.aoa_to_sheet(td); wsT['!cols'] = [{ wch: 11 }, { wch: 24 }, { wch: 12 }, { wch: 4 }, { wch: 3 }, { wch: 18 }, { wch: 46 }];
+        var bd = [['DEVOLUCIONES Y RECHAZOS CD VES'], ['N°', 'RASTREOS', 'ENLACE DE RASTREO', 'FLUJO', 'GUIA', 'Fecha de entrega', 'Observacion']];
+        filas.forEach(function (d, i) { bd.push([String(i + 1), d.rastreo, d.enlace, d.flujo, d.guia, cvfDMY(d.fecha), d.obs]); });
+        var wsB = XLSX.utils.aoa_to_sheet(bd); wsB['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
+        wsB['!cols'] = [{ wch: 7 }, { wch: 29 }, { wch: 30 }, { wch: 31 }, { wch: 26 }, { wch: 21 }, { wch: 42 }];
+        XLSX.utils.book_append_sheet(wb, wsT, 'TD'); XLSX.utils.book_append_sheet(wb, wsB, 'BD');
+        var out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        return new Blob([out], { type: 'application/octet-stream' });
+    }
+
+    window.cvfGenerar = function () {
+        var prec = cvfPrec.filter(function (p) { return p.tipo.trim() || p.num.trim(); });
+        if (!prec.some(function (p) { return p.num.trim(); }) && !confirm('No llenaste ningún N° de precinto. ¿Descargar de todas formas?')) return;
+        var filas = cvfDatos(), flujos = cvfConteoFlujos(filas), btn = $('cvfBtnGenerar');
+        btn.disabled = true; btn.textContent = 'Generando…';
+        var fin = function () { btn.disabled = false; btn.textContent = '⬇ Generar y descargar Excel'; };
+        cvfCargarExcelJS().then(function (EJ) {
+            return cvfExcelConEstilo(EJ, filas, flujos, prec).then(function (buf) {
+                cvfDescargarBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), cvfNombreArchivo());
+            });
+        }).catch(function (err) {
+            console.warn('CD VES formato: sin estilos (ExcelJS no disponible)', err);
+            try { cvfDescargarBlob(cvfExcelSimple(filas, flujos, prec), cvfNombreArchivo()); alert('No se pudo cargar el generador con colores (¿sin internet?). Se descargó el reporte con los mismos datos pero sin estilos.'); }
+            catch (e2) { alert('No se pudo generar el Excel: ' + (e2 && e2.message ? e2.message : e2)); }
+        }).then(fin, fin).then(function () { cvfCerrar(); });
+    };
 
     /* ---------- Flujos y reglas de clasificación ---------- */
     var CVX_LS = 'cdves_flujos_reglas_v1', CVX_RTDB = 'cd_ves_flujos_reglas', CVX_SC = 'Sin clasificar';

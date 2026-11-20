@@ -2686,7 +2686,6 @@
                 </div>
             </div>
             <div class="vr-body">
-                <div class="cv-top">
                 <div class="cv-drop" id="cvDrop">
                     <div id="cvDropIdle">
                         <div class="cv-drop-t">Carga el archivo de anclaje CD VES</div>
@@ -2696,7 +2695,6 @@
                     <input type="file" id="cvInp" accept=".xlsx,.xlsm,.xls,.csv" multiple style="display:none;" onchange="cvCargarArchivo(this)">
                 </div>
                 <div id="cvCargasBox" class="cv-cargas" style="display:none;"></div>
-                </div>
                 <div id="cvArchBox" class="cv-cargas" style="display:none;"></div>
                 <div id="cvSnapBanner" style="display:none; padding:9px 12px; margin-bottom:10px; border:1px solid var(--primary); background:rgba(61,90,128,.09); border-radius:10px; font-size:12px; color:var(--text-main);"></div>
                 <div id="cvKpis" class="vr-kpis"></div>
@@ -16816,37 +16814,5 @@
     });
 })();
 </script>
-<style>
-/* ===== CD VES: encabezado compacto (más espacio para la tabla) ===== */
-#modalCDVES .vr-head { padding: 10px 18px 10px; }
-#modalCDVES .vr-titlebar { margin-bottom: 8px; }
-#modalCDVES .vr-title p { display: none; }
-#modalCDVES .vr-title-ico { width: 32px; height: 32px; }
-#modalCDVES .vr-title h4 { font-size: 15px; }
-#modalCDVES .vr-close { width: 30px; height: 30px; }
-#modalCDVES .vr-filters { gap: 8px; }
-#modalCDVES .vr-filters .custom-filter-btn { padding: 6px 10px; font-size: 11.5px; }
-#modalCDVES .vr-body { padding: 10px 18px 16px; }
-#modalCDVES .cv-top { display: flex; gap: 10px; align-items: stretch; margin-bottom: 8px; flex-wrap: wrap; }
-#modalCDVES .cv-top .cv-drop { flex: 1 1 340px; margin: 0; padding: 8px 12px; border-width: 1px; border-radius: 10px; }
-#modalCDVES .cv-top .cv-drop #cvDropIdle { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-#modalCDVES .cv-top .cv-drop .cv-drop-t { font-size: 12.5px; }
-#modalCDVES .cv-top .cv-drop .cv-drop-s { flex: 1 1 200px; font-size: 11px; margin: 0; }
-#modalCDVES .cv-top .cv-drop .vr-btn { padding: 6px 12px; }
-#modalCDVES .cv-top .cv-cargas { flex: 1 1 340px; margin: 0; padding: 6px 12px; border-radius: 10px; max-height: 92px; overflow-y: auto; }
-#modalCDVES .cv-top .cv-cargas-h { font-size: 11.5px; padding-bottom: 3px; }
-#modalCDVES .cv-top .cv-carga { padding: 4px 0; }
-#modalCDVES .cv-top .cv-carga-t { font-size: 12px; }
-#modalCDVES .cv-top .cv-carga-s { font-size: 10.5px; margin-top: 0; }
-#modalCDVES .cv-top .cv-carga-x { padding: 3px 8px; font-size: 11px; }
-#modalCDVES .vr-kpis { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-#modalCDVES .vr-kpi { flex: 0 1 auto; padding: 4px 12px; border-radius: 8px; box-shadow: none; }
-#modalCDVES .vr-kpi > div { display: flex; align-items: baseline; gap: 8px; }
-#modalCDVES .vr-kpi-label { font-size: 10px; }
-#modalCDVES .vr-kpi-val { font-size: 16px; margin-top: 0; }
-#modalCDVES .vr-table-toolbar { padding: 8px 12px; gap: 8px; }
-#modalCDVES .vr-btn { padding: 6px 11px; }
-#modalCDVES .vr-table-scroll { max-height: calc(100vh - 250px); min-height: 300px; }
-</style>
 </body>
 </html>

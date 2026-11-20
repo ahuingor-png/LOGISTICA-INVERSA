@@ -2695,6 +2695,8 @@
                     <input type="file" id="cvInp" accept=".xlsx,.xlsm,.xls,.csv" multiple style="display:none;" onchange="cvCargarArchivo(this)">
                 </div>
                 <div id="cvCargasBox" class="cv-cargas" style="display:none;"></div>
+                <div id="cvArchBox" class="cv-cargas" style="display:none;"></div>
+                <div id="cvSnapBanner" style="display:none; padding:9px 12px; margin-bottom:10px; border:1px solid var(--primary); background:rgba(61,90,128,.09); border-radius:10px; font-size:12px; color:var(--text-main);"></div>
                 <div id="cvKpis" class="vr-kpis"></div>
                 <div class="vr-table-card">
                     <div class="vr-table-toolbar">
@@ -2705,6 +2707,8 @@
                         <span class="vr-visible-count"><b id="cvVisibles">0</b> registro(s) en pantalla</span>
                         <button class="vr-btn vr-btn-primary" id="cvBtnDescargar" onclick="cvDescargar()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
                         <button class="vr-btn vr-btn-ghost" id="cvxBtnAbrir" onclick="cvxAbrir()" title="Editar flujos y reglas de clasificación">Flujos y reglas <span id="cvxPend" class="cvx-badge" style="display:none;">0</span></button>
+                        <button class="vr-btn vr-btn-primary" onclick="cvGuardarArchivo()" title="Guarda la tabla en la nube con el flujo y la validación RF de este momento">💾 Guardar en la nube</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="caToggle()" title="Ver, buscar, abrir o eliminar los archivos guardados">📂 Archivos guardados</button>
                     </div>
                     <div class="vr-table-scroll">
                         <table class="vr-table" id="cvTabla">
@@ -16125,6 +16129,7 @@
 
     // Une todas las cargas: si un rastreo está en varias, vale el de la carga más reciente
     function cvReconstruir() {
+        if (cvSnap) { cvBadge(); cvPintarCargas(); return; }
         var ids = Object.keys(cvCargas).sort(function (a, b) { return (cvCargas[a].meta.fecha || 0) - (cvCargas[b].meta.fecha || 0); });
         var cols = [], porKey = {}, mapa = {}, orden = [];
         ids.forEach(function (id) {
@@ -16302,12 +16307,13 @@
     function cvClaveVal(f) { return cvxRastreo(f).replace(/[^A-Z0-9]/g, '').replace(/[.#$\[\]\/]/g, '_'); }
     function cvValDe(f) { return cvValid[cvClaveVal(f)] || null; }
     function cvValTxt(f) {
+        if (f.__vt !== undefined) return f.__vt;
         var v = cvValDe(f); if (!v) return '—';
         var tot = parseInt(v.bul, 10) || parseInt(cvVal(f, 'bultos'), 10) || 1;
         if (v.completo) return '✅ Completo' + (v.agregadoManual ? ' · ➕ agregado a ' + (v.pl || '') + (v.plOriginal ? ' (era ' + v.plOriginal + ')' : '') : (v.pl ? ' · PL ' + v.pl : '')) + (v.migrado ? ' · 📤 migrado' : '');
         return '📦 ' + (parseInt(v.bultosValidados, 10) || 0) + ' de ' + tot;
     }
-    function cvValQuien(f) { var v = cvValDe(f); return v ? ((v.validadoPor || 'N/D') + ' · ' + (v.horaValidacion || 'N/D')) : ''; }
+    function cvValQuien(f) { if (f.__vq !== undefined) return f.__vq; var v = cvValDe(f); return v ? ((v.validadoPor || 'N/D') + ' · ' + (v.horaValidacion || 'N/D')) : ''; }
     function cvEscucharValid() {
         if (!cvxNubeOk()) return;
         try {
@@ -16386,7 +16392,7 @@
     function cvxGuardar() {
         var data = { flujos: cvxFlujos, reglas: cvxReglas };
         try { localStorage.setItem(CVX_LS, JSON.stringify(data)); } catch (e) {}
-        if (cvxNubeOk()) { try { rtdb.ref(CVX_RTDB).set(data).catch(function (e) { console.error('CD VES: guardar reglas', e); }); } catch (e) {} }
+        if (cvxNubeOk()) { try { rtdb.ref(CVX_RTDB).set(data).catch(function (e) { console.error('CD VES: guardar reglas', e); alert('Las reglas se guardaron solo en este dispositivo. No se pudieron guardar en la nube: ' + (e && e.message ? e.message : e) + '\n\nSi dice "permission denied", agrega el nodo "cd_ves_flujos_reglas" a las Reglas de Firebase.'); }); } catch (e) {} }
     }
     function cvxOrdenadas() {
         var score = function (r) { return r.prefijo.length * 100 + (r.largo ? 10 : 0) + (r.tipo !== 'cualquiera' ? 1 : 0); };
@@ -16414,6 +16420,7 @@
 
     // Pone en cada fila el flujo que dictan las reglas (o "Sin clasificar")
     function cvAplicarFlujos() {
+        if (cvSnap) return;
         if (!cvFilas.length) { cvxGrupos = []; return; }
         var col = cvCol('FLUJO');
         if (!col) { col = 'FLUJO'; cvCols.push(col); }
@@ -16495,7 +16502,7 @@
         // 1) Pendientes
         if (cvxGrupos.length) {
             var total = cvxGrupos.reduce(function (a, g) { return a + g.n; }, 0);
-            h += '<div class="cvx-sec cvx-pend"><h5>Sin clasificar · ' + total + ' rastreo(s)</h5><p class="cvx-hint">Estos rastreos no cumplen ninguna regla. Revisa el patrón, elige el flujo y pulsa “Guardar regla”: se aplicará a todos los que coincidan, ahora y en próximas cargas.</p>' +
+            h += '<div class="cvx-sec cvx-pend"><button class="cvx-b pri" style="float:right;" onclick="cvxGuardarTodos()">Guardar todas</button><h5>Sin clasificar · ' + total + ' rastreo(s)</h5><p class="cvx-hint">Estos rastreos no cumplen ninguna regla. Revisa el patrón, elige el flujo y pulsa “Guardar regla”: se aplicará a todos los que coincidan, ahora y en próximas cargas.</p>' +
                 '<table class="cvx-t"><thead><tr><th>Ejemplo</th><th>Cant.</th><th>Empieza con</th><th>Largo</th><th>Tipo</th><th>Flujo</th><th></th></tr></thead><tbody>';
             cvxGrupos.forEach(function (g, i) {
                 h += '<tr><td class="cvx-ej">' + cvEsc(g.ej.join(' · ')) + '</td><td><b>' + g.n + '</b></td>' +
@@ -16549,10 +16556,20 @@
 
     window.cvxSetG = function (i, campo, val, sel) {
         var g = cvxGrupos[i]; if (!g) return;
-        if (campo === 'flujo' && val === '__nuevo__') { val = cvxNuevoFlujo(); g.flujo = val; cvxPintar(); return; }
+        if (campo === 'flujo' && val === '__nuevo__') { val = cvxNuevoFlujo(); g.flujo = val; if (val) cvxGuardarGrupo(i); else cvxPintar(); return; }
         if (campo === 'largo') val = parseInt(val, 10) || 0;
         if (campo === 'prefijo') val = String(val || '').trim().toUpperCase();
         g[campo] = val;
+        if (campo === 'flujo' && val) cvxGuardarGrupo(i);   // al elegir el flujo la regla queda guardada: no se vuelve a preguntar
+    };
+    window.cvxGuardarTodos = function () {
+        var n = 0;
+        cvxGrupos.slice().forEach(function (g) {
+            if (!g.flujo || (!g.prefijo && !g.largo && g.tipo === 'cualquiera')) return;
+            cvxReglas.push({ id: cvxUid(), flujo: g.flujo, prefijo: g.prefijo, largo: g.largo || 0, tipo: g.tipo }); n++;
+        });
+        if (!n) return alert('Elige primero el flujo de cada patrón.');
+        cvxCambio();
     };
     window.cvxGuardarGrupo = function (i) {
         var g = cvxGrupos[i]; if (!g) return;
@@ -16641,8 +16658,134 @@
         }
     })();
 
+    /* ---------- Archivos guardados en la nube: la tabla ya con flujo y validación RF, para volver a verla cuando quieras ---------- */
+    var CA_RTDB = 'cd_ves_archivos', CA_CHUNK = 400, caMetas = {}, caCache = {}, caAbierto = false, caTimer = null, caErr = '', cvSnap = null;
+    var CA_INP = 'width:100%;padding:8px 10px;margin:4px 0 6px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-main);font-family:inherit;font-size:13px;';
+
+    function caBanner() {
+        var b = $('cvSnapBanner'); if (!b) return;
+        if (!cvSnap) { b.style.display = 'none'; b.innerHTML = ''; return; }
+        var m = caMetas[cvSnap] || {};
+        b.style.display = '';
+        b.innerHTML = '📂 Estás viendo el archivo guardado <b>' + cvEsc(m.nombre || cvSnap) + '</b> (' + cvEsc(cvFmt(new Date(m.fecha || 0))) + '). La validación RF es la de ese momento. <button type="button" class="cv-carga-x" style="color:var(--primary);margin-left:8px;" onclick="caVolver()">Volver a la vista actual</button>';
+    }
+    function caCargar(id) {
+        if (caCache[id]) return Promise.resolve(caCache[id]);
+        var m = caMetas[id]; if (!m) return Promise.reject(new Error('El archivo ya no existe.'));
+        return rtdb.ref(CA_RTDB + '/data/' + id).once('value').then(function (snap) {
+            var v = snap.val() || {}, rows = [];
+            Object.keys(v).sort(function (a, b) { return a - b; }).forEach(function (k) { if (typeof v[k] === 'string') rows = rows.concat(cvDes(v[k])); });
+            return (caCache[id] = { cols: JSON.parse(m.cols || '[]'), rows: rows });
+        });
+    }
+    function caOrden() { return Object.keys(caMetas).sort(function (a, b) { return (caMetas[b].fecha || 0) - (caMetas[a].fecha || 0); }); }
+    function caPintar() {
+        var box = $('cvArchBox'); if (!box) return;
+        if (!caAbierto) { box.style.display = 'none'; return; }
+        if (!$('caBuscar')) {
+            box.innerHTML = '<div class="cv-cargas-h"><span>Archivos guardados en la nube</span><span class="cv-cargas-n">Quedan con el flujo y la validación RF del momento en que los guardas</span></div>' +
+                '<input id="caBuscar" type="text" placeholder="Buscar por nombre de archivo o por rastreo (mín. 4 caracteres)…" oninput="caBuscar()" style="' + CA_INP + '"><div id="caLista"></div><div id="caRes"></div>';
+        }
+        box.style.display = '';
+        var q = ($('caBuscar').value || '').trim().toUpperCase();
+        var ids = caOrden().filter(function (id) { var m = caMetas[id]; return !q || (String(m.nombre) + ' ' + String(m.usuario || '')).toUpperCase().indexOf(q) >= 0; });
+        $('caLista').innerHTML = caErr ? '<div class="cv-cargas-n err">☁ ' + cvEsc(caErr) + '</div>' : (ids.length ? ids.map(function (id) {
+            var m = caMetas[id];
+            return '<div class="cv-carga"><div><div class="cv-carga-t">' + cvEsc(m.nombre) + (cvSnap === id ? ' · 👁 en pantalla' : '') + '</div><div class="cv-carga-s">' + cvEsc(cvFmt(new Date(m.fecha || 0))) + ' · ' + (m.filas || 0) + ' fila(s) · ✅ ' + (m.validados || 0) + ' validadas' + (m.usuario ? ' · ' + cvEsc(m.usuario) : '') + '</div></div>' +
+                '<div style="display:flex;gap:6px;"><button type="button" class="cv-carga-x" style="color:var(--primary);" title="Reemplaza lo que ves por este archivo" onclick="caAbrir(\'' + cvEsc(id) + '\')">Abrir</button><button type="button" class="cv-carga-x" onclick="caEliminar(\'' + cvEsc(id) + '\')">Eliminar</button></div></div>';
+        }).join('') : '<div class="cv-carga-s" style="padding:8px 0;">' + (Object.keys(caMetas).length ? 'Ningún archivo coincide por nombre.' : 'Aún no guardas ningún archivo.') + '</div>');
+    }
+    window.caToggle = function () { caAbierto = !caAbierto; caPintar(); };
+
+    // Búsqueda dentro de TODOS los archivos guardados (por rastreo, rol, responsable, flujo, etc.)
+    window.caBuscar = function () {
+        caPintar(); clearTimeout(caTimer);
+        var q = ($('caBuscar').value || '').trim().toUpperCase(), res = $('caRes');
+        if (q.length < 4) { res.innerHTML = ''; return; }
+        res.innerHTML = '<div class="cv-carga-s" style="padding:6px 0;">Buscando dentro de los archivos…</div>';
+        caTimer = setTimeout(function () {
+            Promise.all(caOrden().map(function (id) { return caCargar(id).then(function (d) { return { id: id, d: d }; }, function () { return null; }); })).then(function (lst) {
+                if (($('caBuscar').value || '').trim().toUpperCase() !== q) return;
+                var out = [], n = 0;
+                lst.forEach(function (x) {
+                    if (!x) return;
+                    var cf = x.d.cols.filter(function (c) { return cvKey(c) === 'flujo'; })[0], cr = x.d.cols.filter(function (c) { return cvKey(c) === 'rastreo'; })[0];
+                    x.d.rows.forEach(function (r) {
+                        if (n >= 80) return;
+                        if (x.d.cols.map(function (c) { return String(cvFmt(r[c])).toUpperCase(); }).join(' | ').indexOf(q) < 0) return;
+                        n++;
+                        out.push('<tr><td>' + cvEsc(caMetas[x.id].nombre) + '</td><td class="vr-cod">' + cvEsc(cr ? cvFmt(r[cr]) : '') + '</td><td>' + cvEsc(cf ? cvFmt(r[cf]) : '') + '</td><td>' + cvEsc(r.__vt || '—') + '</td><td>' + cvEsc(r.__vq || '') + '</td><td><button type="button" class="cv-carga-x" style="color:var(--primary);" onclick="caAbrir(\'' + cvEsc(x.id) + '\',\'' + cvEsc(q) + '\')">Ver</button></td></tr>');
+                    });
+                });
+                res.innerHTML = out.length ? '<div class="vr-table-scroll" style="max-height:260px;"><table class="vr-table"><thead><tr><th>Archivo</th><th>Rastreo</th><th>Flujo</th><th>Validación RF</th><th>Validado por · hora</th><th></th></tr></thead><tbody>' + out.join('') + '</tbody></table></div>' + (n >= 80 ? '<div class="cv-carga-s">Mostrando los primeros 80. Afina la búsqueda.</div>' : '')
+                    : '<div class="cv-carga-s" style="padding:6px 0;">Sin coincidencias en los archivos guardados.</div>';
+            });
+        }, 450);
+    };
+
+    // Abrir = reemplaza lo que ves por el archivo guardado (no toca las cargas ni lo guardado)
+    window.caAbrir = function (id, q) {
+        caCargar(id).then(function (d) {
+            cvSnap = id; cvCols = d.cols.slice(); cvFilas = d.rows;
+            cvNombre = (caMetas[id] || {}).nombre || '';
+            if ($('cvBuscar')) $('cvBuscar').value = q || '';
+            caBanner(); caPintar(); cvBadge(); cvPoblarFiltros(); cvRender();
+        }).catch(function (e) { alert('No se pudo abrir el archivo: ' + (e && e.message ? e.message : e)); });
+    };
+    window.caVolver = function () {
+        cvSnap = null; if ($('cvBuscar')) $('cvBuscar').value = '';
+        caBanner(); caPintar(); cvReconstruir();
+    };
+
+    window.cvGuardarArchivo = function () {
+        if (cvSnap) return alert('Estás viendo un archivo guardado. Pulsa "Volver a la vista actual" para guardar la tabla actual.');
+        if (!cvFilas.length) return alert('No hay datos para guardar. Carga primero el Excel.');
+        if (!cvxNubeOk()) return alert('Sin conexión a la nube.');
+        var pend = cvFilas.filter(function (f) { return f.__sc; }).length;
+        if (pend && !confirm(pend + ' rastreo(s) siguen "Sin clasificar". ¿Guardar de todos modos?')) return;
+        var nombre = (prompt('Nombre con el que se guarda en la nube:', 'CD-VES_' + new Date().toLocaleDateString().replace(/\//g, '-')) || '').trim(); if (!nombre) return;
+        var viejo = Object.keys(caMetas).filter(function (id) { return String(caMetas[id].nombre).toLowerCase() === nombre.toLowerCase(); })[0];
+        if (viejo && !confirm('Ya existe "' + nombre + '". ¿Reemplazarlo por esta versión?')) return;
+        var cols = cvCols.slice();
+        var rows = cvFilas.map(function (f) { var o = {}; cols.forEach(function (c) { o[c] = f[c]; }); o.__vt = cvValTxt(f); o.__vq = cvValQuien(f); return o; });
+        var vals = cvFilas.filter(function (f) { var v = cvValDe(f); return v && v.completo; }).length;
+        var id = 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), n = Math.ceil(rows.length / CA_CHUNK);
+        var meta = { id: id, nombre: nombre, fecha: Date.now(), filas: rows.length, validados: vals, usuario: cvUsuario(), cols: JSON.stringify(cols), chunks: n };
+        cvEstadoDrop('', 'Guardando "' + nombre + '" en la nube…');
+        var p = Promise.resolve();
+        for (var i = 0; i < n; i++) (function (i) { p = p.then(function () { return rtdb.ref(CA_RTDB + '/data/' + id + '/' + i).set(cvSer(rows.slice(i * CA_CHUNK, (i + 1) * CA_CHUNK))); }); })(i);
+        p.then(function () { return rtdb.ref(CA_RTDB + '/meta/' + id).set(meta); })
+         .then(function () {
+            caCache[id] = { cols: cols, rows: rows };
+            if (viejo) { var up = {}; up['meta/' + viejo] = null; up['data/' + viejo] = null; delete caCache[viejo]; return rtdb.ref(CA_RTDB).update(up); }
+         })
+         .then(function () { cvEstadoDrop('', '✔ "' + nombre + '" guardado en la nube (' + rows.length + ' filas, ' + vals + ' validadas).'); caAbierto = true; caPintar(); })
+         .catch(function (err) {
+            try { rtdb.ref(CA_RTDB + '/data/' + id).remove().catch(function () {}); } catch (e) {}
+            cvEstadoDrop('err', 'No se pudo guardar: ' + (err && err.message ? err.message : err));
+            alert('No se pudo guardar en la nube: ' + (err && err.message ? err.message : err) + '\n\nSi dice "permission denied", agrega el nodo "cd_ves_archivos" a las Reglas de Firebase.');
+         });
+    };
+    window.caEliminar = function (id) {
+        var m = caMetas[id]; if (!m) return;
+        if (!cvPuedeBorrar(m)) return alert('Solo quien guardó este archivo o un usuario con permiso para borrar puede eliminarlo.');
+        if (!confirm('¿Eliminar el archivo guardado "' + m.nombre + '"?\n\nSe quita para TODOS los usuarios.')) return;
+        var up = {}; up['meta/' + id] = null; up['data/' + id] = null;
+        rtdb.ref(CA_RTDB).update(up).then(function () { delete caCache[id]; if (cvSnap === id) window.caVolver(); })
+            .catch(function (err) { alert('No se pudo eliminar: ' + (err && err.message ? err.message : err)); });
+    };
+    function caEscuchar() {
+        if (!cvxNubeOk()) return;
+        try {
+            rtdb.ref(CA_RTDB + '/meta').on('value', function (snap) {
+                caMetas = snap.val() || {}; caErr = ''; caPintar(); caBanner();
+            }, function (err) { caErr = 'Sin acceso a los archivos guardados: ' + (err && err.message ? err.message : err); caPintar(); });
+        } catch (e) { console.error('CD VES: archivos', e); }
+    }
+
     cvEscucharNube();
     cvEscucharValid();
+    caEscuchar();
 
     // Arrastrar y soltar sobre el cuadro de carga
     document.addEventListener('DOMContentLoaded', function () {

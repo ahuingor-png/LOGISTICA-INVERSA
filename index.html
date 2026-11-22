@@ -1374,73 +1374,141 @@
         #modalVistaSender .vr-table-scroll { max-height: 460px; }
         /* ===== Cruce GPO (dentro de Vista de Sender) ===== */
         #modalCruceGPO .cg-shell { display:flex; flex-direction:column; width:min(1280px,97vw); height:92vh; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(15,23,42,.35); }
+        #modalCruceTMS .cg-shell { display:flex; flex-direction:column; width:min(1280px,97vw); height:92vh; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(15,23,42,.35); }
         #modalCruceGPO .cg-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; background:var(--card-bg); border-bottom:1px solid var(--border); }
+        #modalCruceTMS .cg-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; background:var(--card-bg); border-bottom:1px solid var(--border); }
         #modalCruceGPO .cg-title { display:flex; align-items:center; gap:12px; min-width:0; }
+        #modalCruceTMS .cg-title { display:flex; align-items:center; gap:12px; min-width:0; }
         #modalCruceGPO .cg-ico { width:38px; height:38px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+        #modalCruceTMS .cg-ico { width:38px; height:38px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
         #modalCruceGPO .cg-title h4 { margin:0; font-size:17px; font-weight:800; color:var(--text-main); }
+        #modalCruceTMS .cg-title h4 { margin:0; font-size:17px; font-weight:800; color:var(--text-main); }
         #modalCruceGPO .cg-title p { margin:2px 0 0; font-size:12px; color:var(--text-muted); }
+        #modalCruceTMS .cg-title p { margin:2px 0 0; font-size:12px; color:var(--text-muted); }
         #modalCruceGPO .cg-close { width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); font-size:20px; line-height:1; cursor:pointer; }
+        #modalCruceTMS .cg-close { width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); font-size:20px; line-height:1; cursor:pointer; }
         #modalCruceGPO .cg-close:hover { background:var(--bg); color:var(--text-main); }
+        #modalCruceTMS .cg-close:hover { background:var(--bg); color:var(--text-main); }
         #modalCruceGPO .cg-body { flex:1; overflow-y:auto; padding:16px 20px 24px; }
+        #modalCruceTMS .cg-body { flex:1; overflow-y:auto; padding:16px 20px 24px; }
         #modalCruceGPO .cg-files { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:12px; }
+        #modalCruceTMS .cg-files { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:12px; }
         #modalCruceGPO .cg-file { background:var(--card-bg); border:1px dashed var(--border); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+        #modalCruceTMS .cg-file { background:var(--card-bg); border:1px dashed var(--border); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-width:0; }
         #modalCruceGPO .cg-file.drag { border-style:solid; border-color:var(--primary); background:rgba(61,90,128,.09); }
+        #modalCruceTMS .cg-file.drag { border-style:solid; border-color:var(--primary); background:rgba(61,90,128,.09); }
         #modalCruceGPO .cg-file.ok { border-style:solid; border-color:rgba(63,136,98,.55); }
+        #modalCruceTMS .cg-file.ok { border-style:solid; border-color:rgba(63,136,98,.55); }
         #modalCruceGPO .cg-file.err { border-style:solid; border-color:rgba(178,69,63,.55); }
+        #modalCruceTMS .cg-file.err { border-style:solid; border-color:rgba(178,69,63,.55); }
         #modalCruceGPO .cg-file-t { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); }
+        #modalCruceTMS .cg-file-t { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); }
         #modalCruceGPO .cg-file-s { font-size:12px; color:var(--text-main); overflow-wrap:anywhere; min-height:16px; }
+        #modalCruceTMS .cg-file-s { font-size:12px; color:var(--text-main); overflow-wrap:anywhere; min-height:16px; }
         #modalCruceGPO .cg-file.err .cg-file-s { color:var(--danger); }
+        #modalCruceTMS .cg-file.err .cg-file-s { color:var(--danger); }
         #modalCruceGPO .cg-file-h { font-size:11px; color:var(--text-muted); }
+        #modalCruceTMS .cg-file-h { font-size:11px; color:var(--text-muted); }
         #modalCruceGPO .cg-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 13px; font-size:12px; font-weight:600; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); cursor:pointer; font-family:inherit; white-space:nowrap; }
+        #modalCruceTMS .cg-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 13px; font-size:12px; font-weight:600; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); cursor:pointer; font-family:inherit; white-space:nowrap; }
         #modalCruceGPO .cg-btn:hover { background:var(--bg); border-color:var(--primary); color:var(--primary); }
+        #modalCruceTMS .cg-btn:hover { background:var(--bg); border-color:var(--primary); color:var(--primary); }
         #modalCruceGPO .cg-btn.primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+        #modalCruceTMS .cg-btn.primary { background:var(--primary); color:#fff; border-color:var(--primary); }
         #modalCruceGPO .cg-btn.primary:hover { background:var(--primary-hover); color:#fff; }
+        #modalCruceTMS .cg-btn.primary:hover { background:var(--primary-hover); color:#fff; }
         #modalCruceGPO .cg-btn:disabled { opacity:.45; cursor:not-allowed; }
+        #modalCruceTMS .cg-btn:disabled { opacity:.45; cursor:not-allowed; }
         #modalCruceGPO .cg-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin-bottom:14px; }
+        #modalCruceTMS .cg-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin-bottom:14px; }
         #modalCruceGPO .cg-estados { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:12px; color:var(--text-muted); }
+        #modalCruceTMS .cg-estados { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:12px; color:var(--text-muted); }
         #modalCruceGPO .cg-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border:1px solid var(--border); border-radius:999px; background:var(--card-bg); color:var(--text-main); font-size:12px; font-weight:600; cursor:pointer; }
+        #modalCruceTMS .cg-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border:1px solid var(--border); border-radius:999px; background:var(--card-bg); color:var(--text-main); font-size:12px; font-weight:600; cursor:pointer; }
         #modalCruceGPO .cg-chip input { accent-color:var(--primary); }
+        #modalCruceTMS .cg-chip input { accent-color:var(--primary); }
         #modalCruceGPO .cg-nube { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 14px; padding:9px 14px; margin-bottom:12px; font-size:12px; color:var(--text-main); background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--primary); border-radius:10px; }
+        #modalCruceTMS .cg-nube { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 14px; padding:9px 14px; margin-bottom:12px; font-size:12px; color:var(--text-main); background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--primary); border-radius:10px; }
         #modalCruceGPO .cg-nube.ok { border-left-color:var(--success); }
+        #modalCruceTMS .cg-nube.ok { border-left-color:var(--success); }
         #modalCruceGPO .cg-nube.err { border-left-color:var(--danger); color:var(--danger); }
+        #modalCruceTMS .cg-nube.err { border-left-color:var(--danger); color:var(--danger); }
         #modalCruceGPO .cg-nube small { color:var(--text-muted); }
+        #modalCruceTMS .cg-nube small { color:var(--text-muted); }
         #modalCruceGPO .cg-aviso { margin-bottom:12px; padding:11px 14px; border-radius:10px; font-size:13px; font-weight:700; border:1px solid var(--success); background:rgba(63,136,98,.12); color:var(--success); }
+        #modalCruceTMS .cg-aviso { margin-bottom:12px; padding:11px 14px; border-radius:10px; font-size:13px; font-weight:700; border:1px solid var(--success); background:rgba(63,136,98,.12); color:var(--success); }
         #modalCruceGPO .cg-aviso.err { border-color:var(--danger); background:rgba(178,69,63,.10); color:var(--danger); }
+        #modalCruceTMS .cg-aviso.err { border-color:var(--danger); background:rgba(178,69,63,.10); color:var(--danger); }
         #modalCruceGPO .cg-aviso.wait { border-color:var(--border); background:var(--bg); color:var(--text-muted); }
+        #modalCruceTMS .cg-aviso.wait { border-color:var(--border); background:var(--bg); color:var(--text-muted); }
         #modalCruceGPO .cg-inp { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); font-family:inherit; flex:1; min-width:130px; }
+        #modalCruceTMS .cg-inp { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); font-family:inherit; flex:1; min-width:130px; }
         #modalCruceGPO .cg-reglas-form { display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px; align-items:center; }
+        #modalCruceTMS .cg-reglas-form { display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px; align-items:center; }
         #modalCruceGPO .cg-reglas-list { padding:0 14px 12px; display:flex; flex-direction:column; gap:6px; font-size:12px; }
+        #modalCruceTMS .cg-reglas-list { padding:0 14px 12px; display:flex; flex-direction:column; gap:6px; font-size:12px; }
         #modalCruceGPO .cg-regla { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
+        #modalCruceTMS .cg-regla { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
         #modalCruceGPO .cg-regla small { color:var(--text-muted); }
+        #modalCruceTMS .cg-regla small { color:var(--text-muted); }
         #modalCruceGPO .cg-regla-x { border:none; background:transparent; color:var(--danger); font-size:18px; line-height:1; cursor:pointer; padding:0 6px; }
+        #modalCruceTMS .cg-regla-x { border:none; background:transparent; color:var(--danger); font-size:18px; line-height:1; cursor:pointer; padding:0 6px; }
         #modalCruceGPO .cg-nota { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
+        #modalCruceTMS .cg-nota { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
         #modalCruceGPO .cg-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
+        #modalCruceTMS .cg-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
         #modalCruceGPO .cg-kpi { background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--kpi,var(--primary)); border-radius:10px; padding:10px 14px; }
+        #modalCruceTMS .cg-kpi { background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--kpi,var(--primary)); border-radius:10px; padding:10px 14px; }
         #modalCruceGPO .cg-kpi-l { font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; }
+        #modalCruceTMS .cg-kpi-l { font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; }
         #modalCruceGPO .cg-kpi-v { font-size:24px; font-weight:800; color:var(--kpi,var(--primary)); font-variant-numeric:tabular-nums; line-height:1.15; }
+        #modalCruceTMS .cg-kpi-v { font-size:24px; font-weight:800; color:var(--kpi,var(--primary)); font-variant-numeric:tabular-nums; line-height:1.15; }
         #modalCruceGPO .cg-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:14px; }
+        #modalCruceTMS .cg-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:14px; }
         #modalCruceGPO .cg-card-h { font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; padding:11px 14px; border-bottom:1px solid var(--border); }
+        #modalCruceTMS .cg-card-h { font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; padding:11px 14px; border-bottom:1px solid var(--border); }
         #modalCruceGPO .cg-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); }
+        #modalCruceTMS .cg-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); }
         #modalCruceGPO .cg-search { display:flex; align-items:center; gap:8px; flex:1; min-width:220px; padding:0 11px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
+        #modalCruceTMS .cg-search { display:flex; align-items:center; gap:8px; flex:1; min-width:220px; padding:0 11px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
         #modalCruceGPO .cg-search input { flex:1; border:none; outline:none; background:transparent; padding:9px 0; font-size:12px; color:var(--text-main); font-family:inherit; }
+        #modalCruceTMS .cg-search input { flex:1; border:none; outline:none; background:transparent; padding:9px 0; font-size:12px; color:var(--text-main); font-family:inherit; }
         #modalCruceGPO .cg-sel { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--text-main); font-family:inherit; max-width:230px; }
+        #modalCruceTMS .cg-sel { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--text-main); font-family:inherit; max-width:230px; }
         #modalCruceGPO .cg-count { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+        #modalCruceTMS .cg-count { font-size:12px; color:var(--text-muted); white-space:nowrap; }
         #modalCruceGPO .cg-count b { color:var(--text-main); }
+        #modalCruceTMS .cg-count b { color:var(--text-main); }
         #modalCruceGPO .cg-scroll { overflow:auto; max-height:430px; }
+        #modalCruceTMS .cg-scroll { overflow:auto; max-height:430px; }
         #modalCruceGPO .cg-table { width:100%; border-collapse:collapse; font-size:12px; }
+        #modalCruceTMS .cg-table { width:100%; border-collapse:collapse; font-size:12px; }
         #modalCruceGPO .cg-table th { position:sticky; top:0; z-index:1; background:var(--bg); text-align:left; padding:10px 12px; font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); white-space:nowrap; }
+        #modalCruceTMS .cg-table th { position:sticky; top:0; z-index:1; background:var(--bg); text-align:left; padding:10px 12px; font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); white-space:nowrap; }
         #modalCruceGPO .cg-table td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text-main); white-space:nowrap; }
+        #modalCruceTMS .cg-table td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text-main); white-space:nowrap; }
         #modalCruceGPO .cg-table tbody tr:nth-child(even) { background:rgba(100,116,139,.04); }
+        #modalCruceTMS .cg-table tbody tr:nth-child(even) { background:rgba(100,116,139,.04); }
         #modalCruceGPO .cg-table tbody tr:hover { background:rgba(61,90,128,.09); }
+        #modalCruceTMS .cg-table tbody tr:hover { background:rgba(61,90,128,.09); }
         #modalCruceGPO .cg-table td.cod { font-weight:700; font-family:ui-monospace,Menlo,Consolas,monospace; }
+        #modalCruceTMS .cg-table td.cod { font-weight:700; font-family:ui-monospace,Menlo,Consolas,monospace; }
         #modalCruceGPO .cg-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+        #modalCruceTMS .cg-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
         #modalCruceGPO .cg-table tfoot td { font-weight:800; background:var(--bg); }
+        #modalCruceTMS .cg-table tfoot td { font-weight:800; background:var(--bg); }
         #modalCruceGPO .cg-pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:700; background:rgba(100,116,139,.14); color:var(--text-muted); }
+        #modalCruceTMS .cg-pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:700; background:rgba(100,116,139,.14); color:var(--text-muted); }
         #modalCruceGPO .cg-pill.ok { background:rgba(63,136,98,.14); color:var(--success); }
+        #modalCruceTMS .cg-pill.ok { background:rgba(63,136,98,.14); color:var(--success); }
         #modalCruceGPO .cg-pill.warn { background:rgba(185,133,47,.18); color:var(--warning); }
+        #modalCruceTMS .cg-pill.warn { background:rgba(185,133,47,.18); color:var(--warning); }
         #modalCruceGPO .cg-pill.info { background:rgba(61,90,128,.14); color:var(--primary); }
+        #modalCruceTMS .cg-pill.info { background:rgba(61,90,128,.14); color:var(--primary); }
         #modalCruceGPO .cg-vacio { padding:26px 14px; text-align:center; color:var(--text-muted); font-size:12.5px; font-style:italic; }
+        #modalCruceTMS .cg-vacio { padding:26px 14px; text-align:center; color:var(--text-muted); font-size:12.5px; font-style:italic; }
         @media (max-width: 800px) { #modalCruceGPO .cg-files { grid-template-columns:1fr; } #modalCruceGPO .cg-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } #modalCruceGPO .cg-shell { width:100vw; height:100vh; border-radius:0; } }
+        @media (max-width: 800px) { #modalCruceTMS .cg-files { grid-template-columns:1fr; } #modalCruceTMS .cg-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } #modalCruceTMS .cg-shell { width:100vw; height:100vh; border-radius:0; } }
         @media (max-width: 1100px) { #modalVistaSender .vr-filters { grid-template-columns: repeat(3, minmax(0,1fr)); } }
         #modalCDVES .vr-content { padding: 0 !important; background: var(--bg) !important; overflow: hidden; }
         #modalCDVES .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 1480px; margin: 0 auto; }
@@ -2723,6 +2791,7 @@
                         <button class="vr-btn vr-btn-primary" onclick="descargarSenderFiltrado()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
                         <button class="vr-btn vr-btn-ghost" onclick="abrirReporteSender()" title="Reporte con ruta, código y bultos de lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg> Reporte</button>
                         <button class="vr-btn vr-btn-ghost" onclick="abrirModalCruceGPO()" title="Carga la base y el GPO y cruza por Rastreo"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="m18 14 4 4-4 4"/></svg> Cruce GPO</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="abrirModalCruceTMS()" title="Cruza directo el export del TMS (CSV o Excel), sin Base ni GPO">Cruce TMS (CSV)</button>
                         <button class="vr-btn vr-btn-danger" id="btnEliminarSenderSel" onclick="eliminarSenderSeleccionados()" style="display:none;" title="Elimina solo las filas marcadas"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg> <span id="lblSenderSel">Eliminar seleccionados</span></button>
                         <button class="vr-btn vr-btn-danger" id="btnEliminarSenderFiltrados" onclick="eliminarSenderFiltrados()" title="Elimina todo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg> Eliminar filtrados</button>
                     </div>
@@ -2992,13 +3061,6 @@
                     <input type="file" id="cgInpGpo" accept=".xlsx,.xlsm,.xls" style="display:none;" onchange="cgCargarArchivo('gpo', this)">
                 </div>
             </div>
-            <div class="cg-file" id="cgFileTms" style="margin-bottom:12px;">
-                <span class="cg-file-t">Otra forma · Export del TMS (CSV o Excel), sin Base ni GPO</span>
-                <span class="cg-file-s" id="cgFileTmsTxt">Sin archivo</span>
-                <span class="cg-file-h">El archivo tal cual sale del TMS (columnas número, formaEntrega, nombreEstadoEnvio, nombreRemitente, poblacionDest y direccionDest). Al elegirlo el cruce se hace solo, no hace falta cargar la Base ni el GPO. También puedes <b>arrastrarlo a este cuadro</b>.</span>
-                <div><button type="button" class="cg-btn" onclick="document.getElementById('cgInpTms').click()">Elegir archivo…</button></div>
-                <input type="file" id="cgInpTms" accept=".csv,.txt,.xlsx,.xlsm,.xls" style="display:none;" onchange="cgCargarTMS(this)">
-            </div>
             <div class="cg-bar">
                 <button type="button" class="cg-btn primary" id="cgBtnCruzar" onclick="cgEjecutarCruce()" disabled>Realizar cruce</button>
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
@@ -3049,6 +3111,72 @@
                         <table class="cg-table">
                             <thead><tr><th>#</th><th>Rastreo</th><th>Forma de entrega</th><th>Estado TMS</th><th>Nombre seller</th><th>Distrito cliente</th><th>Comentario final</th></tr></thead>
                             <tbody id="cgTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cruce TMS: export del TMS (CSV/Excel) tal cual, funciona aparte del Cruce GPO -->
+<div id="modalCruceTMS" class="modal" style="z-index: 9300;">
+    <div class="cg-shell">
+        <div class="cg-head">
+            <div class="cg-title">
+                <div>
+                    <h4>Cruce TMS (export en CSV o Excel)</h4>
+                    <p>Forma de entrega, Estado TMS, Seller, Distrito de cliente y Comentario final (tienda), sin Base ni GPO</p>
+                </div>
+            </div>
+            <button type="button" class="cg-close" onclick="cerrarModalCruceTMS()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="cg-body">
+            <div class="cg-file" id="ctFile" style="margin-bottom:12px;">
+                <span class="cg-file-t">Export del TMS</span>
+                <span class="cg-file-s" id="ctFileTxt">Sin archivo</span>
+                <span class="cg-file-h">El archivo tal cual sale del TMS, con las columnas número, formaEntrega, nombreEstadoEnvio, nombreRemitente, poblacionDest y direccionDest. Elígelo o <b>arrástralo a este cuadro</b>; el cruce se hace solo.</span>
+                <div><button type="button" class="cg-btn primary" onclick="document.getElementById('ctInp').click()">Elegir archivo…</button></div>
+                <input type="file" id="ctInp" accept=".csv,.txt,.xlsx,.xlsm,.xls" style="display:none;" onchange="ctCargarArchivo(this)">
+            </div>
+            <div class="cg-bar">
+                <div class="cg-estados"><span>Estados TMS considerados:</span>
+                    <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="REINGRESO" checked onchange="ctRender(); ctRevisarEnvio()"> Reingreso</label>
+                    <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="ctRender(); ctRevisarEnvio()"> En bodega Crossdock</label>
+                    <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="REENVIO" checked onchange="ctRender(); ctRevisarEnvio()"> Reenvío</label>
+                    <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="REENVIO AL CLIENTE" checked onchange="ctRender(); ctRevisarEnvio()"> Reenvío al cliente</label>
+                    <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="REENVIO A CLIENTE" checked onchange="ctRender(); ctRevisarEnvio()"> Reenvío a cliente</label>
+                </div>
+            </div>
+            <div class="cg-aviso" id="ctAviso" hidden></div>
+            <div class="cg-card">
+                <div class="cg-card-h">Reglas Seller + Distrito → Comentario final (se agregan o quitan en «Cruce GPO»)</div>
+                <div class="cg-reglas-list" id="ctReglasList"></div>
+            </div>
+            <div class="cg-nota">El <b>Comentario final</b> es la tienda según la dirección de entrega del archivo y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las reglas Seller + Distrito se aplican solo a Click &amp; Collect cuando la dirección no da tienda. El resultado es el mismo que el del Cruce GPO, y la plantilla de carga comparte el candado con él para no cargarse dos veces.</div>
+            <div id="ctResultado" hidden>
+                <div class="cg-kpis" id="ctKpis"></div>
+                <div class="cg-card">
+                    <div class="cg-card-h">Resumen por tienda</div>
+                    <div class="cg-scroll" style="max-height:260px;"><table class="cg-table" id="ctTablaResumen"></table></div>
+                </div>
+                <div class="cg-card">
+                    <div class="cg-toolbar">
+                        <div class="cg-search">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                            <input type="text" id="ctBuscar" placeholder="Buscar rastreo, seller, distrito, tienda…  (separa con coma para varios)" oninput="ctRender()">
+                        </div>
+                        <select class="cg-sel" id="ctSelTienda" onchange="ctRender()"></select>
+                        <select class="cg-sel" id="ctSelForma" onchange="ctRender()"></select>
+                        <span class="cg-count"><b id="ctLblVisibles">0</b> registro(s)</span>
+                        <button type="button" class="cg-btn primary" onclick="ctDescargarExcel()">Descargar Excel</button>
+                        <button type="button" class="cg-btn" onclick="ctDescargarPlantilla()" title="Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final (solo filas con tienda)">Descargar plantilla de carga</button>
+                        <button type="button" class="cg-btn primary" id="ctBtnEnviarCarga" onclick="ctEnviarPlantillaACarga()" title="Manda la plantilla directo a Cargar Bases · Base Ruta, como si hubieras subido el Excel">Enviar a Cargar Bases (Ruta)</button>
+                    </div>
+                    <div class="cg-scroll">
+                        <table class="cg-table">
+                            <thead><tr><th>#</th><th>Rastreo</th><th>Forma de entrega</th><th>Estado TMS</th><th>Nombre seller</th><th>Distrito cliente</th><th>Comentario final</th></tr></thead>
+                            <tbody id="ctTbody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -15967,8 +16095,8 @@
 
     // Recalcula la tienda de cada fila: primero la de la dirección; si no hay, la regla Seller + Distrito.
     // Ambas respetan el filtro Click & Collect: un pedido que no es Click & Collect nunca queda con tienda.
-    function aplicarReglas() {
-        cg.filas.forEach(function (f) {
+    function aplicarReglas(filas) {
+        (filas || cg.filas).forEach(function (f) {
             var b = f.tiendaBase == null ? '' : f.tiendaBase;
             var t = b;
             if (!esClickCollect(f.forma)) t = '';
@@ -16187,73 +16315,274 @@
         });
         return filas;
     }
-    function marcarTMS(clase, texto) {
-        var box = el('cgFileTms'); if (!box) return;
+    // ---------- Cruce TMS (modal aparte): export del TMS en CSV o Excel, sin Base ni GPO ----------
+    // Funciona por su cuenta: mismas reglas de tienda, mismo resumen, mismo Excel y misma plantilla de carga
+    // que el cruce Base + GPO, y comparte con él el candado para que la misma plantilla no se cargue dos veces.
+    var ct = { filas: [], visibles: [], archivo: '', enviandoAhora: false };
+    function ctActivos() {
+        var s = {};
+        document.querySelectorAll('#modalCruceTMS .ct-chk-estado').forEach(function (c) { if (c.checked) s[c.value] = true; });
+        return s;
+    }
+    function ctMarcar(clase, texto) {
+        var box = el('ctFile'); if (!box) return;
         box.classList.remove('ok', 'err');
         if (clase) box.classList.add(clase);
-        el('cgFileTmsTxt').textContent = texto;
+        el('ctFileTxt').textContent = texto;
     }
-    function leerTMS(file) {
-        marcarTMS('', 'Leyendo ' + file.name + '…');
+    function ctAviso(clase, html) {
+        var aviso = el('ctAviso');
+        aviso.className = 'cg-aviso' + (clase ? ' ' + clase : '');
+        aviso.innerHTML = html; aviso.hidden = false;
+        try { aviso.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+    }
+    function ctAplicarReglas() { aplicarReglas(ct.filas); }
+    function ctPintarReglas() {
+        var box = el('ctReglasList'); if (!box) return;
+        box.innerHTML = reglasActivas().map(function (r) {
+            return '<div class="cg-regla"><span>Seller <b>' + esc(r.seller) + '</b>' + (r.distrito ? ' · Distrito <b>' + esc(r.distrito) + '</b>' : ' · cualquier distrito') + ' → <b>' + esc(r.tienda) + '</b></span></div>';
+        }).join('');
+    }
+    function ctReaplicar() {
+        if (!ct.filas.length) return;
+        ctAplicarReglas(); ctPoblar(); ctRender(); ctRevisarEnvio();
+    }
+    function ctLeer(file) {
+        ctMarcar('', 'Leyendo ' + file.name + '…');
         var fr = new FileReader();
-        fr.onerror = function () { marcarTMS('err', 'No se pudo leer el archivo.'); };
+        fr.onerror = function () { ctMarcar('err', 'No se pudo leer el archivo.'); };
         fr.onload = function (e) {
             try {
                 var rows = null, info = null;
                 if (/\.(xlsx|xlsm|xls)$/i.test(file.name)) {
-                    if (typeof XLSX === 'undefined') { marcarTMS('err', 'La librería de Excel no está cargada.'); return; }
+                    if (typeof XLSX === 'undefined') { ctMarcar('err', 'La librería de Excel no está cargada.'); return; }
                     var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                     for (var i = 0; i < wb.SheetNames.length && !info; i++) {
                         var rs = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]], { defval: '', raw: false });
                         var mp = mapearTMS(rs);
                         if (mp && !mp.faltan.length) { rows = rs; info = mp; }
                     }
-                    if (!info) { marcarTMS('err', 'Ninguna hoja trae las columnas del export TMS: ' + Object.keys(CG_TMS_NOMBRES).map(function (k) { return CG_TMS_NOMBRES[k]; }).join(', ') + '.'); return; }
+                    if (!info) { ctMarcar('err', 'Ninguna hoja trae las columnas del export TMS: ' + Object.keys(CG_TMS_NOMBRES).map(function (k) { return CG_TMS_NOMBRES[k]; }).join(', ') + '.'); return; }
                 } else {
                     rows = parseCSV(decodificarTexto(e.target.result));
                     info = mapearTMS(rows);
-                    if (!info) { marcarTMS('err', 'El archivo está vacío.'); return; }
-                    if (info.faltan.length) { marcarTMS('err', 'No parece el export del TMS: faltan las columnas ' + info.faltan.join(', ') + '.'); return; }
+                    if (!info) { ctMarcar('err', 'El archivo está vacío.'); return; }
+                    if (info.faltan.length) { ctMarcar('err', 'No parece el export del TMS: faltan las columnas ' + info.faltan.join(', ') + '.'); return; }
                 }
                 var filas = filasDesdeTMS(rows, info.m);
-                if (!filas.length) { marcarTMS('err', 'El archivo no trae filas con rastreo.'); return; }
-                cg.filas = filas;
-                cg.baseNombre = 'Export TMS: ' + file.name; cg.gpoNombre = '(no aplica)';
-                aplicarReglas();
-                setTimeout(revisarEnvio, 0);
-                poblarDesplegables();
-                el('cgBuscar').value = '';
-                el('cgResultado').hidden = false;
-                cgRender();
-                guardarNube();
+                if (!filas.length) { ctMarcar('err', 'El archivo no trae filas con rastreo.'); return; }
+                ct.filas = filas; ct.archivo = file.name;
+                ctAplicarReglas();
+                ctPoblar();
+                el('ctBuscar').value = '';
+                el('ctResultado').hidden = false;
+                el('ctAviso').hidden = true;
+                ctRender();
+                ctRevisarEnvio();
                 var cc = filas.filter(function (f) { return esClickCollect(f.forma); }).length;
-                var ct = filas.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
-                marcarTMS('ok', '✔ ' + file.name + ' · ' + fmt(filas.length) + ' filas · ' + fmt(cc) + ' Click & Collect, ' + fmt(ct) + ' con tienda');
+                var ct2 = filas.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
+                ctMarcar('ok', '✔ ' + file.name + ' · ' + fmt(filas.length) + ' filas · ' + fmt(cc) + ' Click & Collect, ' + fmt(ct2) + ' con tienda');
             } catch (err) {
-                console.error('Cruce GPO: error leyendo export TMS', err);
-                marcarTMS('err', 'No se pudo abrir el archivo: ' + err.message);
+                console.error('Cruce TMS: error leyendo el archivo', err);
+                ctMarcar('err', 'No se pudo abrir el archivo: ' + err.message);
             }
         };
         fr.readAsArrayBuffer(file);
     }
-    window.cgCargarTMS = function (input) {
+    window.ctCargarArchivo = function (input) {
         var file = input.files && input.files[0];
         if (!file) return;
-        leerTMS(file);
+        ctLeer(file);
         input.value = '';
     };
     (function () {
-        var box = el('cgFileTms'); if (!box) return;
+        var box = el('ctFile'); if (!box) return;
         ['dragenter', 'dragover'].forEach(function (ev) { box.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); box.classList.add('drag'); }); });
         ['dragleave', 'dragend'].forEach(function (ev) { box.addEventListener(ev, function (e) { if (!box.contains(e.relatedTarget)) box.classList.remove('drag'); }); });
         box.addEventListener('drop', function (e) {
             e.preventDefault(); e.stopPropagation(); box.classList.remove('drag');
             var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
             if (!f) return;
-            if (!/\.(csv|txt|xlsx|xlsm|xls)$/i.test(f.name)) { marcarTMS('err', 'Solo se aceptan archivos CSV o Excel.'); return; }
-            leerTMS(f);
+            if (!/\.(csv|txt|xlsx|xlsm|xls)$/i.test(f.name)) { ctMarcar('err', 'Solo se aceptan archivos CSV o Excel.'); return; }
+            ctLeer(f);
         });
     })();
+    function ctPoblar() {
+        var tiendas = {}, formas = {};
+        ct.filas.forEach(function (f) { if (f.tienda) tiendas[f.tienda] = 1; if (f.forma) formas[f.forma] = 1; });
+        el('ctSelTienda').innerHTML = '<option value="">Comentario final (todos)</option><option value="__VACIA__">Sin tienda</option>' +
+            Object.keys(tiendas).sort().map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join('');
+        el('ctSelForma').innerHTML = '<option value="">Forma de entrega (todas)</option>' +
+            Object.keys(formas).sort().map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join('');
+    }
+    window.ctRender = function () {
+        if (!ct.filas.length && el('ctResultado').hidden) return;
+        var act = ctActivos();
+        var base = ct.filas.filter(function (f) { return act[f.estadoN]; });
+        var unicos = {}; base.forEach(function (f) { unicos[clave(f.rastreo)] = 1; });
+        var conTienda = base.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
+        var revisar = base.filter(function (f) { return f.tienda === CG_SIN_TIENDA; }).length;
+        el('ctKpis').innerHTML = [
+            ['Filas con estado elegido', fmt(base.length), 'var(--primary)'],
+            ['Rastreos únicos', fmt(Object.keys(unicos).length), 'var(--primary)'],
+            ['Con tienda', fmt(conTienda), 'var(--success)'],
+            ['Sin tienda · revisar', fmt(revisar), revisar ? 'var(--warning)' : 'var(--success)']
+        ].map(function (k) {
+            return '<div class="cg-kpi" style="--kpi:' + k[2] + ';"><div class="cg-kpi-l">' + esc(k[0]) + '</div><div class="cg-kpi-v">' + esc(k[1]) + '</div></div>';
+        }).join('');
+
+        var res = {}, estadosVistos = {};
+        base.forEach(function (f) {
+            var t = f.tienda || 'Sin tienda (Home Delivery)';
+            estadosVistos[f.estado] = 1;
+            res[t] = res[t] || { total: 0 };
+            res[t][f.estado] = (res[t][f.estado] || 0) + 1;
+            res[t].total++;
+        });
+        var cols = Object.keys(estadosVistos).sort();
+        var nombres = Object.keys(res).sort(function (a, b) { return res[b].total - res[a].total; });
+        var tot = { total: 0 };
+        var html = '<thead><tr><th>Comentario final</th>' + cols.map(function (c) { return '<th style="text-align:right;">' + esc(c) + '</th>'; }).join('') + '<th style="text-align:right;">Total</th></tr></thead><tbody>';
+        nombres.forEach(function (n) {
+            html += '<tr><td>' + pillTienda(n.indexOf('Sin tienda (') === 0 ? '' : n) + (n.indexOf('Sin tienda (') === 0 ? ' <span style="color:var(--text-muted);font-size:11px;">Home Delivery</span>' : '') + '</td>' +
+                cols.map(function (c) { tot[c] = (tot[c] || 0) + (res[n][c] || 0); return '<td class="num">' + fmt(res[n][c] || 0) + '</td>'; }).join('') +
+                '<td class="num"><b>' + fmt(res[n].total) + '</b></td></tr>';
+            tot.total += res[n].total;
+        });
+        html += '</tbody>';
+        if (nombres.length) html += '<tfoot><tr><td>Total</td>' + cols.map(function (c) { return '<td class="num">' + fmt(tot[c] || 0) + '</td>'; }).join('') + '<td class="num">' + fmt(tot.total) + '</td></tr></tfoot>';
+        else html = '<tbody><tr><td class="cg-vacio">Marca al menos un estado TMS.</td></tr></tbody>';
+        el('ctTablaResumen').innerHTML = html;
+
+        var fT = el('ctSelTienda').value, fF = el('ctSelForma').value;
+        var terminos = el('ctBuscar').value.split(',').map(norm).filter(Boolean);
+        ct.visibles = base.filter(function (f) {
+            if (fT === '__VACIA__' ? f.tienda : (fT && f.tienda !== fT)) return false;
+            if (fF && f.forma !== fF) return false;
+            return !terminos.length || terminos.some(function (t) { return f.txt.indexOf(t) !== -1; });
+        });
+        el('ctLblVisibles').textContent = fmt(ct.visibles.length);
+        var LIM = 3000, mostrar = ct.visibles.slice(0, LIM);
+        el('ctTbody').innerHTML = mostrar.length ? mostrar.map(function (f, i) {
+            return '<tr><td style="color:var(--text-muted);">' + (i + 1) + '</td><td class="cod">' + esc(f.rastreo) + '</td><td>' + esc(f.forma || '—') + '</td><td>' +
+                (f.estado ? '<span class="cg-pill info">' + esc(f.estado) + '</span>' : '—') +
+                '</td><td>' + esc(f.seller || '—') + '</td><td>' + esc(f.distrito || '—') + '</td><td>' + pillTienda(f.tienda) + '</td></tr>';
+        }).join('') + (ct.visibles.length > LIM ? '<tr><td colspan="7" class="cg-vacio">Se muestran las primeras ' + fmt(LIM) + ' filas; la descarga incluye todas.</td></tr>' : '')
+            : '<tr><td colspan="7" class="cg-vacio">Sin resultados con estos filtros.</td></tr>';
+    };
+    window.ctDescargarExcel = function () {
+        if (!ct.visibles.length) return alert('No hay filas para descargar.');
+        if (typeof XLSX === 'undefined') return alert('La librería de Excel no está cargada.');
+        var datos = ct.visibles.map(function (f) {
+            return { 'Rastreo': f.rastreo, 'Forma de entrega': f.forma, 'Estado TMS': f.estado, 'Nombre seller': f.seller, 'Distrito cliente': f.distrito, 'Comentario final': f.tienda };
+        });
+        var resumen = {}, estadosRes = {};
+        ct.visibles.forEach(function (f) { if (f.estado) estadosRes[f.estado] = 1; });
+        var colsRes = Object.keys(estadosRes).sort();
+        ct.visibles.forEach(function (f) {
+            var t = f.tienda || 'Sin tienda (Home Delivery)';
+            if (!resumen[t]) {
+                resumen[t] = { 'Comentario final': t };
+                colsRes.forEach(function (c) { resumen[t][c] = 0; });
+                resumen[t]['Total'] = 0;
+            }
+            if (f.estado) resumen[t][f.estado]++;
+            resumen[t]['Total']++;
+        });
+        var wb = XLSX.utils.book_new();
+        var ws = XLSX.utils.json_to_sheet(datos);
+        ws['!cols'] = [{ wch: 26 }, { wch: 16 }, { wch: 20 }, { wch: 34 }, { wch: 24 }, { wch: 34 }];
+        XLSX.utils.book_append_sheet(wb, ws, 'Cruce');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(Object.keys(resumen).map(function (k) { return resumen[k]; })), 'Resumen tiendas');
+        XLSX.writeFile(wb, 'Cruce_TMS_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+    window.ctDescargarPlantilla = function () {
+        var filas = plantillaFilas(false, ct);
+        if (!filas) return;
+        XLSX.writeFile(libroPlantilla(filas), 'Plantilla_carga.xlsx');
+    };
+    function ctBloquear(bloquear, tip) {
+        var btn = el('ctBtnEnviarCarga'); if (!btn) return;
+        btn.disabled = !!bloquear;
+        btn.title = bloquear ? (tip || '') : 'Manda la plantilla directo a Cargar Bases · Base Ruta, como si hubieras subido el Excel';
+    }
+    var ctRevTimer = null, ctRevSeq = 0;
+    function ctRevisarEnvio() {
+        clearTimeout(ctRevTimer);
+        ctRevTimer = setTimeout(function () {
+            var seq = ++ctRevSeq;
+            if (ct.enviandoAhora) return;
+            var filas = plantillaFilas(true, ct);
+            if (!filas || !nubeOk()) { ctBloquear(false); return; }
+            var refR = rtdb.ref(CG_ENVIOS + '/' + huellaPlantilla(filas));
+            refR.once('value').then(function (snap) { return envioActivo(refR, snap.val()); }).then(function (v) {
+                if (seq !== ctRevSeq) return;
+                if (v) { ctAviso('err', '🔒 ' + textoEnvio(v) + ' No se puede volver a cargar.'); ctBloquear(true, 'Esta plantilla ya fue cargada'); }
+                else {
+                    var av = el('ctAviso');
+                    if (av.className.indexOf('err') !== -1 && av.textContent.indexOf('🔒') === 0) av.hidden = true;
+                    ctBloquear(false);
+                }
+            }).catch(function () {});
+        }, 350);
+    }
+    window.ctRevisarEnvio = ctRevisarEnvio;
+    window.ctEnviarPlantillaACarga = function () {
+        var filas = plantillaFilas(false, ct);
+        if (!filas) return;
+        if (typeof cargarExcelRutaNube !== 'function') { alert('No se encontró el módulo Cargar Bases en esta versión.'); return; }
+        if (!puedeCargarRuta()) { alert('No tienes permiso para cargar Base Ruta.'); return; }
+        if (!nubeOk()) { alert('Sin conexión a la nube: no se puede validar si alguien ya cargó esta plantilla.'); return; }
+        var ref = rtdb.ref(CG_ENVIOS + '/' + huellaPlantilla(filas));
+        var ahora = Date.now();
+        ctBloquear(true, 'Validando…');
+        ctAviso('wait', '⏳ Validando que nadie haya cargado esta plantilla…');
+        ct.enviandoAhora = true;
+        ref.once('value').then(function (snap) { return envioActivo(ref, snap.val()); }).then(function () {
+            return ref.transaction(function (actual) {
+                if (envioVigente(actual)) return;
+                return { usuario: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '-', fecha: ahora, estado: 'enviando', cantidad: filas.length };
+            });
+        }).then(function (res) {
+            if (!res.committed) {
+                ct.enviandoAhora = false;
+                var v = res.snapshot.val();
+                ctAviso('err', '🔒 ' + (v ? textoEnvio(v) : 'Esta plantilla ya fue cargada.') + ' No se puede volver a cargar.');
+                ctBloquear(true, 'Esta plantilla ya fue cargada');
+                return;
+            }
+            var buf = XLSX.write(libroPlantilla(filas), { bookType: 'xlsx', type: 'array' });
+            var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+            var nombre = 'Sender_Plantilla_carga_' + d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()) + '_' + z(d.getHours()) + z(d.getMinutes()) + '.xlsx';
+            var file = new File([buf], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            ctAviso('wait', '⏳ Enviando la plantilla a Base Ruta…');
+            cargarExcelRutaNube({
+                target: { files: [file], value: '' },
+                silencioso: true,
+                alTerminar: function (ok, detalle, loteId) {
+                    ct.enviandoAhora = false;
+                    if (ok) {
+                        ref.update({ estado: 'cargado', archivo: nombre, loteId: loteId || null, fecha: Date.now() }).catch(function () {});
+                        ctAviso('', '✅ Listo: la plantilla ya se cargó en Base Ruta · ' + esc(detalle));
+                        ctBloquear(true, 'Esta plantilla ya fue cargada');
+                    } else {
+                        ref.remove().catch(function () {});
+                        ctAviso('err', '❌ No se pudo cargar: ' + esc(detalle));
+                        ctBloquear(false);
+                    }
+                }
+            });
+        }).catch(function (err) {
+            ct.enviandoAhora = false;
+            ctAviso('err', '❌ No se pudo validar la carga: ' + esc(err && err.message ? err.message : err));
+            ctBloquear(false);
+        });
+    };
+    window.abrirModalCruceTMS = function () { el('modalCruceTMS').style.display = 'flex'; ctPintarReglas(); };
+    window.cerrarModalCruceTMS = function () { el('modalCruceTMS').style.display = 'none'; };
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && el('modalCruceTMS') && el('modalCruceTMS').style.display === 'flex') window.cerrarModalCruceTMS();
+    });
 
     function poblarDesplegables() {
         var tiendas = {}, formas = {};
@@ -16362,11 +16691,12 @@
     // Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final.
     // Solo filas con tienda (se omiten Home Delivery y "SIN TIENDA"), con los estados TMS marcados y sin rastreos repetidos.
     // Arma las filas de la plantilla (o devuelve null avisando por qué no hay).
-    function plantillaFilas(silencio) {
-        if (!cg.filas.length) { if (!silencio) alert('Primero realiza el cruce.'); return null; }
+    function plantillaFilas(silencio, fuente) {
+        var FS = fuente || cg;
+        if (!FS.filas.length) { if (!silencio) alert('Primero realiza el cruce.'); return null; }
         if (typeof XLSX === 'undefined') { if (!silencio) alert('La librería de Excel no está cargada.'); return null; }
-        var act = estadosActivos(), vistos = {}, filas = [];
-        cg.filas.forEach(function (f) {
+        var act = fuente ? ctActivos() : estadosActivos(), vistos = {}, filas = [];
+        FS.filas.forEach(function (f) {
             if (!act[f.estadoN] || !f.tienda || f.tienda === CG_SIN_TIENDA) return;
             var k = clave(f.rastreo);
             if (vistos[k]) return;
@@ -16478,7 +16808,7 @@
     window.cgRevisarEnvio = revisarEnvio;
     if (nubeOk()) {
         // Si alguien borra una carga desde "Cargas realizadas", el botón se desbloquea solo.
-        rtdb.ref('cargas_ruta').on('value', function () { if (cg.filas.length) revisarEnvio(); });
+        rtdb.ref('cargas_ruta').on('value', function () { if (cg.filas.length) revisarEnvio(); if (ct.filas.length) ctRevisarEnvio(); });
     }
     window.cgEnviarPlantillaACarga = function () {
         var filas = plantillaFilas();
@@ -16668,6 +16998,7 @@
     }
     function reglasCambiaron() {
         pintarReglas();
+        ctPintarReglas(); ctReaplicar();
         if (cg.filas.length) {
             aplicarReglas();
             poblarDesplegables();

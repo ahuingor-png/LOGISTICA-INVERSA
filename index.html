@@ -1626,6 +1626,91 @@
         #modalCDVES .cv-head-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-left: auto; }
         #modalCDVES .cv-head-actions .vr-btn { padding: 7px 11px; font-size: 12px; white-space: nowrap; }
         #modalCDVES .vr-shell.drag { outline: 2px dashed var(--primary); outline-offset: -6px; }
+        /* ===== Vista Global de Rutas: diseño sobrio y profesional ===== */
+        #modalVistaGlobalRutas .vg-title { display: flex; align-items: center; gap: 12px; }
+        #modalVistaGlobalRutas .vg-title-ico { width: 36px; height: 36px; border-radius: 10px; background: rgba(22,163,74,.12); color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        #modalVistaGlobalRutas .vg-title h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main); letter-spacing: .2px; }
+        #modalVistaGlobalRutas .vg-title small { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+        #modalVistaGlobalRutas .vg-close { background: transparent; border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; font-size: 18px; line-height: 1; cursor: pointer; }
+        #modalVistaGlobalRutas .vg-close:hover { background: var(--bg); color: var(--text-main); }
+        #modalVistaGlobalRutas .vg-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
+        #modalVistaGlobalRutas .vg-kpi { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+        #modalVistaGlobalRutas .vg-kpi span { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+        #modalVistaGlobalRutas .vg-kpi b { display: block; font-size: 22px; font-weight: 800; color: var(--text-main); margin-top: 2px; font-variant-numeric: tabular-nums; }
+        #modalVistaGlobalRutas .vg-kpi b.ok { color: var(--success); }
+        #modalVistaGlobalRutas .vg-kpi b.bad { color: var(--danger); }
+        #modalVistaGlobalRutas .vg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; }
+        #modalVistaGlobalRutas .vg-grp { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+        #modalVistaGlobalRutas .vg-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+        #modalVistaGlobalRutas .vg-btn { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        #modalVistaGlobalRutas .vg-btn:hover { border-color: var(--primary); color: var(--primary); }
+        #modalVistaGlobalRutas .vg-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+        #modalVistaGlobalRutas .vg-head { padding: 14px 14px 12px; }
+        #modalVistaGlobalRutas .vg-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        #modalVistaGlobalRutas .vg-ruta { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: .3px; }
+        #modalVistaGlobalRutas .vg-badge { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+        #modalVistaGlobalRutas .vg-badge.ok { background: rgba(63,136,98,.14); color: #3f8862; }
+        #modalVistaGlobalRutas .vg-badge.mid { background: rgba(185,133,47,.16); color: #9a6f1f; }
+        #modalVistaGlobalRutas .vg-badge.low { background: rgba(178,69,63,.14); color: #b2453f; }
+        #modalVistaGlobalRutas .vg-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        #modalVistaGlobalRutas .vg-tag { font-size: 10px; font-weight: 700; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 2px 8px; border-radius: 6px; }
+        #modalVistaGlobalRutas .vg-bar { height: 8px; background: var(--bg); border-radius: 999px; margin-top: 12px; overflow: hidden; }
+        #modalVistaGlobalRutas .vg-bar > div { height: 100%; border-radius: 999px; transition: width .3s; }
+        #modalVistaGlobalRutas .vg-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        #modalVistaGlobalRutas .vg-stats span { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; }
+        #modalVistaGlobalRutas .vg-stats b { display: block; font-size: 17px; font-weight: 800; color: var(--text-main); margin-top: 1px; font-variant-numeric: tabular-nums; }
+        #modalVistaGlobalRutas .vg-stats b.ok { color: var(--success); }
+        #modalVistaGlobalRutas .vg-stats b.bad { color: var(--danger); }
+        #modalVistaGlobalRutas .vg-zhead, #modalVistaGlobalRutas .vg-zona > summary { display: grid; grid-template-columns: 1fr 92px 64px 14px; align-items: center; gap: 8px; padding: 9px 14px; }
+        #modalVistaGlobalRutas .vg-zhead { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; background: var(--bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        #modalVistaGlobalRutas .vg-zhead .n, #modalVistaGlobalRutas .vg-zona .n { text-align: right; }
+        #modalVistaGlobalRutas .vg-zona { border-bottom: 1px solid var(--border); }
+        #modalVistaGlobalRutas .vg-zona:last-of-type { border-bottom: none; }
+        #modalVistaGlobalRutas .vg-zona > summary { list-style: none; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-main); }
+        #modalVistaGlobalRutas .vg-zona > summary::-webkit-details-marker { display: none; }
+        #modalVistaGlobalRutas .vg-zona > summary:hover { background: var(--bg); }
+        #modalVistaGlobalRutas .vg-zona .n { font-weight: 800; font-variant-numeric: tabular-nums; }
+        #modalVistaGlobalRutas .vg-zona .chev { color: var(--text-muted); font-size: 10px; transition: transform .15s; }
+        #modalVistaGlobalRutas .vg-zona[open] .chev { transform: rotate(90deg); }
+        #modalVistaGlobalRutas .vg-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 12px; max-height: 200px; overflow-y: auto; background: var(--bg); }
+        #modalVistaGlobalRutas .vg-g { font-family: monospace; font-size: 10px; font-weight: 700; color: var(--text-main); background: var(--card-bg); border: 1px solid var(--border); padding: 3px 8px; border-radius: 6px; }
+        #modalVistaGlobalRutas .vg-g em { font-style: normal; color: var(--text-muted); font-weight: 600; }
+        #modalVistaGlobalRutas .vg-g.bad { color: var(--danger); border-color: rgba(178,69,63,.35); background: rgba(178,69,63,.06); }
+        #modalVistaGlobalRutas .vg-falt { border-top: 1px solid rgba(178,69,63,.3); background: rgba(178,69,63,.05); }
+        #modalVistaGlobalRutas .vg-falt > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; font-size: 11px; font-weight: 800; color: var(--danger); }
+        #modalVistaGlobalRutas .vg-falt > summary::-webkit-details-marker { display: none; }
+        #modalVistaGlobalRutas .vg-falt .chev { font-size: 10px; transition: transform .15s; }
+        #modalVistaGlobalRutas .vg-falt[open] .chev { transform: rotate(90deg); }
+        #modalVistaGlobalRutas .vg-falt-bar { display: flex; justify-content: flex-end; padding: 0 14px 6px; }
+        #modalVistaGlobalRutas .vg-falt .vg-chips { background: transparent; padding-top: 0; }
+        #modalVistaGlobalRutas .vg-vacio { padding: 16px 14px; font-size: 11px; color: var(--text-muted); text-align: center; }
+
+        /* --- tarjetas compactas y parejas --- */
+        #modalVistaGlobalRutas .vg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 12px; }
+        #modalVistaGlobalRutas .vg-id { min-width: 0; }
+        #modalVistaGlobalRutas .vg-ruta { font-size: 20px; line-height: 1.1; }
+        #modalVistaGlobalRutas .vg-meta { margin-top: 7px; }
+        #modalVistaGlobalRutas .vg-badge { display: inline-block; margin-top: 8px; }
+        #modalVistaGlobalRutas .vg-ring { --p: 0; --c: #3f8862; width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: conic-gradient(var(--c) calc(var(--p) * 1%), var(--bg) 0); }
+        #modalVistaGlobalRutas .vg-ring span { width: 48px; height: 48px; border-radius: 50%; background: var(--card-bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--text-main); font-variant-numeric: tabular-nums; }
+        #modalVistaGlobalRutas .vg-stats { margin: 0; gap: 0; background: var(--bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        #modalVistaGlobalRutas .vg-stats > div { padding: 9px 6px; text-align: center; }
+        #modalVistaGlobalRutas .vg-stats > div + div { border-left: 1px solid var(--border); }
+        #modalVistaGlobalRutas .vg-stats b { font-size: 18px; }
+        #modalVistaGlobalRutas .vg-zhead { border-top: none; background: transparent; padding-top: 10px; padding-bottom: 6px; }
+        #modalVistaGlobalRutas .vg-zlist { flex: 1; max-height: 178px; overflow-y: auto; }
+        #modalVistaGlobalRutas .vg-zona > summary { padding: 7px 14px; }
+        #modalVistaGlobalRutas .vg-falt { margin-top: auto; }
+        #modalVistaGlobalRutas .vg-falt .vg-chips { max-height: 130px; }
+        @media (max-width: 480px) {
+            #modalVistaGlobalRutas .vg-kpis { grid-template-columns: repeat(2, 1fr); }
+            #modalVistaGlobalRutas .vg-kpi b { font-size: 19px; }
+            #modalVistaGlobalRutas .vg-kpi:last-child { grid-column: 1 / -1; }
+            #modalVistaGlobalRutas .vg-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+            #modalVistaGlobalRutas .vg-toolbar .vg-grp { grid-column: 1 / -1; margin-top: 2px; }
+            #modalVistaGlobalRutas .vg-toolbar .vg-sep { display: none; }
+        }
+
         /* --- CD VES: botones de cabecera sobrios (sin colores) --- */
         #modalCDVES .cv-head-actions .vr-btn { background: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border) !important; box-shadow: none; }
         #modalCDVES .cv-head-actions .vr-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: var(--bg) !important; }
@@ -2498,19 +2583,29 @@
     <div class="modal-content" style="max-width: 1100px; width: 96%; height: 92vh;">
         <div class="table-header">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h4 style="font-weight:900; color:#16a34a; margin:0;">🌐 VISTA GLOBAL DE RUTAS</h4>
-                <button onclick="cerrarModalVistaGlobal()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
+                <div class="vg-title">
+                    <span class="vg-title-ico">🌐</span>
+                    <div>
+                        <h4>Vista global de rutas</h4>
+                        <small>Programado vs escaneado por día, ruta y zona</small>
+                    </div>
+                </div>
+                <button class="vg-close" onclick="cerrarModalVistaGlobal()" aria-label="Cerrar">&times;</button>
             </div>
-            <div id="filtrosGlobalRutasModalSlot" style="margin-top:6px;"></div>
-            <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-                <button onclick="exportarReporteSimple()" style="flex:1; min-width:150px; background:var(--success); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📄 EXCEL SIMPLE</button>
-                <button onclick="exportarReporteDetallado()" style="flex:1; min-width:150px; background:var(--primary); color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📑 EXCEL DETALLADO</button>
-                <button onclick="imprimirReporteSimple()" style="flex:1; min-width:150px; background:var(--text-main); color:var(--card-bg); border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🖨️ IMPRIMIR SIMPLE</button>
-                <button onclick="imprimirReporteDetallado()" style="flex:1; min-width:150px; background:#334155; color:white; border:none; padding:10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🖨️ IMPRIMIR DETALLADO</button>
+            <div id="filtrosGlobalRutasModalSlot" style="margin-top:10px;"></div>
+            <div class="vg-kpis" id="vgKpisModal"></div>
+            <div class="vg-toolbar">
+                <span class="vg-grp">Excel</span>
+                <button class="vg-btn" onclick="exportarReporteSimple()">Simple</button>
+                <button class="vg-btn" onclick="exportarReporteDetallado()">Detallado</button>
+                <span class="vg-sep"></span>
+                <span class="vg-grp">Imprimir</span>
+                <button class="vg-btn" onclick="imprimirReporteSimple()">Simple</button>
+                <button class="vg-btn" onclick="imprimirReporteDetallado()">Detallado</button>
             </div>
         </div>
         <div style="overflow-y:auto; flex:1; padding: 4px 4px 4px 0;">
-            <div id="contenedorVistaGlobalRutas" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap:14px; align-items:start;">
+            <div id="contenedorVistaGlobalRutas" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap:14px; align-items:stretch; padding:4px 2px 8px;">
                 <div class="resumen-vacio">Cargando...</div>
             </div>
         </div>
@@ -14785,6 +14880,16 @@
                 </div>`;
         }
 
+        const kpiModal = document.getElementById('vgKpisModal');
+        if (kpiModal) {
+            kpiModal.innerHTML = `
+                <div class="vg-kpi"><span>Rutas</span><b>${totalRutas}</b></div>
+                <div class="vg-kpi"><span>Programados</span><b>${totalProgramado}</b></div>
+                <div class="vg-kpi"><span>Escaneados</span><b>${totalEscaneado}</b></div>
+                <div class="vg-kpi"><span>Faltantes</span><b class="${totalFaltante > 0 ? 'bad' : 'ok'}">${totalFaltante}</b></div>
+                <div class="vg-kpi"><span>Avance global</span><b class="ok">${pctGlobal.toFixed(0)}%</b></div>`;
+        }
+
         actualizarGraficosVistaGlobal(grupos, claves, totalEscaneado, totalFaltante, pctGlobal);
         actualizarChipsFiltrosGlobal();
 
@@ -14800,78 +14905,63 @@
             const g = grupos[key];
             const pct = g.programado > 0 ? Math.min(100, (g.totalFolios / g.programado) * 100) : (g.totalFolios > 0 ? 100 : 0);
             const secTxt = Array.from(g.secuencias).sort().join(', ') || 'S/S';
-            const colorAvance = pct >= 100 ? '#16a34a' : (pct >= 50 ? '#b9852f' : '#b2453f');
+            const colorAvance = pct >= 100 ? '#3f8862' : (pct >= 50 ? '#b9852f' : '#b2453f');
+            const claseBadge = pct >= 100 ? 'ok' : (pct >= 50 ? 'mid' : 'low');
+            const textoBadge = pct >= 100 ? 'Completa' : (pct >= 50 ? 'En curso' : 'Bajo avance');
+            const zonas = Object.keys(g.zonas).sort();
 
             html += `
-            <div style="border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display:flex; flex-direction:column;">
-                <div style="background: rgba(22,163,74,0.08); padding: 10px 12px; border-bottom: 1px solid var(--border);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                        <span style="font-weight:900; color:#16a34a; font-size:13px;">🚚 ${g.ruta}</span>
-                        <span style="font-size:10px; font-weight:800; color:${colorAvance};">${pct.toFixed(0)}% AVANCE</span>
+            <div class="vg-card">
+                <div class="vg-head">
+                    <div class="vg-id">
+                        <div class="vg-ruta">🚚 ${g.ruta}</div>
+                        <div class="vg-meta">
+                            <span class="vg-tag">Día · ${g.dia}</span>
+                            <span class="vg-tag">Sec · ${secTxt}</span>
+                        </div>
+                        <span class="vg-badge ${claseBadge}">${textoBadge}</span>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
-                        <span style="font-size:10px; font-weight:700; color:var(--text-muted);">📅 Día: ${g.dia}</span>
-                        <span style="font-size:10px; font-weight:700; color:var(--text-muted);">🔢 Sec: ${secTxt}</span>
-                    </div>
-                    <div style="height:6px; background:var(--bg); border-radius:4px; margin-top:6px; overflow:hidden;">
-                        <div style="height:100%; width:${pct}%; background:${colorAvance};"></div>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center; font-size:10px; font-weight:800; margin-top:6px;">
-                        <span style="color:var(--text-muted);">Programados: <b style="color:var(--text-main);">${g.programado}</b></span>
-                        <span style="color:#0ea5e9;">Escaneados: <b>${g.totalFolios}</b></span>
-                        <span style="color:${g.faltante > 0 ? 'var(--danger)' : 'var(--success)'};">Faltantes: <b>${g.faltante}</b></span>
-                    </div>
+                    <div class="vg-ring" style="--p:${pct.toFixed(0)}; --c:${colorAvance};"><span>${pct.toFixed(0)}%</span></div>
                 </div>
-                <table class="resumen-tabla" style="margin-top:0;">
-                    <thead style="background:var(--bg);">
-                        <tr>
-                            <th style="padding:8px 12px;">📍 ZONA</th>
-                            <th style="text-align:center;">📋 SEGUIMIENTOS</th>
-                            <th style="text-align:center;">📦 BULTOS</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                <div class="vg-stats">
+                    <div><span>Programados</span><b>${g.programado}</b></div>
+                    <div><span>Escaneados</span><b class="ok">${g.totalFolios}</b></div>
+                    <div><span>Faltantes</span><b class="${g.faltante > 0 ? 'bad' : 'ok'}">${g.faltante}</b></div>
+                </div>
+                <div class="vg-zhead"><span>Zona</span><span class="n">Seguimientos</span><span class="n">Bultos</span><span></span></div>
+                <div class="vg-zlist">`;
 
-            Object.keys(g.zonas).sort().forEach(zona => {
+            zonas.forEach(zona => {
                 const z = g.zonas[zona];
-                const idLista = `segs_${key}_${zona}`.replace(/[^a-zA-Z0-9_]/g, '_');
                 html += `
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding:8px 12px; font-weight:800; font-size:11px;">${zona}</td>
-                        <td style="text-align:center; font-weight:900; color:#0ea5e9;">${z.folios}</td>
-                        <td style="text-align:center; font-weight:900; color:#3f8862;">${z.bultos}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="padding:0;">
-                            <button type="button" onclick="document.getElementById('${idLista}').style.display = document.getElementById('${idLista}').style.display === 'none' ? 'block' : 'none';" style="width:100%; text-align:left; background:rgba(0,0,0,0.02); border:none; border-bottom:1px solid var(--border); padding:5px 12px; font-size:10px; font-weight:700; color:var(--primary); cursor:pointer;">👁️ Ver/Ocultar ${z.folios} seguimiento(s) de esta zona</button>
-                            <div id="${idLista}" style="display:none; padding:8px 12px; max-height:200px; overflow-y:auto; border-bottom:1px solid var(--border);">
-                                <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                                    ${z.guias.map(it => `<span style="font-family:monospace; font-size:10px; font-weight:800; color:var(--text-main); background:rgba(0,0,0,0.04); border:1px solid var(--border); padding:4px 9px; border-radius:14px;">${it.guia} <span style="color:var(--text-muted); font-weight:700;">(${it.cat || '-'})</span></span>`).join('') || '-'}
-                                </div>
-                            </div>
-                        </td>
-                    </tr>`;
+                <details class="vg-zona">
+                    <summary>
+                        <span>${zona}</span>
+                        <span class="n">${z.folios}</span>
+                        <span class="n">${z.bultos}</span>
+                        <span class="chev">▶</span>
+                    </summary>
+                    <div class="vg-chips">
+                        ${z.guias.map(it => `<span class="vg-g">${it.guia} <em>(${it.cat || '-'})</em></span>`).join('') || '-'}
+                    </div>
+                </details>`;
             });
 
-            if (Object.keys(g.zonas).length === 0) {
-                html += `<tr><td colspan="3" class="resumen-vacio">Sin escaneos registrados aún.</td></tr>`;
+            if (zonas.length === 0) {
+                html += `<div class="vg-vacio">Sin escaneos registrados aún.</div>`;
             }
+            html += `</div>`;
 
-            html += `
-                    </tbody>
-                </table>`;
-
-            const idFaltantes = `falt_${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
             if (g.faltante > 0) {
+                const idFaltantes = `falt_${key}`.replace(/[^a-zA-Z0-9_]/g, '_');
                 html += `
-                <div style="border-top: 2px solid var(--danger); background: rgba(239,68,68,0.06);">
-                    <button type="button" onclick="document.getElementById('${idFaltantes}').style.display = document.getElementById('${idFaltantes}').style.display === 'none' ? 'block' : 'none';" style="width:100%; text-align:left; background:none; border:none; padding:8px 12px; font-size:11px; font-weight:800; color:var(--danger); cursor:pointer;">⚠️ Ver/Ocultar ${g.faltante} seguimiento(s) FALTANTE(S) de esta ruta</button>
-                    <div id="${idFaltantes}" style="display:none; padding:8px 12px 10px; max-height:200px; overflow-y:auto;">
-                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                            ${g.faltantesGuias.map(cod => `<span style="font-family:monospace; font-size:10px; font-weight:800; color:var(--danger); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:4px 9px; border-radius:14px;">${cod}</span>`).join('') || '-'}
-                        </div>
+                <details class="vg-falt">
+                    <summary><span>⚠ ${g.faltante} seguimiento(s) faltante(s) en esta ruta</span><span class="chev">▶</span></summary>
+                    <div class="vg-falt-bar"><button type="button" class="vg-btn" onclick="copiarListaColumna(this, '${idFaltantes}')">📋 Copiar lista</button></div>
+                    <div id="${idFaltantes}" data-lista-guias="1" class="vg-chips">
+                        ${g.faltantesGuias.map(cod => `<span class="vg-g bad">${cod}</span>`).join('') || '-'}
                     </div>
-                </div>`;
+                </details>`;
             }
 
             html += `</div>`;

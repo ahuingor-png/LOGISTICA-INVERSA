@@ -14945,9 +14945,9 @@
                     <div id="${id}" style="display:none; margin:0 14px 14px; border:1px solid ${color}40; border-radius:10px; overflow:hidden;">
                         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:${bg}; padding:8px 12px; flex-wrap:wrap;">
                             <span style="font-size:11px; font-weight:900; color:${colorTexto};">${titulo} <span style="background:${color}22; padding:1px 7px; border-radius:10px; margin-left:4px;">${guias.length}</span></span>
-                            <button type="button" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('${idLista}').textContent).then(()=>{this.textContent='✅ Copiado'; setTimeout(()=>this.textContent='📋 Copiar lista', 1200);});" style="background:var(--card-bg); border:1px solid ${color}55; color:${colorTexto}; padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; white-space:nowrap;">📋 Copiar lista</button>
+                            <button type="button" onclick="copiarListaColumna(this, '${idLista}')" style="background:var(--card-bg); border:1px solid ${color}55; color:${colorTexto}; padding:3px 9px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer; white-space:nowrap;">📋 Copiar lista</button>
                         </div>
-                        <div id="${idLista}" style="max-height:220px; overflow-y:auto; padding:8px 10px; background:var(--card-bg);">${chips}</div>
+                        <div id="${idLista}" data-lista-guias="1" style="max-height:220px; overflow-y:auto; padding:8px 10px; background:var(--card-bg);">${chips}</div>
                     </div>`;
         };
 
@@ -15024,6 +15024,45 @@
 
         cont.innerHTML = html;
     }
+
+    // Copia una lista de guías en UNA COLUMNA (una por línea), para pegarla directo en Excel.
+    function copiarListaColumna(btn, idLista) {
+        const cont = document.getElementById(idLista);
+        if (!cont) return;
+        const texto = Array.from(cont.querySelectorAll('span')).map(s => s.textContent.trim()).filter(Boolean).join('\n');
+        const avisar = () => {
+            btn.textContent = '✅ Copiado';
+            setTimeout(() => { btn.textContent = '📋 Copiar lista'; }, 1200);
+        };
+        const respaldo = () => {
+            const ta = document.createElement('textarea');
+            ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); avisar(); } catch (e) { alert('No se pudo copiar la lista.'); }
+            document.body.removeChild(ta);
+        };
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(texto).then(avisar).catch(respaldo);
+        else respaldo();
+    }
+
+    // Si se selecciona y copia a mano (Ctrl+C) dentro de una lista de guías faltantes,
+    // también se copia en una columna (una guía por línea), igual que el botón.
+    document.addEventListener('copy', function (e) {
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed || !sel.anchorNode || !sel.focusNode) return;
+        const dentro = n => {
+            const el = n.nodeType === 1 ? n : n.parentElement;
+            return el && el.closest ? el.closest('[data-lista-guias]') : null;
+        };
+        const c1 = dentro(sel.anchorNode), c2 = dentro(sel.focusNode);
+        if (!c1 || c1 !== c2) return;
+        const lineas = Array.from(c1.querySelectorAll('span'))
+            .filter(ch => sel.containsNode(ch, true))
+            .map(ch => ch.textContent.trim()).filter(Boolean);
+        if (!lineas.length) return;
+        e.clipboardData.setData('text/plain', lineas.join('\n'));
+        e.preventDefault();
+    });
 
     // Descarga en Excel de los faltantes de "Avance de Rutas por Día": una hoja
     // con los seguimientos que faltan por etiquetar y otra con los que faltan

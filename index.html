@@ -683,7 +683,53 @@
         .hr-tag.t-act { background:rgba(34,197,94,0.14); color:#15803d; }
         .hr-tag.t-resp { background:rgba(8,145,178,0.14); color:#0e7490; }
         .hr-tag.t-liq { background:rgba(185,133,47,0.16); color:#92660f; }
-        [data-theme="dark"] .hr-tag.t-act { color:#4ade80; } [data-theme="dark"] .hr-tag.t-resp { color:#22d3ee; } [data-theme="dark"] .hr-tag.t-liq { color:#fbbf24; }
+        [data-theme="dark"] .hr-tag.t-act { color:#4ade80; }
+.hr-guia.wrapt { flex-wrap:wrap; white-space:normal; row-gap:3px; }
+.hr-tag.t-mod { background:rgba(99,102,241,0.14); color:#4338ca; }
+.hr-tag.t-mod-cold { background:rgba(14,165,233,0.15); color:#0369a1; }
+.hr-tag.t-mod-ruta { background:rgba(20,184,166,0.15); color:#0f766e; }
+.hr-tag.t-mod-cdves { background:rgba(249,115,22,0.15); color:#c2410c; }
+.hr-tag.t-mod-seg { background:rgba(239,68,68,0.14); color:#b91c1c; }
+.hr-tag.t-mod-repro { background:rgba(168,85,247,0.15); color:#7e22ce; }
+.hr-tag.t-mod-liq { background:rgba(185,133,47,0.18); color:#92660f; }
+[data-theme="dark"] .hr-tag.t-mod { color:#a5b4fc; } [data-theme="dark"] .hr-tag.t-mod-cold { color:#7dd3fc; } [data-theme="dark"] .hr-tag.t-mod-ruta { color:#5eead4; } [data-theme="dark"] .hr-tag.t-mod-cdves { color:#fdba74; } [data-theme="dark"] .hr-tag.t-mod-seg { color:#fca5a5; } [data-theme="dark"] .hr-tag.t-mod-repro { color:#d8b4fe; } [data-theme="dark"] .hr-tag.t-mod-liq { color:#fbbf24; }
+ [data-theme="dark"] .hr-tag.t-resp { color:#22d3ee; } [data-theme="dark"] .hr-tag.t-liq { color:#fbbf24; }
+/* ===== Panel de Consulta (Admin): vista profesional ===== */
+.consulta-filtros { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; margin-top:8px; }
+.consulta-filtros select { padding:9px 10px; font-size:12px; font-weight:600; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); cursor:pointer; }
+.consulta-filtros select:focus, #inpBusquedaAdmin:focus { border-color:#0ea5e9; box-shadow:0 0 0 3px rgba(14,165,233,0.18); outline:none; }
+#estadoRespaldosConsulta { line-height:1.5; }
+#resumenModulosConsulta { align-items:center; }
+.chip-mod-consulta { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--bg); border:1px solid var(--border); color:var(--text-main); cursor:pointer; transition:background .12s, border-color .12s; }
+.chip-mod-consulta:hover { border-color:#0ea5e9; }
+.chip-mod-consulta i { width:8px; height:8px; border-radius:50%; background:#6366f1; flex-shrink:0; }
+.chip-mod-consulta i.t-mod-cold { background:#0ea5e9; } .chip-mod-consulta i.t-mod-ruta { background:#14b8a6; } .chip-mod-consulta i.t-mod-cdves { background:#f97316; }
+.chip-mod-consulta i.t-mod-seg { background:#ef4444; } .chip-mod-consulta i.t-mod-repro { background:#a855f7; } .chip-mod-consulta i.t-mod-liq { background:#b9852f; }
+.chip-mod-consulta b { color:#0ea5e9; font-variant-numeric:tabular-nums; }
+.chip-mod-consulta.on { background:#0ea5e9; border-color:#0ea5e9; color:#fff; }
+.chip-mod-consulta.on b { color:#fff; }
+.hr-consulta .hr-head, .hr-consulta .hr-row { grid-template-columns:26px minmax(200px,1.5fr) minmax(120px,.75fr) 56px minmax(80px,.9fr) minmax(70px,.8fr) 56px minmax(80px,.9fr) minmax(80px,.7fr) minmax(110px,1fr) 104px minmax(90px,.8fr) 34px; }
+.hr-consulta .hr-row { min-height:56px; padding-top:7px; padding-bottom:7px; }
+.hr-consulta .hr-row:nth-child(even) { background:rgba(127,127,127,0.035); }
+.hr-consulta .hr-row:hover { background:rgba(14,165,233,0.07); }
+.hr-guia2 { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; }
+.hr-guia2 .hr-folio { font-size:13.5px; }
+.hr-orig { display:flex; align-items:center; gap:6px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10.5px; font-weight:600; color:var(--text-muted); }
+.hr-orig i { width:7px; height:7px; border-radius:50%; background:#16a34a; flex-shrink:0; }
+.hr-orig i.r { background:#0891b2; }
+.hr-modc { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.hr-modc .hr-tag { padding:3px 9px; font-size:9.5px; }
+.hr-fecha { display:flex; flex-direction:column; line-height:1.3; }
+.hr-fecha b { font-size:12px; font-weight:700; color:var(--text-main); font-variant-numeric:tabular-nums; }
+.hr-fecha em { font-style:normal; font-size:10.5px; font-weight:500; color:var(--text-muted); font-variant-numeric:tabular-nums; }
+.consulta-vacio { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:48px 20px; text-align:center; color:var(--text-muted); }
+.consulta-vacio .ico { font-size:34px; opacity:.55; }
+.consulta-vacio b { font-size:14px; color:var(--text-main); }
+.consulta-vacio span { font-size:12px; max-width:460px; line-height:1.5; }
+.consulta-mas { grid-column:1/-1; display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 0 6px; font-size:11px; color:var(--text-muted); }
+.consulta-mas button { background:var(--bg); border:1px solid #0ea5e9; color:#0ea5e9; font-weight:800; font-size:12px; padding:8px 18px; border-radius:8px; cursor:pointer; }
+.consulta-mas button:hover { background:#0ea5e9; color:#fff; }
+@media (max-width:1100px) { .hr-consulta .hr-user { grid-column:span 2; } .hr-consulta .hr-row { min-height:0; } }
         .hr-cat { display:inline-block; max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid var(--border); color:var(--text-muted); }
         .hr-cat.aviso { border-color:rgba(245,158,11,0.5); background:rgba(245,158,11,0.12); color:#b45309; }
         [data-theme="dark"] .hr-cat.aviso { color:#fbbf24; }
@@ -1487,6 +1533,41 @@
         #modalCDVES .cv-carga-s { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
         #modalCDVES .cv-carga-x { border: 1px solid var(--border); background: transparent; color: var(--danger); border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: inherit; }
         #modalCDVES .cv-carga-x:hover { background: rgba(178,69,63,.08); }
+        /* --- CD VES: versión compacta (cuadro de carga, cargas, archivos guardados, aviso y KPIs) --- */
+        #modalCDVES .vr-body { padding: 14px 22px 24px; }
+        #modalCDVES .cv-cargas { padding: 8px 12px; margin-bottom: 10px; border-radius: 10px; }
+        #modalCDVES .cv-cargas-h { font-size: 12px; padding-bottom: 4px; }
+        #modalCDVES .cv-cargas-n { font-size: 10.5px; }
+        #modalCDVES .cv-carga { padding: 5px 0; gap: 8px; }
+        #modalCDVES .cv-carga-t { font-size: 12px; line-height: 1.3; }
+        #modalCDVES .cv-carga-s { font-size: 10.5px; margin-top: 1px; }
+        #modalCDVES .cv-carga-x { padding: 3px 9px; font-size: 11px; border-radius: 6px; }
+        #modalCDVES #caBuscar { padding: 6px 10px !important; margin: 2px 0 4px !important; font-size: 12px !important; border-radius: 7px !important; }
+        #modalCDVES #caLista { max-height: 132px; overflow-y: auto; }
+        #modalCDVES #caRes { max-height: 180px; overflow-y: auto; }
+        #modalCDVES #cvSnapBanner { padding: 6px 12px !important; margin-bottom: 10px !important; font-size: 11.5px !important; border-radius: 8px !important; }
+        #modalCDVES .vr-kpis { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        #modalCDVES .vr-kpi { padding: 8px 14px; }
+        #modalCDVES .vr-kpi-val { font-size: 21px; margin-top: 0; }
+        /* --- CD VES: acciones junto al título (tablero limpio) --- */
+        #modalCDVES .vr-head { padding: 12px 22px 12px; }
+        #modalCDVES .vr-titlebar { flex-wrap: wrap; gap: 10px 14px; margin-bottom: 10px; }
+        #modalCDVES .vr-title > div { min-width: 0; }
+        #modalCDVES .vr-title .cv-drop-s { margin: 2px 0 0; font-size: 11.5px; max-width: 360px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); }
+        #modalCDVES .vr-title.err .cv-drop-s { color: var(--danger); font-weight: 600; }
+        #modalCDVES .cv-head-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-left: auto; }
+        #modalCDVES .cv-head-actions .vr-btn { padding: 7px 11px; font-size: 12px; white-space: nowrap; }
+        #modalCDVES .vr-shell.drag { outline: 2px dashed var(--primary); outline-offset: -6px; }
+        /* --- CD VES: botones de cabecera sobrios (sin colores) --- */
+        #modalCDVES .cv-head-actions .vr-btn { background: var(--card-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border) !important; box-shadow: none; }
+        #modalCDVES .cv-head-actions .vr-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: var(--bg) !important; }
+        /* --- CD VES: ventanas emergentes (Cargas / Archivos guardados) --- */
+        #modalCDVES .cv-pop { z-index: 8700; }
+        #modalCDVES .cv-pop-card { background: var(--card-bg); color: var(--text-main); width: min(720px, 94vw); max-height: 86vh; border-radius: 14px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.25); overflow: hidden; }
+        #modalCDVES .cv-pop-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 800; }
+        #modalCDVES .cv-pop-card .cv-cargas { border: none; border-radius: 0; margin: 0; padding: 10px 16px 16px; overflow-y: auto; }
+        #modalCDVES .cv-pop-card #caLista { max-height: 38vh; }
+        #modalCDVES .cv-pop-card #caRes { max-height: 30vh; }
         #modalCDVES .cv-vacio { text-align:center; color: var(--text-muted); font-size:12px; padding: 30px 0; font-style: italic; }
         #modalCDVES .vr-filters { grid-template-columns: repeat(4, 1fr); }
         @media (max-width: 800px) { #modalCDVES .vr-filters { grid-template-columns: repeat(2, minmax(0,1fr)); } #modalCDVES .vr-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -2484,7 +2565,7 @@
         <div class="vr-shell">
             <div class="vr-head">
                 <div class="vr-titlebar">
-                    <div class="vr-title">
+                    <div class="vr-title" id="cvDrop">
                         <span class="vr-title-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></span>
                         <div>
                             <h4>Vista de Repros</h4>
@@ -2672,9 +2753,19 @@
                         <span class="vr-title-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
                         <div>
                             <h4>CD VES</h4>
-                            <p>Carga el Excel de anclaje y revísalo como tabla</p>
+                            <p class="cv-drop-s" id="cvDropTxt">Elige el Excel o arrástralo a esta ventana. Cada archivo se suma a las cargas anteriores.</p>
                         </div>
                         <span id="cvTotal" class="vr-count" title="Total de registros cargados">0</span>
+                    </div>
+                    <div class="cv-head-actions">
+                        <button type="button" class="vr-btn vr-btn-ghost" id="cvBtnCargas" onclick="cvCargasAbrir()" title="Ver y eliminar las cargas">Cargas <span id="cvCargasN">0</span></button>
+                        <button type="button" class="vr-btn vr-btn-ghost" onclick="document.getElementById('cvInp').click()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg> Cargar archivo</button>
+                        <button class="vr-btn vr-btn-ghost" id="cvBtnDescargar" onclick="cvDescargar()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
+                        <button class="vr-btn vr-btn-ghost" id="cvBtnResumen" onclick="cvResumen()" title="Excel con el avance de validación: resumen, por flujo, por responsable, por rol container, pendientes y validados">Resumen de validación</button>
+                        <button class="vr-btn vr-btn-ghost" id="cvfBtnAbrir" onclick="cvfAbrir()" title="Llena guía, fecha de entrega, observaciones y precintos y descarga el reporte con formato">Editar formato</button>
+                        <button class="vr-btn vr-btn-ghost" id="cvxBtnAbrir" onclick="cvxAbrir()" title="Editar flujos y reglas de clasificación">Flujos y reglas <span id="cvxPend" class="cvx-badge" style="display:none;">0</span></button>
+                        <button class="vr-btn vr-btn-ghost" onclick="cvGuardarArchivo()" title="Guarda la tabla en la nube con el flujo y la validación RF de este momento">Guardar en la nube</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="caToggle()" title="Ver, buscar, abrir o eliminar los archivos guardados">Archivos guardados</button>
                     </div>
                     <button class="vr-close" onclick="cerrarModalCDVES()" aria-label="Cerrar">&times;</button>
                 </div>
@@ -2686,16 +2777,7 @@
                 </div>
             </div>
             <div class="vr-body">
-                <div class="cv-drop" id="cvDrop">
-                    <div id="cvDropIdle">
-                        <div class="cv-drop-t">Carga el archivo de anclaje CD VES</div>
-                        <div class="cv-drop-s" id="cvDropTxt">Elige el Excel (ej. Anclaje_CD-VES_18.11.xlsx) o <b>arrástralo a este cuadro</b>. Cada archivo se suma a las cargas anteriores.</div>
-                        <button type="button" class="vr-btn vr-btn-primary" onclick="document.getElementById('cvInp').click()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg> Elegir archivo…</button>
-                    </div>
-                    <input type="file" id="cvInp" accept=".xlsx,.xlsm,.xls,.csv" multiple style="display:none;" onchange="cvCargarArchivo(this)">
-                </div>
-                <div id="cvCargasBox" class="cv-cargas" style="display:none;"></div>
-                <div id="cvArchBox" class="cv-cargas" style="display:none;"></div>
+                <input type="file" id="cvInp" accept=".xlsx,.xlsm,.xls,.csv" multiple style="display:none;" onchange="cvCargarArchivo(this)">
                 <div id="cvSnapBanner" style="display:none; padding:9px 12px; margin-bottom:10px; border:1px solid var(--primary); background:rgba(61,90,128,.09); border-radius:10px; font-size:12px; color:var(--text-main);"></div>
                 <div id="cvKpis" class="vr-kpis"></div>
                 <div class="vr-table-card">
@@ -2705,11 +2787,6 @@
                             <input type="text" id="cvBuscar" placeholder="Buscar por rastreo, rol container, responsable…  (separa con coma para buscar varios)" oninput="cvFiltrarTexto()">
                         </div>
                         <span class="vr-visible-count"><b id="cvVisibles">0</b> registro(s) en pantalla</span>
-                        <button class="vr-btn vr-btn-primary" id="cvBtnDescargar" onclick="cvDescargar()" title="Descarga en Excel solo lo que se ve en la tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Descargar filtrado</button>
-                        <button class="vr-btn vr-btn-primary" id="cvfBtnAbrir" onclick="cvfAbrir()" title="Llena guía, fecha de entrega, observaciones y precintos y descarga el reporte con formato" style="background:var(--success);">📝 Editar formato</button>
-                        <button class="vr-btn vr-btn-ghost" id="cvxBtnAbrir" onclick="cvxAbrir()" title="Editar flujos y reglas de clasificación">Flujos y reglas <span id="cvxPend" class="cvx-badge" style="display:none;">0</span></button>
-                        <button class="vr-btn vr-btn-primary" onclick="cvGuardarArchivo()" title="Guarda la tabla en la nube con el flujo y la validación RF de este momento">💾 Guardar en la nube</button>
-                        <button class="vr-btn vr-btn-ghost" onclick="caToggle()" title="Ver, buscar, abrir o eliminar los archivos guardados">📂 Archivos guardados</button>
                     </div>
                     <div class="vr-table-scroll">
                         <table class="vr-table" id="cvTabla">
@@ -2717,6 +2794,18 @@
                             <tbody id="cvTbody"><tr><td class="vr-empty">Aún no cargas ningún archivo.</td></tr></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+            <div id="cvCargasModal" class="modal cv-pop" onclick="if(event.target===this)cvCargasCerrar()">
+                <div class="cv-pop-card">
+                    <div class="cv-pop-h"><span>Cargas</span><button type="button" class="vr-close" onclick="cvCargasCerrar()" aria-label="Cerrar">&times;</button></div>
+                    <div id="cvCargasBox" class="cv-cargas"></div>
+                </div>
+            </div>
+            <div id="cvArchModal" class="modal cv-pop" onclick="if(event.target===this)caCerrar()">
+                <div class="cv-pop-card">
+                    <div class="cv-pop-h"><span>Archivos guardados</span><button type="button" class="vr-close" onclick="caCerrar()" aria-label="Cerrar">&times;</button></div>
+                    <div id="cvArchBox" class="cv-cargas"></div>
                 </div>
             </div>
         </div>
@@ -3497,18 +3586,29 @@
                 <h4 style="font-weight:900; color:#0ea5e9;">🔍 PANEL DE CONSULTA (ADMIN)</h4>
                 <button onclick="cerrarModalConsulta()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
             </div>
-            <div style="margin-top: 6px;">
-                <input type="text" id="inpBusquedaAdmin" oninput="ejecutarFiltroAdmin()" placeholder="Busca por Guía, Ubic., Operario, Día, Ruta, Sec., Zona, Cat., Hora..." style="width:100%; padding:12px; font-size:14px; font-weight:700; border:2px solid #0ea5e9; border-radius:var(--radius-md); text-transform:uppercase; text-align:center; outline:none; background:var(--bg); color:var(--text-main);">
+            <div style="margin-top:8px; position:relative;">
+                <span style="position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.55; pointer-events:none;">🔍</span>
+                <input type="text" id="inpBusquedaAdmin" oninput="ejecutarFiltroAdmin()" autocomplete="off" placeholder="Busca por guía, ubicación, operario, día, ruta, sec., zona, categoría, hora…" style="width:100%; padding:13px 14px 13px 44px; font-size:14px; font-weight:600; border:1.5px solid #0ea5e9; border-radius:var(--radius-md); text-align:left; outline:none; background:var(--bg); color:var(--text-main); transition:box-shadow .12s;">
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
-                <select id="filtroConsultaZona" onchange="ejecutarFiltroAdmin()" style="padding:8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main);">
+            <div class="consulta-filtros">
+                <select id="filtroConsultaZona" onchange="ejecutarFiltroAdmin()">
                     <option value="">📍 Todas las Zonas</option>
                 </select>
-                <select id="filtroConsultaCat" onchange="ejecutarFiltroAdmin()" style="padding:8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main);">
+                <select id="filtroConsultaCat" onchange="ejecutarFiltroAdmin()">
                     <option value="">🏷️ Todas las Categorías</option>
                 </select>
+                <select id="filtroConsultaModulo" onchange="ejecutarFiltroAdmin()">
+                    <option value="">🧩 Todos los módulos</option>
+                </select>
+                <select id="filtroConsultaOrigen" onchange="ejecutarFiltroAdmin()">
+                    <option value="">☁️ Activos + Respaldos</option>
+                    <option value="ACTIVO">🟢 Solo activos</option>
+                    <option value="RESPALDO">📦 Solo respaldos (nube)</option>
+                </select>
             </div>
+            <div id="estadoRespaldosConsulta" style="display:none; margin-top:8px; font-size:11px; font-weight:600; color:var(--text-muted); text-align:center;"></div>
+            <div id="resumenModulosConsulta" style="display:none; margin-top:8px; gap:6px; flex-wrap:wrap; justify-content:center;"></div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
                 <div style="background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.2); padding:8px; border-radius:6px; text-align:center;">
@@ -9089,12 +9189,238 @@
         document.getElementById('tTotal').textContent = scans.length;
     }
 
+    // =====================================================================
+    // CONSULTA GLOBAL DE RESPALDOS (todos los módulos)
+    //   historial_archivado         -> Escaneos (Escaneo General, COLD, Validar Ruta, CD VES...)
+    //   historial_archivado_repros  -> Repros
+    //   liquidaciones_backups       -> Liquidación
+    // Cada registro de respaldo se normaliza a la forma de un escaneo y se
+    // marca con _modulo / _nodo para identificar de dónde viene.
+    // =====================================================================
+    let respaldosLQCache = {};
+    let respaldosCVCargas = [];              // cargas actuales de CD VES leídas directo de la nube (cd_ves_cargas)
+    let respaldosCVConsulta = [];            // filas de los archivos guardados de CD VES (cd_ves_archivos)
+    let consultaRespaldosEstado = '';        // '' | 'cargando' | 'listo' | 'parcial'
+    let consultaRespaldosErrores = [];
+    let consultaArchivadosCache = null;      // lista normalizada (se reconstruye al cambiar los respaldos)
+
+    function escConsulta(v) {
+        return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function moduloDeEscaneoConsulta(s) {
+        const modo = String((s && s.modo) || '').toUpperCase();
+        if (modo === 'IMPRESION_COLD') return 'IMPRESIÓN COLD';
+        if (modo === 'VALIDAR_RUTA') return 'VALIDAR RUTA';
+        if (modo === 'CD_VES') return 'CD VES';
+        if (modo === 'CONTROL_SEGURIDAD_MANUAL') return 'CONTROL SEGURIDAD';
+        if (modo && modo !== 'SIMPLE') return modo.replace(/_/g, ' ');
+        // La Terminal RF guarda la impresión de etiquetas sin campo "modo": se reconoce por la categoría.
+        if (s && s.cat && String(s.cat).startsWith('IMPRESO')) return 'IMPRESIÓN COLD';
+        return 'ESCANEO GENERAL';
+    }
+
+    function claseModuloConsulta(m) {
+        switch (m) {
+            case 'IMPRESIÓN COLD': return 't-mod-cold';
+            case 'VALIDAR RUTA': return 't-mod-ruta';
+            case 'CD VES': return 't-mod-cdves';
+            case 'CONTROL SEGURIDAD': return 't-mod-seg';
+            case 'REPROS': return 't-mod-repro';
+            case 'LIQUIDACIÓN': return 't-mod-liq';
+            default: return '';
+        }
+    }
+
+    function listaDatosRespaldoConsulta(r, campo) {
+        const d = r && r[campo || 'datos'];
+        return Array.isArray(d) ? d : (d ? Object.values(d) : []);
+    }
+
+    // "dd/mm/yyyy hh:mm" (Liquidación) -> milisegundos
+    function tsDeTextoLQConsulta(t) {
+        const m = String(t || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);
+        return m ? new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]).getTime() : 0;
+    }
+
+    function tsConsulta(s) {
+        if (s && s._ts) return s._ts;
+        return parsearHoraAObj(s && s.hora).getTime() || 0;
+    }
+
+    function construirArchivadosConsulta() {
+        const out = [];
+
+        // 1) Escaneos (todos los modos guardados en historial_archivado)
+        Object.keys(respaldosNubeCache || {}).forEach(k => {
+            const r = respaldosNubeCache[k] || {};
+            listaDatosRespaldoConsulta(r).forEach((s, idx) => {
+                if (!s) return;
+                out.push({ ...s, _archivado: true, _nodo: 'historial_archivado', _respaldoKey: k,
+                           _fechaRespaldo: r.fechaArchivo || k, _idx: idx, _modulo: moduloDeEscaneoConsulta(s) });
+            });
+        });
+
+        // 2) Repros (historial_archivado_repros)
+        Object.keys(respaldosReprosCache || {}).forEach(k => {
+            const r = respaldosReprosCache[k] || {};
+            listaDatosRespaldoConsulta(r).forEach((s, idx) => {
+                if (!s) return;
+                out.push({
+                    guia: s.codigo || '', sec: '', dia: s.dia || '', ruta: s.ruta || '', bul: '',
+                    ubic: s.ubi || '', zona: s.zona || '', cat: s.categoria || s.resultado || '',
+                    hora: [s.fecha, s.hora].filter(Boolean).join(' '), usuario: s.usuario || '',
+                    _ts: Number(s.timestamp) || 0, _sinBultos: true,
+                    _extra: [s.resultado, s.turno_operativo].filter(Boolean).join(' '),
+                    _archivado: true, _nodo: 'historial_archivado_repros', _respaldoKey: k,
+                    _fechaRespaldo: r.fechaArchivo || k, _idx: idx, _modulo: 'REPROS'
+                });
+            });
+        });
+
+        // 3) Liquidación (liquidaciones_backups)
+        Object.keys(respaldosLQCache || {}).forEach(k => {
+            const b = respaldosLQCache[k] || {};
+            listaDatosRespaldoConsulta(b, 'filas').forEach((f, idx) => {
+                if (!f) return;
+                const ts = tsDeTextoLQConsulta(f.escaneoTxt) || tsDeTextoLQConsulta(f.cargaTxt) || Number(b.fecha) || 0;
+                out.push({
+                    guia: String(f.guia ?? ''), sec: f.sec || '', dia: f.dia || '', ruta: f.ruta || '', bul: '',
+                    ubic: '', zona: '', cat: 'LIQUIDACIÓN' + (f.dias ? ' · ' + f.dias + ' d' : ''),
+                    hora: f.escaneoTxt || f.cargaTxt || '', usuario: f.usuarioEscaneo || f.conservadoPor || '',
+                    _ts: ts, _sinBultos: true,
+                    _extra: [f.guiaRegistrada, f.marca, f.cargaTxt, f.usuarioCarga, f.fechasRuteo].filter(Boolean).join(' '),
+                    _archivado: true, _nodo: 'liquidaciones_backups', _respaldoKey: k,
+                    _fechaRespaldo: b.fechaTxt || k, _idx: idx, _modulo: 'LIQUIDACIÓN'
+                });
+            });
+        });
+
+        // 4) CD VES (archivos guardados en la nube: cd_ves_archivos)
+        (respaldosCVConsulta || []).forEach(f => {
+            const fecha = f.fecha ? new Date(f.fecha) : null;
+            const p2 = n => String(n).padStart(2, '0');
+            const fechaTxt = fecha ? `${p2(fecha.getDate())}/${p2(fecha.getMonth() + 1)}/${fecha.getFullYear()} ${p2(fecha.getHours())}:${p2(fecha.getMinutes())}` : '';
+            out.push({
+                guia: f.rastreo || '', sec: '', dia: f.dia || '', ruta: f.ruta || '', bul: '',
+                ubic: '', zona: f.zona || '', cat: f.flujo || '',
+                hora: fechaTxt, usuario: (String(f.vq || '').split(' · ')[0]) || f.guardadoPor || '',
+                _ts: f.fecha || 0, _sinBultos: true,
+                _extra: [f.texto, f.vt, f.vq, f.nombre, f.guardadoPor].filter(Boolean).join(' '),
+                _archivado: true, _nodo: 'cd_ves_archivos', _respaldoKey: f.id,
+                _fechaRespaldo: f.nombre || f.id, _idx: f.idx, _modulo: 'CD VES'
+            });
+        });
+
+        // 5) CD VES: cargas en la nube (cd_ves_cargas). Son datos en uso (no respaldos): se marcan _vivo.
+        (respaldosCVCargas || []).forEach(f => {
+            const fecha = f.fecha ? new Date(f.fecha) : null;
+            const p2 = n => String(n).padStart(2, '0');
+            const fechaTxt = fecha ? `${p2(fecha.getDate())}/${p2(fecha.getMonth() + 1)}/${fecha.getFullYear()} ${p2(fecha.getHours())}:${p2(fecha.getMinutes())}` : '';
+            out.push({
+                guia: f.rastreo || '', sec: '', dia: f.dia || '', ruta: f.ruta || '', bul: '',
+                ubic: '', zona: f.zona || '', cat: f.flujo || '',
+                hora: fechaTxt, usuario: (String(f.vq || '').split(' · ')[0]) || f.guardadoPor || '',
+                _ts: f.fecha || 0, _sinBultos: true,
+                _extra: [f.texto, f.vt, f.vq, f.enlace, f.nombre, f.guardadoPor].filter(Boolean).join(' '),
+                _archivado: true, _vivo: true, _nodo: 'cd_ves_cargas', _respaldoKey: f.id,
+                _fechaRespaldo: f.nombre || f.id, _idx: f.idx, _modulo: 'CD VES'
+            });
+        });
+        return out;
+    }
+
+    function obtenerArchivadosConsulta() {
+        if (!puedeVerRespaldos()) return [];
+        if (!consultaArchivadosCache) consultaArchivadosCache = construirArchivadosConsulta();
+        return consultaArchivadosCache;
+    }
+
+    async function cargarRespaldosConsulta() {
+        const el = document.getElementById('estadoRespaldosConsulta');
+        if (!puedeVerRespaldos()) { if (el) el.style.display = 'none'; return; }
+        consultaRespaldosEstado = 'cargando';
+        consultaRespaldosErrores = [];
+        actualizarEstadoRespaldosConsulta();
+
+        // CD VES (cargas en uso): se leen directo de cd_ves_cargas, sin abrir la tabla de CD VES.
+        const cargarCVCargas = async () => {
+            try {
+                respaldosCVCargas = (typeof window.cvConsultaCargas === 'function') ? await window.cvConsultaCargas() : [];
+            } catch (err) {
+                console.error('No se pudieron cargar las cargas de CD VES para la consulta:', err);
+                respaldosCVCargas = [];
+                consultaRespaldosErrores.push('CD VES (cargas)');
+            }
+        };
+        const nodos = [
+            ['historial_archivado', v => { respaldosNubeCache = v || {}; }, 'Escaneos'],
+            ['historial_archivado_repros', v => { respaldosReprosCache = v || {}; }, 'Repros'],
+            ['liquidaciones_backups', v => { respaldosLQCache = v || {}; }, 'Liquidación']
+        ];
+        // CD VES: sus archivos guardados viven en cd_ves_archivos (en bloques); el módulo los entrega ya armados.
+        const cargarCV = async () => {
+            try {
+                respaldosCVConsulta = (typeof window.cvConsultaArchivos === 'function') ? await window.cvConsultaArchivos() : [];
+            } catch (err) {
+                console.error('No se pudieron cargar los archivos de CD VES para la consulta:', err);
+                respaldosCVConsulta = [];
+                consultaRespaldosErrores.push('CD VES');
+            }
+        };
+        // Cada nodo se lee por separado: si uno falla (permisos/red) los demás siguen funcionando.
+        await Promise.all([cargarCV(), cargarCVCargas()].concat(nodos.map(async ([path, guardar, nombre]) => {
+            try {
+                const snap = await rtdb.ref(path).once('value');
+                guardar(snap.val());
+            } catch (err) {
+                console.error('No se pudo cargar el respaldo "' + path + '" para la consulta:', err);
+                consultaRespaldosErrores.push(nombre);
+            }
+        })));
+
+        consultaArchivadosCache = null;
+        consultaRespaldosEstado = consultaRespaldosErrores.length ? 'parcial' : 'listo';
+        if (document.getElementById('modalConsultaAdmin').style.display !== 'flex') return;
+        poblarFiltrosConsultaAdmin();
+        actualizarEstadoRespaldosConsulta();
+        ejecutarFiltroAdmin();
+    }
+
+    function actualizarEstadoRespaldosConsulta() {
+        const el = document.getElementById('estadoRespaldosConsulta');
+        if (!el) return;
+        if (!puedeVerRespaldos()) { el.style.display = 'none'; return; }
+        el.style.display = 'block';
+        if (consultaRespaldosEstado === 'cargando') {
+            el.style.color = 'var(--text-muted)';
+            el.textContent = '☁️ Cargando respaldos de todos los módulos...';
+            return;
+        }
+        const arch = obtenerArchivadosConsulta();
+        const cuenta = m => arch.filter(a => a._nodo === m).length;
+        const nArchCV = new Set((respaldosCVConsulta || []).map(f => f.id)).size;
+        const nResp = Object.keys(respaldosNubeCache || {}).length + Object.keys(respaldosReprosCache || {}).length + Object.keys(respaldosLQCache || {}).length + nArchCV;
+        const n = v => Number(v).toLocaleString('es-PE');
+        const enRespaldos = arch.length - cuenta('cd_ves_cargas');
+        let html = `☁️ <b>${n(enRespaldos)}</b> registros en <b>${n(nResp)}</b> respaldos` +
+            ` <span style="font-weight:500; opacity:.85;">· Escaneos ${n(cuenta('historial_archivado'))} · Repros ${n(cuenta('historial_archivado_repros'))} · Liquidación ${n(cuenta('liquidaciones_backups'))} · CD VES ${n(cuenta('cd_ves_archivos'))} (+ ${n(cuenta('cd_ves_cargas'))} en cargas)</span>`;
+        if (consultaRespaldosErrores.length) {
+            html += ` <span style="color:var(--danger); font-weight:700;">⚠️ No se pudo leer: ${consultaRespaldosErrores.join(', ')} (revisa las Reglas de Firebase)</span>`;
+        }
+        el.style.color = 'var(--text-muted)';
+        el.innerHTML = html;
+    }
+
     function abrirModalConsulta() {
         if (!esAdmin()) {
             let datosUsuario = Object.values(usuariosPermitidos).find(u => u.nombre.toLowerCase() === usuarioActivo.toLowerCase());
             if (!datosUsuario || !datosUsuario.permisos || !datosUsuario.permisos.consultar) return;
         }
         document.getElementById('inpBusquedaAdmin').value = "";
+        document.getElementById('filtroConsultaModulo').value = "";
+        document.getElementById('filtroConsultaOrigen').value = "";
+        document.getElementById('resumenModulosConsulta').style.display = "none";
         document.getElementById('lblQueryGuias').textContent = "0";
         document.getElementById('lblQueryBultos').textContent = "0";
         document.getElementById('btnEliminarTodoFiltrado').style.display = "none";
@@ -9108,36 +9434,31 @@
         seleccionConsultaSet.clear();
         poblarFiltrosConsultaAdmin();
 
-        // Carga en paralelo los respaldos guardados en la nube, así la búsqueda
-        // de este modal también encuentra coincidencias dentro de ELLOS (no solo
-        // en los escaneos activos). Si el usuario ya escribió algo cuando termina
-        // de cargar, se re-ejecuta el filtro para incluir esos resultados.
-        if (esAdmin()) {
-            rtdb.ref('historial_archivado').once('value').then(snap => {
-                respaldosNubeCache = snap.val() || {};
-                if (document.getElementById('inpBusquedaAdmin').value.trim()) {
-                    ejecutarFiltroAdmin();
-                }
-            }).catch(err => console.error('No se pudo precargar respaldos para la consulta:', err));
-        }
+        // Carga en paralelo los respaldos de la nube de TODOS los módulos
+        // (Escaneos, Repros y Liquidación) para que la búsqueda los incluya.
+        cargarRespaldosConsulta();
     }
 
     function poblarFiltrosConsultaAdmin() {
-        let zonas = new Set(), cats = new Set();
-        scans.forEach(s => {
+        let zonas = new Set(), cats = new Set(), modulos = new Set();
+        const agregar = s => {
             if (s.zona) zonas.add(String(s.zona).toUpperCase());
             if (s.cat) cats.add(String(s.cat).toUpperCase());
-        });
+            modulos.add(s._modulo || moduloDeEscaneoConsulta(s));
+        };
+        scans.forEach(agregar);
+        obtenerArchivadosConsulta().forEach(agregar);
 
         const construir = (id, valores, etiqueta) => {
             const sel = document.getElementById(id);
             const valorPrevio = sel.value;
-            sel.innerHTML = `<option value="">${etiqueta}</option>` + Array.from(valores).sort().map(v => `<option value="${v}">${v}</option>`).join('');
+            sel.innerHTML = `<option value="">${etiqueta}</option>` + Array.from(valores).sort().map(v => `<option value="${escConsulta(v)}">${escConsulta(v)}</option>`).join('');
             if (Array.from(valores).includes(valorPrevio)) sel.value = valorPrevio;
         };
 
         construir('filtroConsultaZona', zonas, '📍 Todas las Zonas');
         construir('filtroConsultaCat', cats, '🏷️ Todas las Categorías');
+        construir('filtroConsultaModulo', modulos, '🧩 Todos los módulos');
     }
 
     function cerrarModalConsulta() {
@@ -9149,22 +9470,27 @@
         }
     }
 
-    function ejecutarFiltroAdmin() {
+    function ejecutarFiltroAdmin(mantenerLimite) {
+        if (mantenerLimite !== true) consultaLimite = 300;
         const q = document.getElementById('inpBusquedaAdmin').value.trim().toUpperCase();
         const fZona = document.getElementById('filtroConsultaZona').value;
         const fCat = document.getElementById('filtroConsultaCat').value;
+        const fMod = document.getElementById('filtroConsultaModulo').value;
+        const fOrigen = document.getElementById('filtroConsultaOrigen').value;
         const contenedor = document.getElementById('contenedorResultadosConsulta');
         const btnEliminarTodo = document.getElementById('btnEliminarTodoFiltrado');
         const btnEliminarSel = document.getElementById('btnEliminarSeleccionados');
         const wrapperSeleccionTodo = document.getElementById('wrapperSeleccionTodo');
+        const resumenMod = document.getElementById('resumenModulosConsulta');
 
-        if (!q && !fZona && !fCat) {
+        if (!q && !fZona && !fCat && !fMod && !fOrigen) {
             document.getElementById('lblQueryGuias').textContent = "0";
             document.getElementById('lblQueryBultos').textContent = "0";
             btnEliminarTodo.style.display = "none";
             btnEliminarSel.style.display = "none";
             wrapperSeleccionTodo.style.display = "none";
-            contenedor.innerHTML = "";
+            resumenMod.style.display = "none";
+            contenedor.innerHTML = `<div class="consulta-vacio"><div class="ico">🔎</div><b>Busca en todos los módulos</b><span>Escribe una guía, rastreo, ruta u operario, o usa los filtros. Se incluyen escaneos activos y los respaldos en la nube de Escaneos, Repros, Liquidación y CD VES.</span></div>`;
             registrosFiltradosConsultaGlobal = [];
             seleccionConsultaSet.clear();
             return;
@@ -9172,42 +9498,52 @@
 
         const coincide = s => {
             // Busca en TODOS los encabezados del historial: guía, ubicación,
-            // operario, día, ruta, secuencia, zona, categoría, hora y bultos.
-            const camposTexto = [s.guia, s.ubic, s.usuario, s.dia, s.ruta, s.sec, s.zona, s.cat, s.hora, s.bul];
+            // operario, día, ruta, secuencia, zona, categoría, hora y bultos
+            // (y, en respaldos de Liquidación, los datos extra de la carga).
+            const camposTexto = [s.guia, s.ubic, s.usuario, s.dia, s.ruta, s.sec, s.zona, s.cat, s.hora, s.bul, s._extra];
             const coincideTexto = !q || camposTexto.some(v => v !== undefined && v !== null && v !== '' && String(v).toUpperCase().includes(q));
             const coincideZona = !fZona || (s.zona && String(s.zona).toUpperCase() === fZona);
             const coincideCat = !fCat || (s.cat && String(s.cat).toUpperCase() === fCat);
-            return coincideTexto && coincideZona && coincideCat;
+            const coincideMod = !fMod || (s._modulo || moduloDeEscaneoConsulta(s)) === fMod;
+            return coincideTexto && coincideZona && coincideCat && coincideMod;
         };
 
-        const resultadosActivos = scans.filter(coincide);
+        const resultadosActivos = (fOrigen === 'RESPALDO') ? [] : scans.filter(coincide);   // (las cargas CD VES en la nube también cuentan como activas)
 
-        // Aplana TODOS los respaldos guardados en la nube (los dos, o los que
-        // haya) y los marca con _archivado para poder distinguirlos y borrar
-        // línea por línea desde el respaldo que les corresponde.
-        let resultadosArchivados = [];
-        Object.keys(respaldosNubeCache || {}).forEach(respaldoKey => {
-            const r = respaldosNubeCache[respaldoKey] || {};
-            const listaDatos = Array.isArray(r.datos) ? r.datos : (r.datos ? Object.values(r.datos) : []);
-            listaDatos.forEach((s, idx) => {
-                if (coincide(s)) {
-                    resultadosArchivados.push({ ...s, _archivado: true, _respaldoKey: respaldoKey, _fechaRespaldo: r.fechaArchivo || respaldoKey, _idx: idx });
-                }
-            });
-        });
+        // TODOS los respaldos de la nube, de todos los módulos (Escaneos, Repros y
+        // Liquidación), ya normalizados y marcados con _modulo / _nodo.
+        const resultadosArchivados = obtenerArchivadosConsulta()
+            .filter(a => fOrigen === 'ACTIVO' ? a._vivo : (fOrigen === 'RESPALDO' ? !a._vivo : true))
+            .filter(coincide);
 
-        // Orden: del registro MÁS RECIENTE al MÁS ANTIGUO (activos y respaldos mezclados),
-        // usando la fecha y hora del escaneo. Si empatan, se conserva el orden original.
+        // Orden: del registro MÁS RECIENTE al MÁS ANTIGUO (activos y respaldos mezclados).
+        // Si empatan, se conserva el orden original.
         registrosFiltradosConsultaGlobal = resultadosActivos.concat(resultadosArchivados)
-            .map((s, i) => ({ s, i, t: parsearHoraAObj(s.hora).getTime() || 0 }))
+            .map((s, i) => ({ s, i, t: tsConsulta(s) }))
             .sort((a, b) => (b.t - a.t) || (a.i - b.i))
             .map(o => o.s);
 
         const totalGuias = registrosFiltradosConsultaGlobal.length;
         const totalBultos = registrosFiltradosConsultaGlobal.reduce((sum, item) => sum + (parseInt(item.bul) || 0), 0);
 
-        document.getElementById('lblQueryGuias').textContent = totalGuias;
-        document.getElementById('lblQueryBultos').textContent = totalBultos;
+        document.getElementById('lblQueryGuias').textContent = totalGuias.toLocaleString('es-PE');
+        document.getElementById('lblQueryBultos').textContent = totalBultos.toLocaleString('es-PE');
+
+        // Resumen: cuántos resultados hay por módulo (al tocar uno se filtra por él)
+        const porModulo = {};
+        registrosFiltradosConsultaGlobal.forEach(s => {
+            const m = s._modulo || moduloDeEscaneoConsulta(s);
+            porModulo[m] = (porModulo[m] || 0) + 1;
+        });
+        const clavesMod = Object.keys(porModulo).sort((a, b) => porModulo[b] - porModulo[a]);
+        if (clavesMod.length) {
+            resumenMod.style.display = "flex";
+            resumenMod.innerHTML = clavesMod.map(m =>
+                `<span class="chip-mod-consulta ${fMod === m ? 'on' : ''}" onclick="filtrarPorModuloConsulta(this.dataset.m)" data-m="${escConsulta(m)}" title="Filtrar por este módulo"><i class="${claseModuloConsulta(m)}"></i>${escConsulta(m)} <b>${porModulo[m].toLocaleString('es-PE')}</b></span>`
+            ).join('');
+        } else {
+            resumenMod.style.display = "none";
+        }
 
         // Limpiar selecciones que ya no aparecen en el filtro actual (solo aplica a activos)
         const keysVisibles = new Set(resultadosActivos.map(i => i.key));
@@ -9222,9 +9558,33 @@
             wrapperSeleccionTodo.style.display = "none";
         }
 
-        contenedor.innerHTML = construirHtmlTarjetas(registrosFiltradosConsultaGlobal, true);
+        if (!registrosFiltradosConsultaGlobal.length) {
+            contenedor.innerHTML = `<div class="consulta-vacio"><div class="ico">📭</div><b>Sin resultados</b><span>No hay coincidencias con la búsqueda y los filtros actuales. Prueba con otra guía, quita algún filtro o cambia el módulo.</span></div>`;
+        } else {
+            const visibles = registrosFiltradosConsultaGlobal.slice(0, consultaLimite);
+            const faltan = registrosFiltradosConsultaGlobal.length - visibles.length;
+            contenedor.innerHTML = construirHtmlTarjetas(visibles, true) + (faltan > 0
+                ? `<div class="consulta-mas"><span>Mostrando ${visibles.length.toLocaleString('es-PE')} de ${registrosFiltradosConsultaGlobal.length.toLocaleString('es-PE')} resultados</span><button type="button" onclick="mostrarMasConsulta()">Mostrar ${Math.min(300, faltan).toLocaleString('es-PE')} más</button></div>` : '');
+        }
         document.getElementById('chkSeleccionarTodoConsulta').checked = resultadosActivos.length > 0 && seleccionConsultaSet.size === resultadosActivos.length;
         actualizarBotonSeleccionados();
+    }
+
+    let consultaLimite = 300;     // filas que se dibujan a la vez (los totales siempre cuentan TODO)
+    function mostrarMasConsulta() { consultaLimite += 300; ejecutarFiltroAdmin(true); }
+
+    // Fecha y hora uniformes (dd/mm/aaaa + HH:mm) sin importar el módulo de origen.
+    function fechaHoraConsulta(s) {
+        const ts = tsConsulta(s);
+        if (!ts) return { d: String(s.hora || '—'), t: '' };
+        const d = new Date(ts), p = n => String(n).padStart(2, '0');
+        return { d: `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`, t: `${p(d.getHours())}:${p(d.getMinutes())}` };
+    }
+
+    function filtrarPorModuloConsulta(m) {
+        const sel = document.getElementById('filtroConsultaModulo');
+        sel.value = (sel.value === m) ? '' : m;
+        ejecutarFiltroAdmin();
     }
 
     function toggleSeleccionFila(key, checked) {
@@ -11113,7 +11473,12 @@
             let checkboxSeleccion = '';
             if (s._archivado) {
                 if (esAdmin()) {
-                    botonEliminarFila = `<button class="hc-del" onclick="eliminarLineaArchivadaDesdeConsulta('${s._respaldoKey}', ${s._idx})">🗑️ Eliminar</button>`;
+                    if (s._nodo === 'historial_archivado_repros') {
+                        botonEliminarFila = `<button class="hc-del" onclick="eliminarLineaReproDesdeConsulta('${s._respaldoKey}', ${s._idx})">🗑️ Eliminar</button>`;
+                    } else if (!s._nodo || s._nodo === 'historial_archivado') {
+                        botonEliminarFila = `<button class="hc-del" onclick="eliminarLineaArchivadaDesdeConsulta('${s._respaldoKey}', ${s._idx})">🗑️ Eliminar</button>`;
+                    }
+                    // Los respaldos de Liquidación y los archivos de CD VES son una foto completa: no se borran línea por línea.
                 }
                 // Los archivados no se pueden seleccionar para borrado masivo:
                 // cada uno vive dentro de un respaldo distinto.
@@ -11143,23 +11508,53 @@
             const celda = (cls, et, v) => `<div class="hr-c hr-d ${cls} ${vac(v) ? 'vacio' : ''}"><span class="hr-lbl">${et}</span>${vac(v) ? '—' : v}</div>`;
 
             const tagOrigen = esConsulta
-                ? (s._archivado ? `<span class="hr-tag t-resp">Respaldo ${s._fechaRespaldo}</span>` : `<span class="hr-tag t-act">Activo</span>`)
+                ? (s._vivo ? `<span class="hr-tag t-act">Carga nube ${escConsulta(s._fechaRespaldo)}</span>`
+                    : (s._archivado ? `<span class="hr-tag t-resp">Respaldo ${escConsulta(s._fechaRespaldo)}</span>` : `<span class="hr-tag t-act">Activo</span>`))
                 : '';
-            const tagLiq = esLiquidacionLQ(s) ? `<span class="hr-tag t-liq">Liquidación</span>` : '';
+            const moduloFila = s._modulo || moduloDeEscaneoConsulta(s);
+            const tagModulo = esConsulta
+                ? `<span class="hr-tag t-mod ${claseModuloConsulta(moduloFila)}" title="Módulo de origen">${escConsulta(moduloFila)}</span>`
+                : '';
+            const tagLiq = (moduloFila !== 'LIQUIDACIÓN' && esLiquidacionLQ(s)) ? `<span class="hr-tag t-liq">Liquidación</span>` : '';
 
             const svgDel = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>';
             const accion = botonEliminarFila
                 ? botonEliminarFila.replace('class="hc-del"', 'class="hr-del" title="Eliminar"').replace(/>[^<]*Eliminar<\/button>/, '>' + svgDel + '</button>')
                 : '';
 
+            if (esConsulta) {
+                // Vista de consulta: guía + origen discreto, módulo en su propia columna, fecha uniforme.
+                const origTxt = s._vivo ? `Carga en nube · ${s._fechaRespaldo}` : (s._archivado ? `Respaldo · ${s._fechaRespaldo}` : 'Activo');
+                const dotCls = (s._archivado && !s._vivo) ? 'r' : '';
+                const fh = fechaHoraConsulta(s);
+                const e = escConsulta;
+                const celdaC = (cls, et, v) => `<div class="hr-c hr-d ${cls} ${vac(v) ? 'vacio' : ''}" title="${vac(v) ? '' : e(v)}"><span class="hr-lbl">${et}</span>${vac(v) ? '—' : e(v)}</div>`;
+                return `
+                <div class="hr-row ${claseForzado}">
+                    <div class="hr-c hr-chk ${checkboxSeleccion ? 'on' : ''}">${checkboxSeleccion}</div>
+                    <div class="hr-c hr-guia hr-guia2"><span class="hr-folio">${e(s.guia)}</span><span class="hr-orig" title="${e(origTxt)}"><i class="${dotCls}"></i>${e(origTxt)}</span></div>
+                    <div class="hr-c hr-d hr-modc"><span class="hr-lbl">Módulo</span><span class="hr-tag t-mod ${claseModuloConsulta(moduloFila)}" title="Módulo de origen">${e(moduloFila)}</span>${tagLiq}</div>
+                    <div class="hr-c hr-sec num" title="${e(s.sec || 'S/S')}">${e(s.sec || 'S/S')}</div>
+                    ${celdaC('', 'Día', s.dia || 'S/P')}
+                    ${celdaC('', 'Ruta', s.ruta || 'S/P')}
+                    ${celdaC('num', 'Bultos', s._sinBultos ? '' : (s.bul || 1))}
+                    ${celdaC('w3', 'Ubic.', s.ubic)}
+                    ${celdaC('w3 num', 'Zona', s.zona)}
+                    <div class="hr-c hr-d hr-catc"><span class="hr-lbl">Categoría</span>${s.cat ? `<span class="hr-cat ${esAviso ? 'aviso' : ''}" title="${e(s.cat)}">${e(s.cat)}</span>` : '—'}</div>
+                    <div class="hr-c hr-d hr-fecha"><span class="hr-lbl">Fecha y hora</span><b>${e(fh.d)}</b>${fh.t ? `<em>${e(fh.t)}</em>` : ''}</div>
+                    <div class="hr-c hr-user mut" title="${e(s.usuario || '')}">${e(s.usuario || '@?')}</div>
+                    <div class="hr-c hr-acc">${accion}</div>
+                </div>`;
+            }
+
             return `
                 <div class="hr-row ${claseForzado}">
                     <div class="hr-c hr-chk ${checkboxSeleccion ? 'on' : ''}">${checkboxSeleccion}</div>
-                    <div class="hr-c hr-guia"><span class="hr-folio">${s.guia}</span>${tagOrigen}${tagLiq}</div>
+                    <div class="hr-c hr-guia ${esConsulta ? 'wrapt' : ''}"><span class="hr-folio">${s.guia}</span>${tagOrigen}${tagModulo}${tagLiq}</div>
                     <div class="hr-c hr-sec num"><span class="hr-lbl" style="display:none"></span>${s.sec || "S/S"}</div>
                     ${celda('', 'Día', s.dia || "S/P")}
                     ${celda('', 'Ruta', s.ruta || "S/P")}
-                    ${celda('num', 'Bultos', s.bul || 1)}
+                    ${celda('num', 'Bultos', s._sinBultos ? '' : (s.bul || 1))}
                     ${celda('w3', 'Ubic.', s.ubic)}
                     ${celda('w3 num', 'Zona', s.zona)}
                     <div class="hr-c hr-d hr-catc">${s.cat ? `<span class="hr-lbl">Categoría</span><span class="hr-cat ${esAviso ? 'aviso' : ''}" title="${s.cat}">${s.cat}</span>` : '<span class="hr-lbl">Categoría</span>—'}</div>
@@ -11169,6 +11564,12 @@
                 </div>
             `;
         }).join('');
+        if (esConsulta) {
+            return `<div class="hr-tabla hr-consulta">
+            <div class="hr-head"><div></div><div>Guía</div><div>Módulo</div><div style="text-align:center">Sec.</div><div>Día</div><div>Ruta</div><div style="text-align:center">Bultos</div><div>Ubicación</div><div style="text-align:center">Zona</div><div>Categoría</div><div>Fecha y hora</div><div>Usuario</div><div></div></div>
+            ${filasHtml}
+        </div>`;
+        }
         return `<div class="hr-tabla">
             <div class="hr-head"><div></div><div>Guía</div><div style="text-align:center">Sec.</div><div>Día</div><div>Ruta</div><div style="text-align:center">Bultos</div><div>Ubicación</div><div style="text-align:center">Zona</div><div>Categoría</div><div>Fecha y hora</div><div>Usuario</div><div></div></div>
             ${filasHtml}
@@ -11402,6 +11803,16 @@
     // "Ver Respaldos Guardados".
     async function eliminarLineaArchivadaDesdeConsulta(respaldoKey, idx) {
         await eliminarLineaDeRespaldo(respaldoKey, idx);
+        consultaArchivadosCache = null;      // los índices cambian al borrar: se reconstruye
+        actualizarEstadoRespaldosConsulta();
+        ejecutarFiltroAdmin();
+    }
+
+    // Igual, pero para líneas que vienen de un respaldo de Repros.
+    async function eliminarLineaReproDesdeConsulta(respaldoKey, idx) {
+        await eliminarLineaDeRespaldoRepro(respaldoKey, idx);
+        consultaArchivadosCache = null;
+        actualizarEstadoRespaldosConsulta();
         ejecutarFiltroAdmin();
     }
 
@@ -16199,7 +16610,15 @@
         if (cvxNubeOk()) cvBajarFaltantes(false);
         cvPoblarFiltros(); cvRender();
     };
-    window.cerrarModalCDVES = function () { $('modalCDVES').style.display = 'none'; };
+    window.cerrarModalCDVES = function () { $('modalCDVES').style.display = 'none'; cvCargasCerrar(); caCerrar(); };
+    window.cvCargasAbrir = function () { cvPintarCargas(); $('cvCargasModal').style.display = 'flex'; };
+    window.cvCargasCerrar = function () { var m = $('cvCargasModal'); if (m) m.style.display = 'none'; };
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        var a = $('cvArchModal'), c = $('cvCargasModal');
+        if (a && a.style.display === 'flex') { caCerrar(); e.stopPropagation(); }
+        else if (c && c.style.display === 'flex') { cvCargasCerrar(); e.stopPropagation(); }
+    }, true);
 
     function cvBadge() {
         var n = cvDatosPedidos ? cvFilas.length : Object.keys(cvMetas).reduce(function (a, id) { return a + (cvMetas[id].filas || 0); }, 0);
@@ -16207,19 +16626,19 @@
         cvxBadge();
     }
 
-    var CV_DROP_TXT = 'Elige el Excel (ej. Anclaje_CD-VES_18.11.xlsx) o <b>arrástralo a este cuadro</b>. Cada archivo se suma a las cargas anteriores.';
+    var CV_DROP_TXT = 'Elige el Excel o <b>arrástralo a esta ventana</b>. Cada archivo se suma a las cargas anteriores.';
     function cvEstadoDrop(estado, msg) {
         var d = $('cvDrop'); if (!d) return;
         d.classList.remove('ok', 'err');
         if (estado === 'err') d.classList.add('err');
-        var t = $('cvDropTxt'); if (t) t.innerHTML = msg ? cvEsc(msg) : CV_DROP_TXT;
+        var t = $('cvDropTxt'); if (t) { t.innerHTML = msg ? cvEsc(msg) : CV_DROP_TXT; t.title = t.textContent; }
     }
 
     function cvPintarCargas() {
         var box = $('cvCargasBox'); if (!box) return;
         var ids = Object.keys(cvMetas).sort(function (a, b) { return (cvMetas[b].fecha || 0) - (cvMetas[a].fecha || 0); });
-        if (!ids.length && !cvNubeErr) { box.style.display = 'none'; box.innerHTML = ''; return; }
-        box.style.display = '';
+        var nEl = $('cvCargasN'); if (nEl) nEl.textContent = ids.length;
+        if (!ids.length && !cvNubeErr) { box.innerHTML = '<div class="cv-carga-s" style="padding:10px 0;">Aún no hay cargas. Usa «Cargar archivo» para subir un Excel.</div>'; return; }
         var nube = cvxNubeOk();
         var nota = cvNubeErr ? '<span class="cv-cargas-n err">☁ ' + cvEsc(cvNubeErr) + '</span>'
             : (nube ? '<span class="cv-cargas-n">☁ Guardadas en la nube: las ven todos los usuarios</span>'
@@ -16458,7 +16877,7 @@
     function cvPintar(filas) {
         cvVisibles = filas;
         $('cvVisibles').textContent = filas.length;
-        $('cvBtnDescargar').disabled = !filas.length; var bf = $('cvfBtnAbrir'); if (bf) bf.disabled = !filas.length;
+        $('cvBtnDescargar').disabled = !filas.length; var br = $('cvBtnResumen'); if (br) br.disabled = !filas.length; var bf = $('cvfBtnAbrir'); if (bf) bf.disabled = !filas.length;
         var thead = $('cvThead'), tbody = $('cvTbody');
         if (!cvCols.length) {
             thead.innerHTML = ''; tbody.innerHTML = '<tr><td class="vr-empty">Aún no cargas ningún archivo.</td></tr>';
@@ -16497,6 +16916,69 @@
     };
 
 
+
+
+    /* ---------- Reporte de avance de validación (resumen por flujo, responsable, rol container, pendientes y validados) ---------- */
+    function cvEstVal(f) {
+        var v = cvValDe(f), tot = parseInt(cvVal(f, 'bultos'), 10); if (isNaN(tot) || tot < 1) tot = 1;
+        if (f.__vt !== undefined && !v) {
+            var t = String(f.__vt || ''), m = /(\d+)\s*de\s*(\d+)/.exec(t);
+            if (/Completo/.test(t)) return { e: 'Completo', tot: tot, val: tot, pl: (/PL\s+(\S+)/.exec(t) || [])[1] || '', quien: f.__vq || '', mig: /migrado/.test(t), man: /agregado/.test(t) };
+            if (m) return { e: 'Parcial', tot: parseInt(m[2], 10) || tot, val: parseInt(m[1], 10) || 0, pl: '', quien: f.__vq || '', mig: false, man: false };
+            return { e: 'Pendiente', tot: tot, val: 0, pl: '', quien: '', mig: false, man: false };
+        }
+        if (!v) return { e: 'Pendiente', tot: tot, val: 0, pl: '', quien: '', mig: false, man: false };
+        tot = parseInt(v.bul, 10) || tot;
+        if (v.completo) return { e: 'Completo', tot: tot, val: tot, pl: v.pl || '', quien: (v.validadoPor || 'N/D') + ' · ' + (v.horaValidacion || 'N/D'), mig: !!v.migrado, man: !!v.agregadoManual };
+        var bv = parseInt(v.bultosValidados, 10) || 0;
+        return { e: bv > 0 ? 'Parcial' : 'Pendiente', tot: tot, val: bv, pl: v.pl || '', quien: v.validadoPor ? (v.validadoPor + ' · ' + (v.horaValidacion || 'N/D')) : '', mig: false, man: false };
+    }
+    window.cvResumen = function () {
+        if (!cvVisibles.length) return alert('No hay registros en pantalla para el resumen.');
+        var filas = cvVisibles.map(function (f) { return { f: f, s: cvEstVal(f), ras: cvxRastreo(f), flujo: cvVal(f, 'FLUJO') || 'Sin clasificar', rol: cvVal(f, 'codigoRolContainer') || '(sin rol)', resp: cvVal(f, 'responsableFinal') || '(sin responsable)', est: cvVal(f, 'estadoRolContainer') || '' }; });
+        var pct = function (a, b) { return b ? Math.round(a * 1000 / b) / 10 + '%' : '0%'; };
+        var agrupar = function (key, titulo) {
+            var g = {};
+            filas.forEach(function (r) {
+                var k = r[key], o = g[k] || (g[k] = { n: 0, bul: 0, bv: 0, c: 0, p: 0, pe: 0 });
+                o.n++; o.bul += r.s.tot; o.bv += r.s.val;
+                if (r.s.e === 'Completo') o.c++; else if (r.s.e === 'Parcial') o.p++; else o.pe++;
+            });
+            return Object.keys(g).sort(function (a, b) { return g[b].n - g[a].n; }).map(function (k) {
+                var o = g[k], x = {}; x[titulo] = k; x['Registros'] = o.n; x['Bultos'] = o.bul; x['Bultos validados'] = o.bv;
+                x['Completos'] = o.c; x['Parciales'] = o.p; x['Pendientes'] = o.pe; x['% avance (registros)'] = pct(o.c, o.n); return x;
+            });
+        };
+        var tot = { n: filas.length, bul: 0, bv: 0, c: 0, p: 0, pe: 0, mig: 0, man: 0, sc: 0 };
+        filas.forEach(function (r) {
+            tot.bul += r.s.tot; tot.bv += r.s.val;
+            if (r.s.e === 'Completo') tot.c++; else if (r.s.e === 'Parcial') tot.p++; else tot.pe++;
+            if (r.s.mig) tot.mig++; if (r.s.man) tot.man++; if (r.flujo === 'Sin clasificar') tot.sc++;
+        });
+        var ahora = new Date();
+        var resumen = [
+            ['REPORTE DE AVANCE DE VALIDACIÓN · CD VES', ''],
+            ['Generado', cvFmt(ahora)], ['Generado por', cvUsuario() || 'N/D'],
+            ['Alcance', 'Registros que se ven en pantalla con los filtros actuales'], ['', ''],
+            ['Registros', tot.n], ['Bultos', tot.bul], ['Bultos validados', tot.bv], ['% avance (bultos)', pct(tot.bv, tot.bul)], ['', ''],
+            ['Registros completos', tot.c], ['Registros parciales', tot.p], ['Registros pendientes', tot.pe], ['% avance (registros)', pct(tot.c, tot.n)], ['', ''],
+            ['Agregados manualmente', tot.man], ['Migrados al escáner', tot.mig], ['Sin clasificar', tot.sc]
+        ];
+        var wb = XLSX.utils.book_new(), add = function (ws, n, w) { if (w) ws['!cols'] = w.map(function (x) { return { wch: x }; }); XLSX.utils.book_append_sheet(wb, ws, n); };
+        add(XLSX.utils.aoa_to_sheet(resumen), 'Resumen', [34, 52]);
+        add(XLSX.utils.json_to_sheet(agrupar('flujo', 'Flujo')), 'Por flujo', [26, 11, 10, 16, 11, 11, 12, 20]);
+        add(XLSX.utils.json_to_sheet(agrupar('resp', 'Responsable')), 'Por responsable', [30, 11, 10, 16, 11, 11, 12, 20]);
+        add(XLSX.utils.json_to_sheet(agrupar('rol', 'Rol container')), 'Por rol container', [26, 11, 10, 16, 11, 11, 12, 20]);
+        var pend = filas.filter(function (r) { return r.s.e !== 'Completo'; }).map(function (r) {
+            return { 'Rastreo': r.ras, 'Flujo': r.flujo, 'Rol container': r.rol, 'Responsable': r.resp, 'Bultos': r.s.tot, 'Bultos validados': r.s.val, 'Faltan': Math.max(r.s.tot - r.s.val, 0), 'Estado': r.s.e };
+        });
+        add(XLSX.utils.json_to_sheet(pend.length ? pend : [{ 'Rastreo': 'Sin pendientes 🎉' }]), 'Pendientes', [22, 18, 18, 26, 9, 16, 9, 12]);
+        var ok = filas.filter(function (r) { return r.s.e === 'Completo'; }).map(function (r) {
+            return { 'Rastreo': r.ras, 'Flujo': r.flujo, 'Rol container': r.rol, 'Responsable': r.resp, 'Bultos': r.s.tot, 'PL': r.s.pl, 'Validado por · hora': r.s.quien, 'Agregado manual': r.s.man ? 'Sí' : '', 'Migrado al escáner': r.s.mig ? 'Sí' : '' };
+        });
+        add(XLSX.utils.json_to_sheet(ok.length ? ok : [{ 'Rastreo': 'Aún no hay validados' }]), 'Validados', [22, 18, 18, 26, 9, 14, 28, 15, 18]);
+        XLSX.writeFile(wb, 'CD-VES_Resumen_validacion_' + ahora.toLocaleDateString().replace(/\//g, '-') + '.xlsx');
+    };
 
     /* ---------- Reporte con formato: GUÍA, FECHA DE ENTREGA, OBSERVACIONES y PRECINTOS ---------- */
     var CVF_LS = 'cdves_formato_v1';
@@ -17052,7 +17534,8 @@
     function caOrden() { return Object.keys(caMetas).sort(function (a, b) { return (caMetas[b].fecha || 0) - (caMetas[a].fecha || 0); }); }
     function caPintar() {
         var box = $('cvArchBox'); if (!box) return;
-        if (!caAbierto) { box.style.display = 'none'; return; }
+        var pop = $('cvArchModal'); if (pop) pop.style.display = caAbierto ? 'flex' : 'none';
+        if (!caAbierto) return;
         if (!$('caBuscar')) {
             box.innerHTML = '<div class="cv-cargas-h"><span>Archivos guardados en la nube</span><span class="cv-cargas-n">Quedan con el flujo y la validación RF del momento en que los guardas</span></div>' +
                 '<input id="caBuscar" type="text" placeholder="Buscar por nombre de archivo o por rastreo (mín. 4 caracteres)…" oninput="caBuscar()" style="' + CA_INP + '"><div id="caLista"></div><div id="caRes"></div>';
@@ -17067,6 +17550,7 @@
         }).join('') : '<div class="cv-carga-s" style="padding:8px 0;">' + (Object.keys(caMetas).length ? 'Ningún archivo coincide por nombre.' : 'Aún no guardas ningún archivo.') + '</div>');
     }
     window.caToggle = function () { caAbierto = !caAbierto; caPintar(); };
+    window.caCerrar = function () { caAbierto = false; caPintar(); };
 
     // Búsqueda dentro de TODOS los archivos guardados (por rastreo, rol, responsable, flujo, etc.)
     window.caBuscar = function () {
@@ -17094,10 +17578,95 @@
         }, 450);
     };
 
+    // Para el Panel de Consulta (Admin): entrega TODAS las filas de TODOS los archivos guardados
+    // de CD VES (cd_ves_archivos), con su nombre de archivo, para buscarlas junto a los demás respaldos.
+    window.cvConsultaArchivos = function () {
+        return rtdb.ref(CA_RTDB + '/meta').once('value').then(function (snap) {
+            var v = snap.val(); if (v) caMetas = v;
+            return Promise.all(caOrden().map(function (id) {
+                return caCargar(id).then(function (d) { return { id: id, d: d }; }, function () { return null; });
+            }));
+        }).then(function (lst) {
+            var out = [];
+            lst.forEach(function (x) {
+                if (!x) return;
+                var m = caMetas[x.id] || {}, cols = x.d.cols;
+                var col = function (k) { return cols.filter(function (c) { return cvKey(c) === k; })[0]; };
+                var cr = col('rastreo'), cf = col('flujo'), cru = col('ruta'), cz = col('zona'), cd = col('dia');
+                x.d.rows.forEach(function (r, idx) {
+                    out.push({
+                        id: x.id, nombre: m.nombre || x.id, fecha: Number(m.fecha) || 0, guardadoPor: m.usuario || '', idx: idx,
+                        rastreo: cr ? cvFmt(r[cr]) : '', flujo: cf ? cvFmt(r[cf]) : '',
+                        ruta: cru ? cvFmt(r[cru]) : '', zona: cz ? cvFmt(r[cz]) : '', dia: cd ? cvFmt(r[cd]) : '',
+                        vt: r.__vt || '', vq: r.__vq || '',
+                        texto: cols.map(function (c) { return cvFmt(r[c]); }).filter(Boolean).join(' | ')
+                    });
+                });
+            });
+            return out;
+        });
+    };
+
+    // Para el Panel de Consulta (Admin): lee las CARGAS de CD VES (cd_ves_cargas) directo de la nube,
+    // SIN necesidad de abrir la tabla. Ojo: cvCol/cvVal/cvxRastreo dependen de las columnas de la tabla en
+    // pantalla (cvCols), por eso aquí se usan las columnas propias de cada carga.
+    var cvConsCache = {};   // id -> { cols, rows } (descargas hechas por la consulta)
+    window.cvConsultaCargas = function () {
+        return rtdb.ref(CV_RTDB + '/meta').once('value').then(function (snap) {
+            var v = snap.val() || {}, metas = {};
+            Object.keys(v).forEach(function (k) { if (v[k] && typeof v[k] === 'object') metas[k] = v[k]; });
+            Object.keys(cvConsCache).forEach(function (id) { if (!metas[id]) delete cvConsCache[id]; });
+            var ids = Object.keys(metas).sort(function (a, b) { return (metas[a].fecha || 0) - (metas[b].fecha || 0); });
+            return Promise.all(ids.map(function (id) {
+                var m = metas[id];
+                if (cvCargas[id]) return { id: id, m: m, d: { cols: cvCargas[id].cols, rows: cvCargas[id].rows } };   // ya descargada por la tabla
+                if (cvConsCache[id]) return { id: id, m: m, d: cvConsCache[id] };
+                return rtdb.ref(CV_RTDB + '/data/' + id).once('value').then(function (sn) {
+                    var d = sn.val() || {}, rows = [];
+                    Object.keys(d).sort(function (a, b) { return a - b; }).forEach(function (k) { if (typeof d[k] === 'string') rows = rows.concat(cvDes(d[k])); });
+                    return (cvConsCache[id] = { cols: JSON.parse(m.cols || '[]'), rows: rows }), { id: id, m: m, d: cvConsCache[id] };
+                }, function () { return null; });
+            }));
+        }).then(function (lst) {
+            // Igual que la tabla: si un rastreo está en varias cargas, manda la más reciente.
+            var mapa = {}, orden = [];
+            lst.forEach(function (x) {
+                if (!x) return;
+                var cols = x.d.cols;
+                var col = function (k) { return cols.filter(function (c) { return cvKey(c) === k; })[0]; };
+                var cr = col('rastreo'), cf = col('flujo'), cru = col('ruta'), cz = col('zona'), cd = col('dia'), cb = col('bultos');
+                x.d.rows.forEach(function (r, i) {
+                    var ras = cr ? r[cr] : '';
+                    if (typeof ras === 'number') ras = ras.toLocaleString('fullwide', { useGrouping: false });
+                    ras = String(ras == null ? '' : ras).trim().toUpperCase();
+                    var clave = ras.replace(/[^A-Z0-9]/g, '').replace(/[.#$\[\]\/]/g, '_');
+                    var val = clave ? cvValid[clave] : null, enl = clave ? cvEnl[clave] : null;
+                    var flujo = ''; try { flujo = ras ? (cvxClasificar(ras) || '') : ''; } catch (e) {}
+                    if (!flujo) flujo = CVX_SC;
+                    var vt = '—', vq = '';
+                    if (val) {
+                        var tot = parseInt(val.bul, 10) || parseInt(cb ? cvFmt(r[cb]) : '', 10) || 1;
+                        vt = val.completo ? ('✅ Completo' + (val.pl ? ' · PL ' + val.pl : '')) : ('📦 ' + (parseInt(val.bultosValidados, 10) || 0) + ' de ' + tot);
+                        vq = (val.validadoPor || 'N/D') + ' · ' + (val.horaValidacion || 'N/D');
+                    }
+                    var fila = {
+                        id: x.id, nombre: x.m.nombre || x.id, fecha: Number(x.m.fecha) || 0, guardadoPor: x.m.usuario || '', idx: i,
+                        rastreo: ras, flujo: flujo, ruta: cru ? cvFmt(r[cru]) : '', zona: cz ? cvFmt(r[cz]) : '', dia: cd ? cvFmt(r[cd]) : '',
+                        vt: vt, vq: vq, enlace: (enl && enl.enlazado) ? String(enl.enlazado) : '',
+                        texto: cols.map(function (c) { return cvFmt(r[c]); }).filter(Boolean).join(' | ')
+                    };
+                    var k = ras || ('__sin_' + x.id + '_' + i);
+                    if (mapa[k] === undefined) { mapa[k] = orden.length; orden.push(fila); } else { orden[mapa[k]] = fila; }
+                });
+            });
+            return orden;
+        });
+    };
+
     // Abrir = reemplaza lo que ves por el archivo guardado (no toca las cargas ni lo guardado)
     window.caAbrir = function (id, q) {
         caCargar(id).then(function (d) {
-            cvSnap = id; cvCols = d.cols.slice(); cvFilas = d.rows;
+            caAbierto = false; cvSnap = id; cvCols = d.cols.slice(); cvFilas = d.rows;
             cvNombre = (caMetas[id] || {}).nombre || '';
             if ($('cvBuscar')) $('cvBuscar').value = q || '';
             caBanner(); caPintar(); cvBadge(); cvPoblarFiltros(); cvRender();
@@ -17130,7 +17699,7 @@
             caCache[id] = { cols: cols, rows: rows };
             if (viejo) { var up = {}; up['meta/' + viejo] = null; up['data/' + viejo] = null; delete caCache[viejo]; return rtdb.ref(CA_RTDB).update(up); }
          })
-         .then(function () { cvEstadoDrop('', '✔ "' + nombre + '" guardado en la nube (' + rows.length + ' filas, ' + vals + ' validadas).'); caAbierto = true; caPintar(); })
+         .then(function () { cvEstadoDrop('', '✔ "' + nombre + '" guardado en la nube (' + rows.length + ' filas, ' + vals + ' validadas).'); caPintar(); })
          .catch(function (err) {
             try { rtdb.ref(CA_RTDB + '/data/' + id).remove().catch(function () {}); } catch (e) {}
             cvEstadoDrop('err', 'No se pudo guardar: ' + (err && err.message ? err.message : err));
@@ -17161,7 +17730,7 @@
 
     // Arrastrar y soltar sobre el cuadro de carga
     document.addEventListener('DOMContentLoaded', function () {
-        var d = $('cvDrop'); if (!d) return;
+        var d = document.querySelector('#modalCDVES .vr-shell'); if (!d) return;
         ['dragenter', 'dragover'].forEach(function (ev) { d.addEventListener(ev, function (e) { e.preventDefault(); d.classList.add('drag'); }); });
         ['dragleave', 'drop'].forEach(function (ev) { d.addEventListener(ev, function (e) { e.preventDefault(); d.classList.remove('drag'); }); });
         d.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files; if (f && f.length) window.cvCargarArchivo({ files: f, value: '' }); });

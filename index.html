@@ -2992,6 +2992,13 @@
                     <input type="file" id="cgInpGpo" accept=".xlsx,.xlsm,.xls" style="display:none;" onchange="cgCargarArchivo('gpo', this)">
                 </div>
             </div>
+            <div class="cg-file" id="cgFileTms" style="margin-bottom:12px;">
+                <span class="cg-file-t">Otra forma · Export del TMS (CSV o Excel), sin Base ni GPO</span>
+                <span class="cg-file-s" id="cgFileTmsTxt">Sin archivo</span>
+                <span class="cg-file-h">El archivo tal cual sale del TMS (columnas número, formaEntrega, nombreEstadoEnvio, nombreRemitente, poblacionDest y direccionDest). Al elegirlo el cruce se hace solo, no hace falta cargar la Base ni el GPO. También puedes <b>arrastrarlo a este cuadro</b>.</span>
+                <div><button type="button" class="cg-btn" onclick="document.getElementById('cgInpTms').click()">Elegir archivo…</button></div>
+                <input type="file" id="cgInpTms" accept=".csv,.txt,.xlsx,.xlsm,.xls" style="display:none;" onchange="cgCargarTMS(this)">
+            </div>
             <div class="cg-bar">
                 <button type="button" class="cg-btn primary" id="cgBtnCruzar" onclick="cgEjecutarCruce()" disabled>Realizar cruce</button>
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
@@ -15928,7 +15935,7 @@
 
     function tiendaDe(forma, direccion) {
         if (!esClickCollect(forma)) return '';
-        var n = ' ' + norm(direccion) + ' ';
+        var n = ' ' + norm(direccion).replace(/\bAVENIDA\b/g, 'AV') + ' ';
         for (var i = 0; i < CG_TIENDAS.length; i++) {
             if (n.indexOf(' ' + CG_TIENDAS[i][0] + ' ') !== -1) return CG_TIENDAS[i][1];
         }
@@ -16101,6 +16108,152 @@
         cgRender();
         guardarNube();
     };
+
+    // ---------- Segunda forma de cruzar: export del TMS (CSV o Excel) tal cual, sin Base ni GPO ----------
+    // Trae todo en un solo archivo: rastreo (número), forma de entrega, estado, remitente (seller),
+    // población y dirección de destino. La tienda sale con las mismas reglas que el cruce Base + GPO.
+    var CG_TMS_COLS = {
+        rastreo:   ['RASTREO', 'NUMERO', 'GUIA', 'SEGUIMIENTO'],
+        forma:     ['FORMAENTREGA', 'FORMA ENTREGA', 'FORMA DE ENTREGA', 'FULLFILMENTTYPE'],
+        estado:    ['NOMBREESTADOENVIO', 'ESTADO TMS', 'ESTADO'],
+        seller:    ['NOMBREREMITENTE', 'NOMBRE SELLER', 'SELLER', 'REMITENTE'],
+        distrito:  ['POBLACIONDEST', 'DISTRITO CLIENTE', 'DISTRITO'],
+        direccion: ['DIRECCIONDEST', 'DIRECCION CLIENTE', 'DIRECCION DEST', 'DIRECCION']
+    };
+    var CG_TMS_NOMBRES = { rastreo: 'número (rastreo)', forma: 'formaEntrega', estado: 'nombreEstadoEnvio', seller: 'nombreRemitente', distrito: 'poblacionDest', direccion: 'direccionDest' };
+
+    // El CSV del TMS suele venir en UTF-16; se detecta la codificación para no perder tildes ni la Ñ.
+    function decodificarTexto(buf) {
+        var u8 = new Uint8Array(buf);
+        if (u8[0] === 0xFF && u8[1] === 0xFE) return new TextDecoder('utf-16le').decode(u8.subarray(2));
+        if (u8[0] === 0xFE && u8[1] === 0xFF) return new TextDecoder('utf-16be').decode(u8.subarray(2));
+        if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) return new TextDecoder('utf-8').decode(u8.subarray(3));
+        try { return new TextDecoder('utf-8', { fatal: true }).decode(u8); }
+        catch (e) { return new TextDecoder('windows-1252').decode(u8); }
+    }
+    // Lector de CSV propio: deja TODO como texto (si pasara por Excel, un rastreo de 18 dígitos o con ceros a la izquierda se dañaría).
+    function parseCSV(txt) {
+        var primera = txt.slice(0, txt.search(/\r?\n/) < 0 ? txt.length : txt.search(/\r?\n/));
+        var delim = ',', best = (primera.match(/,/g) || []).length;
+        [';', '\t'].forEach(function (d) { var n = primera.split(d).length - 1; if (n > best) { best = n; delim = d; } });
+        var filas = [], fila = [], campo = '', enComillas = false, i = 0, n = txt.length, inicio = true;
+        for (; i < n; i++) {
+            var c = txt[i];
+            if (enComillas) {
+                if (c === '"') { if (txt[i + 1] === '"') { campo += '"'; i++; } else enComillas = false; }
+                else campo += c;
+            } else if (c === '"' && inicio) { enComillas = true; inicio = false; }
+            else if (c === delim) { fila.push(campo); campo = ''; inicio = true; }
+            else if (c === '\n' || c === '\r') {
+                if (c === '\r' && txt[i + 1] === '\n') i++;
+                fila.push(campo); campo = ''; inicio = true;
+                if (fila.length > 1 || fila[0] !== '') filas.push(fila);
+                fila = [];
+            } else { campo += c; inicio = false; }
+        }
+        if (campo !== '' || fila.length) { fila.push(campo); filas.push(fila); }
+        if (!filas.length) return [];
+        var cab = filas[0].map(function (h) { return norm(h); });
+        return filas.slice(1).map(function (f) {
+            var o = {};
+            cab.forEach(function (k, j) { if (k && !(k in o)) o[k] = f[j] == null ? '' : f[j]; });
+            return o;
+        });
+    }
+    function mapearTMS(rows) {
+        if (!rows.length) return null;
+        var claves = {}; Object.keys(rows[0]).forEach(function (k) { claves[norm(k)] = k; });
+        var m = {}, faltan = [];
+        Object.keys(CG_TMS_COLS).forEach(function (campo) {
+            var hallada = CG_TMS_COLS[campo].filter(function (c) { return claves[c]; })[0];
+            if (hallada) m[campo] = claves[hallada];
+            else if (campo !== 'seller' && campo !== 'distrito' && campo !== 'estado') faltan.push(CG_TMS_NOMBRES[campo]);
+        });
+        return { m: m, faltan: faltan };
+    }
+    // Una fila por envío del archivo; la tienda se calcula igual que en el cruce con GPO.
+    function filasDesdeTMS(rows, m) {
+        var filas = [];
+        rows.forEach(function (r) {
+            var rastreo = String(r[m.rastreo] == null ? '' : r[m.rastreo]).trim();
+            if (!rastreo) return;
+            var g = function (k) { return m[k] ? String(r[m[k]] == null ? '' : r[m[k]]).trim() : ''; };
+            var f = { rastreo: rastreo, sku: '', desc: '', enGpo: true, forma: g('forma'), estado: g('estado'), seller: g('seller'), distrito: g('distrito'), tienda: '', tiendaBase: '' };
+            f.tiendaBase = tiendaDe(f.forma, g('direccion'));
+            f.tienda = f.tiendaBase;
+            f.estadoN = estadoNorm(f.estado);
+            f.txt = norm([f.rastreo, f.sku, f.forma, f.estado, f.seller, f.distrito, f.tienda].join(' '));
+            filas.push(f);
+        });
+        return filas;
+    }
+    function marcarTMS(clase, texto) {
+        var box = el('cgFileTms'); if (!box) return;
+        box.classList.remove('ok', 'err');
+        if (clase) box.classList.add(clase);
+        el('cgFileTmsTxt').textContent = texto;
+    }
+    function leerTMS(file) {
+        marcarTMS('', 'Leyendo ' + file.name + '…');
+        var fr = new FileReader();
+        fr.onerror = function () { marcarTMS('err', 'No se pudo leer el archivo.'); };
+        fr.onload = function (e) {
+            try {
+                var rows = null, info = null;
+                if (/\.(xlsx|xlsm|xls)$/i.test(file.name)) {
+                    if (typeof XLSX === 'undefined') { marcarTMS('err', 'La librería de Excel no está cargada.'); return; }
+                    var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    for (var i = 0; i < wb.SheetNames.length && !info; i++) {
+                        var rs = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]], { defval: '', raw: false });
+                        var mp = mapearTMS(rs);
+                        if (mp && !mp.faltan.length) { rows = rs; info = mp; }
+                    }
+                    if (!info) { marcarTMS('err', 'Ninguna hoja trae las columnas del export TMS: ' + Object.keys(CG_TMS_NOMBRES).map(function (k) { return CG_TMS_NOMBRES[k]; }).join(', ') + '.'); return; }
+                } else {
+                    rows = parseCSV(decodificarTexto(e.target.result));
+                    info = mapearTMS(rows);
+                    if (!info) { marcarTMS('err', 'El archivo está vacío.'); return; }
+                    if (info.faltan.length) { marcarTMS('err', 'No parece el export del TMS: faltan las columnas ' + info.faltan.join(', ') + '.'); return; }
+                }
+                var filas = filasDesdeTMS(rows, info.m);
+                if (!filas.length) { marcarTMS('err', 'El archivo no trae filas con rastreo.'); return; }
+                cg.filas = filas;
+                cg.baseNombre = 'Export TMS: ' + file.name; cg.gpoNombre = '(no aplica)';
+                aplicarReglas();
+                setTimeout(revisarEnvio, 0);
+                poblarDesplegables();
+                el('cgBuscar').value = '';
+                el('cgResultado').hidden = false;
+                cgRender();
+                guardarNube();
+                var cc = filas.filter(function (f) { return esClickCollect(f.forma); }).length;
+                var ct = filas.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
+                marcarTMS('ok', '✔ ' + file.name + ' · ' + fmt(filas.length) + ' filas · ' + fmt(cc) + ' Click & Collect, ' + fmt(ct) + ' con tienda');
+            } catch (err) {
+                console.error('Cruce GPO: error leyendo export TMS', err);
+                marcarTMS('err', 'No se pudo abrir el archivo: ' + err.message);
+            }
+        };
+        fr.readAsArrayBuffer(file);
+    }
+    window.cgCargarTMS = function (input) {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        leerTMS(file);
+        input.value = '';
+    };
+    (function () {
+        var box = el('cgFileTms'); if (!box) return;
+        ['dragenter', 'dragover'].forEach(function (ev) { box.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); box.classList.add('drag'); }); });
+        ['dragleave', 'dragend'].forEach(function (ev) { box.addEventListener(ev, function (e) { if (!box.contains(e.relatedTarget)) box.classList.remove('drag'); }); });
+        box.addEventListener('drop', function (e) {
+            e.preventDefault(); e.stopPropagation(); box.classList.remove('drag');
+            var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (!f) return;
+            if (!/\.(csv|txt|xlsx|xlsm|xls)$/i.test(f.name)) { marcarTMS('err', 'Solo se aceptan archivos CSV o Excel.'); return; }
+            leerTMS(f);
+        });
+    })();
 
     function poblarDesplegables() {
         var tiendas = {}, formas = {};

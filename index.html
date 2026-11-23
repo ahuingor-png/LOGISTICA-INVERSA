@@ -1509,6 +1509,80 @@
         #modalCruceTMS .cg-vacio { padding:26px 14px; text-align:center; color:var(--text-muted); font-size:12.5px; font-style:italic; }
         @media (max-width: 800px) { #modalCruceGPO .cg-files { grid-template-columns:1fr; } #modalCruceGPO .cg-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } #modalCruceGPO .cg-shell { width:100vw; height:100vh; border-radius:0; } }
         @media (max-width: 800px) { #modalCruceTMS .cg-files { grid-template-columns:1fr; } #modalCruceTMS .cg-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } #modalCruceTMS .cg-shell { width:100vw; height:100vh; border-radius:0; } }
+        #modalReglasCG .cg-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 20px; background:var(--card-bg); border-bottom:1px solid var(--border); }
+        #modalReglasCG .cg-title { display:flex; align-items:center; gap:12px; min-width:0; }
+        #modalReglasCG .cg-ico { width:38px; height:38px; border-radius:10px; background:var(--primary); color:#fff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+        #modalReglasCG .cg-title h4 { margin:0; font-size:17px; font-weight:800; color:var(--text-main); }
+        #modalReglasCG .cg-title p { margin:2px 0 0; font-size:12px; color:var(--text-muted); }
+        #modalReglasCG .cg-close { width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); font-size:20px; line-height:1; cursor:pointer; }
+        #modalReglasCG .cg-close:hover { background:var(--bg); color:var(--text-main); }
+        #modalReglasCG .cg-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 13px; font-size:12px; font-weight:600; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); cursor:pointer; font-family:inherit; white-space:nowrap; }
+        #modalReglasCG .cg-btn:hover { background:var(--bg); border-color:var(--primary); color:var(--primary); }
+        #modalReglasCG .cg-btn.primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+        #modalReglasCG .cg-btn.primary:hover { background:var(--primary-hover); color:#fff; }
+        #modalReglasCG .cg-btn:disabled { opacity:.45; cursor:not-allowed; }
+        #modalReglasCG .cg-inp { padding:8px 10px; font-size:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); font-family:inherit; flex:1; min-width:130px; }
+        #modalReglasCG .cg-regla-x { border:none; background:transparent; color:var(--danger); font-size:18px; line-height:1; cursor:pointer; padding:0 6px; }
+        #modalReglasCG .cg-search { display:flex; align-items:center; gap:8px; flex:1; min-width:220px; padding:0 11px; border:1px solid var(--border); border-radius:8px; background:var(--bg); }
+        #modalReglasCG .cg-search input { flex:1; border:none; outline:none; background:transparent; padding:9px 0; font-size:12px; color:var(--text-main); font-family:inherit; }
+        #modalReglasCG .cg-count { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+        #modalReglasCG .cg-count b { color:var(--text-main); }
+        #modalReglasCG .cg-scroll { overflow:auto; max-height:430px; }
+        #modalReglasCG .cg-table { width:100%; border-collapse:collapse; font-size:12px; }
+        #modalReglasCG .cg-table th { position:sticky; top:0; z-index:1; background:var(--bg); text-align:left; padding:10px 12px; font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); white-space:nowrap; }
+        #modalReglasCG .cg-table td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text-main); white-space:nowrap; }
+        #modalReglasCG .cg-table tbody tr:nth-child(even) { background:rgba(100,116,139,.04); }
+        #modalReglasCG .cg-table tbody tr:hover { background:rgba(61,90,128,.09); }
+        #modalReglasCG .cg-table td.cod { font-weight:700; font-family:ui-monospace,Menlo,Consolas,monospace; }
+        #modalReglasCG .cg-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+        #modalReglasCG .cg-table tfoot td { font-weight:800; background:var(--bg); }
+        #modalReglasCG .cg-pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:700; background:rgba(100,116,139,.14); color:var(--text-muted); }
+        #modalReglasCG .cg-pill.ok { background:rgba(63,136,98,.14); color:var(--success); }
+        #modalReglasCG .cg-pill.warn { background:rgba(185,133,47,.18); color:var(--warning); }
+        #modalReglasCG .cg-pill.info { background:rgba(61,90,128,.14); color:var(--primary); }
+        #modalReglasCG .cg-vacio { padding:26px 14px; text-align:center; color:var(--text-muted); font-size:12.5px; font-style:italic; }
+        /* ===== Mejoras visuales Cruce GPO / Reglas ===== */
+        #modalReglasCG .cg-rshell { display:flex; flex-direction:column; width:min(780px,96vw); max-height:90vh; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(15,23,42,.35); }
+        #modalReglasCG .cg-rbody { padding:16px 20px 20px; overflow-y:auto; }
+        #modalReglasCG .cg-rform { display:grid; grid-template-columns:1fr 1fr 1.3fr auto; gap:10px; align-items:end; }
+        #modalReglasCG .cg-lbl { display:flex; flex-direction:column; gap:4px; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); min-width:0; }
+        #modalReglasCG .cg-inp { width:100%; min-width:0; box-sizing:border-box; padding:9px 10px; text-transform:none; letter-spacing:0; font-weight:500; }
+        #modalReglasCG .cg-inp:focus { outline:2px solid rgba(61,90,128,.35); border-color:var(--primary); }
+        #modalReglasCG .cg-rhint { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin:10px 2px 0; }
+        #modalReglasCG .cg-rcard { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-top:14px; }
+        #modalReglasCG .cg-rtools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); }
+        #modalReglasCG .cg-table td, #modalReglasCG .cg-table th { white-space:normal; }
+        #modalReglasCG .cg-table td.cg-acc { text-align:right; white-space:nowrap; width:1%; }
+        #modalReglasCG .cg-table .cg-cero { color:var(--text-muted); font-style:italic; }
+        @media (max-width: 680px) { #modalReglasCG .cg-rform { grid-template-columns:1fr; } #modalReglasCG .cg-rshell { width:100vw; max-height:100vh; height:100vh; border-radius:0; } }
+        #modalCruceGPO .cg-badge, #modalCruceTMS .cg-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 6px; border-radius:999px; background:var(--primary); color:#fff; font-size:10.5px; font-weight:800; font-variant-numeric:tabular-nums; }
+        #modalCruceGPO .cg-info, #modalCruceTMS .cg-info { margin-bottom:14px; border:1px solid var(--border); border-radius:10px; background:var(--card-bg); }
+        #modalCruceGPO .cg-info summary, #modalCruceTMS .cg-info summary { cursor:pointer; padding:8px 14px; font-size:12px; font-weight:700; color:var(--text-muted); list-style:none; display:flex; align-items:center; gap:8px; user-select:none; }
+        #modalCruceGPO .cg-info summary::-webkit-details-marker, #modalCruceTMS .cg-info summary::-webkit-details-marker { display:none; }
+        #modalCruceGPO .cg-info summary::before, #modalCruceTMS .cg-info summary::before { content:'ⓘ'; font-size:15px; color:var(--primary); }
+        #modalCruceGPO .cg-info summary:hover, #modalCruceTMS .cg-info summary:hover { color:var(--primary); }
+        #modalCruceGPO .cg-info[open] summary, #modalCruceTMS .cg-info[open] summary { border-bottom:1px solid var(--border); }
+        #modalCruceGPO .cg-info .cg-nota, #modalCruceTMS .cg-info .cg-nota { padding:10px 14px; margin:0; }
+        #modalCruceGPO .cg-nube { padding:7px 12px; font-size:11.5px; flex-wrap:nowrap; }
+        #modalCruceGPO .cg-nube > span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #modalCruceGPO .cg-nube .cg-btn { padding:5px 11px; font-size:11.5px; flex-shrink:0; }
+        #modalCruceGPO .cg-kpis { grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; }
+        #modalCruceGPO .cg-kpi { padding:10px 12px; }
+        #modalCruceGPO .cg-kpi-v { font-size:22px; }
+        #modalCruceGPO .cg-kpi-s { font-size:10.5px; color:var(--text-muted); margin-top:2px; line-height:1.3; }
+        #modalCruceGPO .cg-kpi.click { cursor:pointer; transition:background .15s, box-shadow .15s; }
+        #modalCruceGPO .cg-kpi.click:hover { background:rgba(185,133,47,.08); box-shadow:0 1px 6px rgba(15,23,42,.10); }
+        @media (max-width: 1100px) { #modalCruceGPO .cg-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+        @media (max-width: 800px) { #modalCruceGPO .cg-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } #modalCruceGPO .cg-nube { flex-wrap:wrap; } #modalCruceGPO .cg-nube > span { white-space:normal; } }
+        #modalCruceGPO .cg-hint { font-weight:500; text-transform:none; letter-spacing:0; font-size:11px; }
+        #modalCruceGPO .cg-resumen .cg-table td, #modalCruceGPO .cg-resumen .cg-table th { padding:8px 14px; }
+        #modalCruceGPO .cg-cero { color:var(--text-muted); opacity:.45; }
+        #modalCruceGPO .cg-table tr.cg-rowf { cursor:pointer; }
+        #modalCruceGPO .cg-table tr.cg-rowf.sel td { background:rgba(61,90,128,.14); }
+        #modalCruceGPO .cg-table tr.cg-rowf.sel td:first-child { box-shadow:inset 3px 0 0 var(--primary); }
+        #modalCruceGPO .cg-table tr.cg-rowf.cg-rev td { background:rgba(185,133,47,.10); }
+        #modalCruceGPO .cg-table tr.cg-rowf.cg-hd td { color:var(--text-muted); border-top:2px solid var(--border); }
+        #modalCruceGPO .cg-table tfoot td { border-top:2px solid var(--border); }
         @media (max-width: 1100px) { #modalVistaSender .vr-filters { grid-template-columns: repeat(3, minmax(0,1fr)); } }
         #modalCDVES .vr-content { padding: 0 !important; background: var(--bg) !important; overflow: hidden; }
         #modalCDVES .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 1480px; margin: 0 auto; }
@@ -3158,6 +3232,7 @@
             </div>
             <div class="cg-bar">
                 <button type="button" class="cg-btn primary" id="cgBtnCruzar" onclick="cgEjecutarCruce()" disabled>Realizar cruce</button>
+                <button type="button" class="cg-btn" onclick="abrirReglasCG()" title="Reglas Seller + Distrito → Comentario final (tienda)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="var(--card-bg)"/><circle cx="15" cy="12" r="2" fill="var(--card-bg)"/><circle cx="8" cy="18" r="2" fill="var(--card-bg)"/></svg> Reglas <span class="cg-badge" id="cgReglasCount">0</span></button>
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="REINGRESO" checked onchange="cgRender(); cgRevisarEnvio()"> Reingreso</label>
                     <label class="cg-chip"><input type="checkbox" class="cg-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="cgRender(); cgRevisarEnvio()"> En bodega Crossdock</label>
@@ -3171,23 +3246,12 @@
                 <span id="cgNubeTxt">☁ Comprobando si hay un cruce guardado en la nube…</span>
                 <button type="button" class="cg-btn" id="cgBtnBorrarNube" onclick="cgBorrarNube()" style="display:none;">Borrar de la nube</button>
             </div>
-            <div class="cg-card">
-                <div class="cg-card-h">Reglas manuales · Seller + Distrito → Comentario final (tienda)</div>
-                <div class="cg-reglas-form">
-                    <input type="text" class="cg-inp" id="cgRegSeller" placeholder="Seller (ej. VIALE)">
-                    <input type="text" class="cg-inp" id="cgRegDistrito" placeholder="Distrito (ej. SAN MIGUEL)">
-                    <input type="text" class="cg-inp" id="cgRegTienda" list="cgDlTiendas" placeholder="Comentario final / tienda">
-                    <datalist id="cgDlTiendas"></datalist>
-                    <button type="button" class="cg-btn primary" onclick="cgAgregarRegla()">Agregar regla</button>
-                </div>
-                <div class="cg-reglas-list" id="cgReglasList"></div>
-            </div>
-            <div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las <b>reglas Seller + Distrito</b> (arriba) también se aplican solo a Click &amp; Collect, cuando la dirección no da tienda, y se reflejan al instante en el cruce, el resumen, el Excel y la plantilla de carga.</div>
+            <details class="cg-info"><summary>¿Cómo funciona el cruce?</summary><div class="cg-nota">El cruce busca cada Rastreo de la base en el GPO (si hay varias filas con el mismo rastreo usa la primera, igual que BUSCARV). El <b>Comentario final</b> es la tienda según la dirección de entrega del GPO y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las <b>reglas Seller + Distrito</b> (botón «Reglas») también se aplican solo a Click &amp; Collect, cuando la dirección no da tienda, y se reflejan al instante en el cruce, el resumen, el Excel y la plantilla de carga.</div></details>
             <div id="cgResultado" hidden>
                 <div class="cg-kpis" id="cgKpis"></div>
                 <div class="cg-card">
-                    <div class="cg-card-h">Resumen por tienda</div>
-                    <div class="cg-scroll" style="max-height:260px;"><table class="cg-table" id="cgTablaResumen"></table></div>
+                    <div class="cg-card-h">Resumen por tienda <span class="cg-hint">· clic en una fila para filtrar el detalle</span></div>
+                    <div class="cg-scroll cg-resumen" style="max-height:none;"><table class="cg-table" id="cgTablaResumen"></table></div>
                 </div>
                 <div class="cg-card">
                     <div class="cg-toolbar">
@@ -3208,6 +3272,47 @@
                             <tbody id="cgTbody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Reglas manuales del cruce (Seller + Distrito → Comentario final). Lo abren Cruce GPO y Cruce TMS. ===== -->
+<div id="modalReglasCG" class="modal" style="z-index: 9400;" onclick="if(event.target===this)cerrarReglasCG()">
+    <div class="cg-rshell">
+        <div class="cg-head">
+            <div class="cg-title">
+                <span class="cg-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="var(--card-bg)"/><circle cx="15" cy="12" r="2" fill="var(--card-bg)"/><circle cx="8" cy="18" r="2" fill="var(--card-bg)"/></svg></span>
+                <div>
+                    <h4>Reglas manuales</h4>
+                    <p>Seller + Distrito → Comentario final (tienda)</p>
+                </div>
+            </div>
+            <button type="button" class="cg-close" onclick="cerrarReglasCG()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="cg-rbody">
+            <div class="cg-rform">
+                <label class="cg-lbl">Seller<input type="text" class="cg-inp" id="cgRegSeller" placeholder="ej. VIALE" onkeydown="if(event.key==='Enter')cgAgregarRegla()"></label>
+                <label class="cg-lbl">Distrito<input type="text" class="cg-inp" id="cgRegDistrito" placeholder="ej. SAN MIGUEL" onkeydown="if(event.key==='Enter')cgAgregarRegla()"></label>
+                <label class="cg-lbl">Comentario final / tienda<input type="text" class="cg-inp" id="cgRegTienda" list="cgDlTiendas" placeholder="ej. Tottus La Marina" onkeydown="if(event.key==='Enter')cgAgregarRegla()"></label>
+                <datalist id="cgDlTiendas"></datalist>
+                <button type="button" class="cg-btn primary" onclick="cgAgregarRegla()">Agregar regla</button>
+            </div>
+            <div class="cg-rhint">Se aplican solo a pedidos <b>Click &amp; Collect</b> cuando la dirección de entrega no da tienda. Si dejas el Distrito vacío, la regla vale para cualquier distrito del seller.</div>
+            <div class="cg-rcard">
+                <div class="cg-rtools">
+                    <div class="cg-search">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <input type="text" id="cgRegFiltro" placeholder="Buscar seller, distrito o tienda…" oninput="cgFiltrarReglas()">
+                    </div>
+                    <span class="cg-count"><b id="cgReglasTotal">0</b> regla(s)</span>
+                </div>
+                <div class="cg-scroll" style="max-height:340px;">
+                    <table class="cg-table">
+                        <thead><tr><th>Seller</th><th>Distrito</th><th>Comentario final</th><th>Tipo</th><th></th></tr></thead>
+                        <tbody id="cgReglasList"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -3235,6 +3340,7 @@
                 <input type="file" id="ctInp" accept=".csv,.txt,.xlsx,.xlsm,.xls" style="display:none;" onchange="ctCargarArchivo(this)">
             </div>
             <div class="cg-bar">
+                <button type="button" class="cg-btn" onclick="abrirReglasCG()" title="Reglas Seller + Distrito → Comentario final (tienda)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="var(--card-bg)"/><circle cx="15" cy="12" r="2" fill="var(--card-bg)"/><circle cx="8" cy="18" r="2" fill="var(--card-bg)"/></svg> Reglas <span class="cg-badge" id="ctReglasCount">0</span></button>
                 <div class="cg-estados"><span>Estados TMS considerados:</span>
                     <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="REINGRESO" checked onchange="ctRender(); ctRevisarEnvio()"> Reingreso</label>
                     <label class="cg-chip"><input type="checkbox" class="ct-chk-estado" value="EN BODEGA CROSSDOCK" checked onchange="ctRender(); ctRevisarEnvio()"> En bodega Crossdock</label>
@@ -3244,11 +3350,7 @@
                 </div>
             </div>
             <div class="cg-aviso" id="ctAviso" hidden></div>
-            <div class="cg-card">
-                <div class="cg-card-h">Reglas Seller + Distrito → Comentario final (se agregan o quitan en «Cruce GPO»)</div>
-                <div class="cg-reglas-list" id="ctReglasList"></div>
-            </div>
-            <div class="cg-nota">El <b>Comentario final</b> es la tienda según la dirección de entrega del archivo y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las reglas Seller + Distrito se aplican solo a Click &amp; Collect cuando la dirección no da tienda. El resultado es el mismo que el del Cruce GPO, y la plantilla de carga comparte el candado con él para no cargarse dos veces.</div>
+            <details class="cg-info"><summary>¿Cómo funciona el cruce?</summary><div class="cg-nota">El <b>Comentario final</b> es la tienda según la dirección de entrega del archivo y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las reglas Seller + Distrito se aplican solo a Click &amp; Collect cuando la dirección no da tienda. El resultado es el mismo que el del Cruce GPO, y la plantilla de carga comparte el candado con él para no cargarse dos veces.</div></details>
             <div id="ctResultado" hidden>
                 <div class="cg-kpis" id="ctKpis"></div>
                 <div class="cg-card">
@@ -16738,14 +16840,20 @@
         var conTienda = base.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
         var revisar = base.filter(function (f) { return f.tienda === CG_SIN_TIENDA; }).length;
         var sinGpo = cg.filas.filter(function (f) { return !f.enGpo; }).length;
+        var cc = base.filter(function (f) { return esClickCollect(f.forma); }).length;
+        var hd = base.filter(function (f) { return f.enGpo && !esClickCollect(f.forma); }).length;
+        function pct(a, b) { return b ? (Math.round(a * 1000 / b) / 10).toLocaleString('es-PE') + ' %' : '—'; }
         el('cgKpis').innerHTML = [
-            ['Filas con estado elegido', fmt(base.length), 'var(--primary)'],
-            ['Rastreos únicos', fmt(Object.keys(unicos).length), 'var(--primary)'],
-            ['Con tienda', fmt(conTienda), 'var(--success)'],
-            ['Sin tienda · revisar / sin GPO', fmt(revisar) + ' / ' + fmt(sinGpo), (revisar || sinGpo) ? 'var(--warning)' : 'var(--success)']
+            ['Filas con estado elegido', fmt(base.length), 'var(--primary)', fmt(Object.keys(unicos).length) + ' rastreos únicos', ''],
+            ['Home Delivery', fmt(hd), 'var(--primary)', pct(hd, base.length) + ' del total', ''],
+            ['Click & Collect', fmt(cc), 'var(--primary)', pct(cc, base.length) + ' del total', ''],
+            ['Con tienda', fmt(conTienda), 'var(--success)', pct(conTienda, cc) + ' de los Click & Collect', ''],
+            ['Sin tienda · revisar', fmt(revisar), revisar ? 'var(--warning)' : 'var(--success)', revisar ? 'Clic para ver el detalle' : 'Todo asignado', revisar ? CG_SIN_TIENDA : ''],
+            ['Sin GPO', fmt(sinGpo), sinGpo ? 'var(--warning)' : 'var(--success)', sinGpo ? 'Rastreos no encontrados' : 'Todo encontrado', '']
         ].map(function (k) {
-            return '<div class="cg-kpi" style="--kpi:' + k[2] + ';"><div class="cg-kpi-l">' + esc(k[0]) + '</div><div class="cg-kpi-v">' + esc(k[1]) + '</div></div>';
+            return '<div class="cg-kpi' + (k[4] ? ' click' : '') + '" style="--kpi:' + k[2] + ';"' + (k[4] ? ' data-t="' + esc(k[4]) + '"' : '') + '><div class="cg-kpi-l">' + esc(k[0]) + '</div><div class="cg-kpi-v">' + esc(k[1]) + '</div><div class="cg-kpi-s">' + esc(k[3]) + '</div></div>';
         }).join('');
+        el('cgKpis').onclick = function (e) { var k = e.target.closest ? e.target.closest('.cg-kpi.click') : null; if (k) window.cgFiltrarTienda(k.getAttribute('data-t'), true); };
 
         // Resumen por tienda x estado
         var res = {}, estadosVistos = {};
@@ -16756,13 +16864,21 @@
             res[t][f.estado] = (res[t][f.estado] || 0) + 1;
             res[t].total++;
         });
+        var HD = 'Sin tienda (Home Delivery)';
         var cols = Object.keys(estadosVistos).sort();
-        var nombres = Object.keys(res).sort(function (a, b) { return res[b].total - res[a].total; });
+        var nombres = Object.keys(res).sort(function (a, b) {
+            if ((a === HD) !== (b === HD)) return a === HD ? 1 : -1;   // Home Delivery siempre al final
+            return res[b].total - res[a].total;
+        });
+        var selT = el('cgSelTienda').value;
         var tot = { total: 0 };
+        function celda(v) { return v ? '<td class="num">' + fmt(v) + '</td>' : '<td class="num"><span class="cg-cero">—</span></td>'; }
         var html = '<thead><tr><th>Comentario final</th>' + cols.map(function (c) { return '<th style="text-align:right;">' + esc(c) + '</th>'; }).join('') + '<th style="text-align:right;">Total</th></tr></thead><tbody>';
         nombres.forEach(function (n) {
-            html += '<tr><td>' + pillTienda(n.indexOf('Sin tienda (') === 0 ? '' : n) + (n.indexOf('Sin tienda (') === 0 ? ' <span style="color:var(--text-muted);font-size:11px;">Home Delivery</span>' : '') + '</td>' +
-                cols.map(function (c) { tot[c] = (tot[c] || 0) + (res[n][c] || 0); return '<td class="num">' + fmt(res[n][c] || 0) + '</td>'; }).join('') +
+            var esHD = n === HD, filtro = esHD ? '__VACIA__' : n;
+            var cls = 'cg-rowf' + (esHD ? ' cg-hd' : '') + (n === CG_SIN_TIENDA ? ' cg-rev' : '') + (selT === filtro ? ' sel' : '');
+            html += '<tr class="' + cls + '" data-t="' + esc(filtro) + '" title="Clic para filtrar el detalle"><td>' + (esHD ? '<span class="cg-pill">Home Delivery</span>' : pillTienda(n)) + '</td>' +
+                cols.map(function (c) { tot[c] = (tot[c] || 0) + (res[n][c] || 0); return celda(res[n][c] || 0); }).join('') +
                 '<td class="num"><b>' + fmt(res[n].total) + '</b></td></tr>';
             tot.total += res[n].total;
         });
@@ -16770,6 +16886,7 @@
         if (nombres.length) html += '<tfoot><tr><td>Total</td>' + cols.map(function (c) { return '<td class="num">' + fmt(tot[c] || 0) + '</td>'; }).join('') + '<td class="num">' + fmt(tot.total) + '</td></tr></tfoot>';
         else html = '<tbody><tr><td class="cg-vacio">Marca al menos un estado TMS.</td></tr></tbody>';
         el('cgTablaResumen').innerHTML = html;
+        el('cgTablaResumen').onclick = function (e) { var tr = e.target.closest ? e.target.closest('tr.cg-rowf') : null; if (tr) window.cgFiltrarTienda(tr.getAttribute('data-t'), false); };
 
         // Tabla detalle (estados + desplegables + búsqueda)
         var fT = el('cgSelTienda').value, fF = el('cgSelForma').value;
@@ -16787,6 +16904,15 @@
                 '</td><td>' + esc(f.seller || '—') + '</td><td>' + esc(f.distrito || '—') + '</td><td>' + pillTienda(f.tienda) + '</td></tr>';
         }).join('') + (cg.visibles.length > LIM ? '<tr><td colspan="7" class="cg-vacio">Se muestran las primeras ' + fmt(LIM) + ' filas; la descarga incluye todas.</td></tr>' : '')
             : '<tr><td colspan="7" class="cg-vacio">Sin resultados con estos filtros.</td></tr>';
+    };
+
+    // Clic en una fila del resumen (o en el KPI «revisar»): filtra el detalle por esa tienda; otro clic lo quita.
+    window.cgFiltrarTienda = function (t, soloAplicar) {
+        var sel = el('cgSelTienda');
+        if (!sel) return;
+        sel.value = (!soloAplicar && sel.value === t) ? '' : t;
+        window.cgRender();
+        if (sel.value) { var b = el('cgBuscar'); if (b && b.scrollIntoView) b.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     };
 
     window.cgDescargarExcel = function () {
@@ -17009,14 +17135,14 @@
     function pintarNube(estado, msg) {
         var box = el('cgNube'), txt = el('cgNubeTxt'), btn = el('cgBtnBorrarNube');
         if (!box) return;
-        box.classList.remove('ok', 'err');
+        box.classList.remove('ok', 'err'); box.title = '';
         if (estado) box.classList.add(estado);
         if (msg) { txt.innerHTML = msg; }
         else if (cg.meta) {
             var d = new Date(cg.meta.fecha);
             txt.innerHTML = '☁ <b>Cruce guardado en la nube</b> · ' + esc(d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })) +
-                ' · por ' + esc(cg.meta.usuario || '-') + ' · ' + fmt(cg.meta.filas) + ' filas<br><small>Base: ' + esc(cg.meta.base || '-') + ' · GPO: ' + esc(cg.meta.gpo || '-') +
-                ' · Se mantiene hasta que se borre o se haga otro cruce.</small>';
+                ' · por ' + esc(cg.meta.usuario || '-') + ' · ' + fmt(cg.meta.filas) + ' filas <small>· Base: ' + esc(cg.meta.base || '-') + ' · GPO: ' + esc(cg.meta.gpo || '-') + '</small>';
+            box.title = 'Base: ' + (cg.meta.base || '-') + ' · GPO: ' + (cg.meta.gpo || '-') + ' · Se mantiene hasta que se borre o se haga otro cruce.';
             box.classList.add('ok');
         } else {
             txt.innerHTML = '☁ No hay ningún cruce guardado en la nube. Carga la base y el GPO y presiona «Realizar cruce».';
@@ -17114,17 +17240,35 @@
     // ---------- Reglas manuales: pantalla y guardado ----------
     function pintarReglas() {
         var rs = reglasActivas(), box = el('cgReglasList');
-        if (!box) return;
-        box.innerHTML = rs.map(function (r) {
-            return '<div class="cg-regla"><span>Seller <b>' + esc(r.seller) + '</b>' + (r.distrito ? ' · Distrito <b>' + esc(r.distrito) + '</b>' : ' · cualquier distrito') +
-                ' → <b>' + esc(r.tienda) + '</b>' + (r.base ? ' <small>(fija)</small>' : '') + '</span>' +
-                (r.base ? '' : '<button type="button" class="cg-regla-x" title="Quitar regla" onclick="cgQuitarRegla(\'' + esc(r.id) + '\')">&times;</button>') + '</div>';
-        }).join('');
+        ['cgReglasCount', 'ctReglasCount'].forEach(function (id) { var b = el(id); if (b) b.textContent = rs.length; });
         var tiendas = {};
         CG_TIENDAS.forEach(function (t) { tiendas[t[1]] = 1; });
         rs.forEach(function (r) { tiendas[r.tienda] = 1; });
-        el('cgDlTiendas').innerHTML = Object.keys(tiendas).sort().map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+        if (el('cgDlTiendas')) el('cgDlTiendas').innerHTML = Object.keys(tiendas).sort().map(function (t) { return '<option value="' + esc(t) + '">'; }).join('');
+        if (!box) return;
+        var q = el('cgRegFiltro') ? norm(el('cgRegFiltro').value) : '';
+        var vis = rs.filter(function (r) { return !q || norm(r.seller + ' ' + r.distrito + ' ' + r.tienda).indexOf(q) !== -1; });
+        if (el('cgReglasTotal')) el('cgReglasTotal').textContent = vis.length === rs.length ? rs.length : vis.length + ' de ' + rs.length;
+        box.innerHTML = vis.length ? vis.map(function (r) {
+            return '<tr><td><b>' + esc(r.seller) + '</b></td>' +
+                '<td>' + (r.distrito ? esc(r.distrito) : '<span class="cg-cero">Cualquiera</span>') + '</td>' +
+                '<td><span class="cg-pill ok">' + esc(r.tienda) + '</span></td>' +
+                '<td>' + (r.base ? '<span class="cg-pill">Fija</span>' : '<span class="cg-pill info">Manual</span>') + '</td>' +
+                '<td class="cg-acc">' + (r.base ? '' : '<button type="button" class="cg-regla-x" title="Quitar regla" onclick="cgQuitarRegla(\'' + esc(r.id) + '\')">&times;</button>') + '</td></tr>';
+        }).join('') : '<tr><td colspan="5" class="cg-vacio">' + (rs.length ? 'Ninguna regla coincide con la búsqueda.' : 'Aún no hay reglas. Agrega la primera arriba.') + '</td></tr>';
     }
+    window.cgFiltrarReglas = pintarReglas;
+    window.abrirReglasCG = function () {
+        el('modalReglasCG').style.display = 'flex';
+        pintarReglas();
+        setTimeout(function () { var i = el('cgRegSeller'); if (i) i.focus(); }, 60);
+    };
+    window.cerrarReglasCG = function () { el('modalReglasCG').style.display = 'none'; };
+    // Escape cierra primero el modal de reglas (sin cerrar también el cruce que está detrás)
+    document.addEventListener('keydown', function (e) {
+        var m = el('modalReglasCG');
+        if (e.key === 'Escape' && m && m.style.display === 'flex') { e.stopImmediatePropagation(); window.cerrarReglasCG(); }
+    }, true);
     function reglasCambiaron() {
         pintarReglas();
         ctPintarReglas(); ctReaplicar();

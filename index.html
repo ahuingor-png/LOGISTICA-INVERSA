@@ -3261,7 +3261,7 @@
                         </div>
                         <select class="cg-sel" id="cgSelTienda" onchange="cgRender()"></select>
                         <select class="cg-sel" id="cgSelForma" onchange="cgRender()"></select>
-                        <span class="cg-count"><b id="cgLblVisibles">0</b> registro(s)</span>
+                        <span class="cg-count"><b id="cgLblVisibles">0</b> registro(s) · <b id="cgLblFolios">0</b> folio(s) único(s)</span>
                         <button type="button" class="cg-btn primary" id="cgBtnExcel" onclick="cgDescargarExcel()">Descargar Excel</button>
                         <button type="button" class="cg-btn" id="cgBtnPlantilla" onclick="cgDescargarPlantilla()" title="Plantilla_carga.xlsx lista: seguimiento = rastreo, ruta = comentario final (solo filas con tienda)">Descargar plantilla de carga</button>
                         <button type="button" class="cg-btn primary" id="cgBtnEnviarCarga" onclick="cgEnviarPlantillaACarga()" title="Manda la plantilla directo a Cargar Bases · Base Ruta, como si hubieras subido el Excel">Enviar a Cargar Bases (Ruta)</button>
@@ -3350,6 +3350,10 @@
                 </div>
             </div>
             <div class="cg-aviso" id="ctAviso" hidden></div>
+            <div class="cg-nube" id="ctNube">
+                <span id="ctNubeTxt">☁ Comprobando si hay un cruce TMS guardado en la nube…</span>
+                <button type="button" class="cg-btn" id="ctBtnBorrarNube" onclick="ctBorrarNube()" style="display:none;">Borrar de la nube</button>
+            </div>
             <details class="cg-info"><summary>¿Cómo funciona el cruce?</summary><div class="cg-nota">El <b>Comentario final</b> es la tienda según la dirección de entrega del archivo y se asigna solo a pedidos <b>Click &amp; Collect</b>; los Home Delivery quedan siempre sin tienda. Las reglas Seller + Distrito se aplican solo a Click &amp; Collect cuando la dirección no da tienda. El resultado es el mismo que el del Cruce GPO, y la plantilla de carga comparte el candado con él para no cargarse dos veces.</div></details>
             <div id="ctResultado" hidden>
                 <div class="cg-kpis" id="ctKpis"></div>
@@ -3911,12 +3915,105 @@
     </div>
 </div>
 
+<!-- ===== EXTRAER FOLIOS: saca rastreos/folios de una ruta escaneada o del escaneo general (uno a uno o masivo), con respaldo y restauración ===== -->
+<style>
+#modalExtraerFolios .ef-wrap { display:flex; flex-direction:column; height:100%; max-width:1100px; width:100%; margin:0 auto; }
+#modalExtraerFolios .ef-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); }
+#modalExtraerFolios .ef-head h4 { margin:0; font-size:16px; font-weight:900; color:var(--danger); }
+#modalExtraerFolios .ef-head p { margin:2px 0 0; font-size:11.5px; color:var(--text-muted); }
+#modalExtraerFolios .ef-x { width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); font-size:20px; cursor:pointer; }
+#modalExtraerFolios .ef-body { flex:1; overflow-y:auto; padding:14px 16px 24px; }
+#modalExtraerFolios .ef-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+#modalExtraerFolios .ef-seg { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+#modalExtraerFolios .ef-seg button { padding:9px 14px; border:none; background:var(--card-bg); color:var(--text-main); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+#modalExtraerFolios .ef-seg button.on { background:var(--primary); color:#fff; }
+#modalExtraerFolios select, #modalExtraerFolios textarea { border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text-main); font-family:inherit; font-size:13px; }
+#modalExtraerFolios select { padding:9px 10px; min-width:170px; }
+#modalExtraerFolios textarea { width:100%; min-height:84px; padding:10px 12px; resize:vertical; font-family:ui-monospace,Menlo,Consolas,monospace; }
+#modalExtraerFolios .ef-btn { padding:9px 14px; border-radius:8px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+#modalExtraerFolios .ef-btn.primary { background:var(--primary); border-color:var(--primary); color:#fff; }
+#modalExtraerFolios .ef-btn.danger { background:var(--danger); border-color:var(--danger); color:#fff; }
+#modalExtraerFolios .ef-btn:disabled { opacity:.45; cursor:not-allowed; }
+#modalExtraerFolios .ef-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:6px 0 12px; }
+#modalExtraerFolios .ef-kpi { background:var(--card-bg); border:1px solid var(--border); border-left:4px solid var(--k,var(--primary)); border-radius:8px; padding:8px 12px; }
+#modalExtraerFolios .ef-kpi small { display:block; font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; }
+#modalExtraerFolios .ef-kpi b { font-size:20px; color:var(--k,var(--primary)); font-variant-numeric:tabular-nums; }
+#modalExtraerFolios .ef-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:12px; }
+#modalExtraerFolios .ef-card-h { padding:10px 12px; font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+#modalExtraerFolios .ef-scroll { overflow:auto; max-height:380px; }
+#modalExtraerFolios table { width:100%; border-collapse:collapse; font-size:12px; }
+#modalExtraerFolios th { position:sticky; top:0; background:var(--bg); text-align:left; padding:8px 10px; font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; white-space:nowrap; border-bottom:1px solid var(--border); }
+#modalExtraerFolios td { padding:7px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+#modalExtraerFolios td.c { font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; }
+#modalExtraerFolios .ef-chips { display:flex; flex-wrap:wrap; gap:6px; padding:10px 12px; max-height:140px; overflow:auto; }
+#modalExtraerFolios .ef-chip { padding:3px 9px; border-radius:999px; background:rgba(185,133,47,.16); color:var(--warning); font-size:11px; font-weight:700; font-family:ui-monospace,Menlo,Consolas,monospace; }
+#modalExtraerFolios .ef-vacio { text-align:center; padding:18px 10px; color:var(--text-muted); font-style:italic; }
+#modalExtraerFolios .ef-dup { display:inline-block; padding:1px 7px; border-radius:999px; background:rgba(185,133,47,.16); color:var(--warning); font-size:10.5px; font-weight:800; margin-left:6px; }
+@media (max-width:700px){ #modalExtraerFolios .ef-kpis{grid-template-columns:repeat(2,minmax(0,1fr));} }
+</style>
+<div id="modalExtraerFolios" class="modal" style="z-index: 9400;">
+    <div class="modal-content" style="padding:0;">
+        <div class="ef-wrap">
+            <div class="ef-head">
+                <div>
+                    <h4>📤 Extraer folios / rastreos</h4>
+                    <p>Saca folios de una ruta ya escaneada o del escaneo general, uno a uno o masivamente. Todo queda respaldado y se puede restaurar.</p>
+                </div>
+                <button type="button" class="ef-x" onclick="cerrarExtraerFolios()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="ef-body">
+                <div class="ef-row">
+                    <div class="ef-seg">
+                        <button type="button" id="efBtnRuta" class="on" onclick="efCambiarAlcance('RUTA')">🛣️ Ruta</button>
+                        <button type="button" id="efBtnGeneral" onclick="efCambiarAlcance('GENERAL')">📦 Escaneo general</button>
+                    </div>
+                    <select id="efRuta" onchange="efBuscar()" title="Ruta escaneada (la que el operario digitó en Ubicación)"></select>
+                </div>
+                <textarea id="efInput" placeholder="Un folio/rastreo, o pega muchos (uno por línea, o separados por coma o espacio). Enter = buscar · Shift+Enter = nueva línea" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();efBuscar();}"></textarea>
+                <div class="ef-row" style="margin-top:8px;">
+                    <button type="button" class="ef-btn primary" onclick="efBuscar()">🔎 Buscar</button>
+                    <button type="button" class="ef-btn" onclick="efLimpiar()">Limpiar</button>
+                </div>
+                <div id="efResultado" hidden>
+                    <div class="ef-kpis" id="efKpis"></div>
+                    <div class="ef-card">
+                        <div class="ef-card-h"><span>Encontrados en el alcance elegido</span>
+                            <span style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button type="button" class="ef-btn" onclick="efDescargar()">Descargar Excel</button>
+                                <button type="button" class="ef-btn danger" id="efBtnExtraer" onclick="efExtraer()" disabled>Extraer seleccionados</button>
+                            </span>
+                        </div>
+                        <div class="ef-scroll"><table>
+                            <thead><tr><th><input type="checkbox" id="efChkTodos" onchange="efToggleTodos(this.checked)" checked></th><th>Folio</th><th>Ruta (ubic.)</th><th>Zona</th><th>Cat.</th><th>Usuario</th><th>Hora</th></tr></thead>
+                            <tbody id="efTbody"></tbody>
+                        </table></div>
+                    </div>
+                    <div class="ef-card" id="efNoCard" hidden>
+                        <div class="ef-card-h"><span id="efNoTit">No encontrados</span><button type="button" class="ef-btn" onclick="efCopiarNo()">Copiar lista</button></div>
+                        <div class="ef-chips" id="efNoChips"></div>
+                    </div>
+                </div>
+                <div class="ef-card">
+                    <div class="ef-card-h"><span>Historial de extracciones (últimas 10)</span><button type="button" class="ef-btn" onclick="efHistorial()">Actualizar</button></div>
+                    <div class="ef-scroll" style="max-height:240px;"><table>
+                        <thead><tr><th>Fecha</th><th>Usuario</th><th>Alcance</th><th style="text-align:right;">Folios</th><th style="text-align:right;">Registros</th><th></th></tr></thead>
+                        <tbody id="efHist"><tr><td colspan="6" class="ef-vacio">—</td></tr></tbody>
+                    </table></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="modalConsultaAdmin" class="modal">
     <div class="modal-content">
         <div class="table-header">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h4 style="font-weight:900; color:#0ea5e9;">🔍 PANEL DE CONSULTA (ADMIN)</h4>
-                <button onclick="cerrarModalConsulta()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button onclick="abrirExtraerFolios()" style="background:var(--bg); border:1px solid var(--border); padding:5px 10px; border-radius:6px; font-size:12px; font-weight:800; color:var(--danger); cursor:pointer;">📤 Extraer folios</button>
+                    <button onclick="cerrarModalConsulta()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700;">&times;</button>
+                </div>
             </div>
             <div style="margin-top:8px; position:relative;">
                 <span style="position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.55; pointer-events:none;">🔍</span>
@@ -9977,6 +10074,177 @@
             });
         }
     }
+
+    // ===== EXTRAER FOLIOS de rutas escaneadas / escaneo general =====
+    // Ruta = escaneos del Modo Ruta (modo VALIDAR_RUTA) filtrados por la Ubicación digitada; Escaneo general = modo SIMPLE.
+    // Antes de borrar se guarda un respaldo en "folios_extraidos_datos" (+ resumen en "folios_extraidos_meta") para poder restaurar.
+    let efAlcance = 'RUTA', efHallados = [], efNoHallados = [], efSel = new Set();
+    function efClave(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
+    function efEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function efEnAlcance(sc, alcance, ruta) {
+        if (alcance === 'GENERAL') return esEscaneoGeneralLQ(sc);
+        if (sc.modo !== 'VALIDAR_RUTA') return false;
+        return !ruta || efClave(sc.ubic) === ruta;
+    }
+    function efEtiqueta(sc) {
+        if (sc.modo === 'VALIDAR_RUTA') return 'Ruta ' + (sc.ubic || '-');
+        if (esEscaneoGeneralLQ(sc)) return 'Escaneo general';
+        return sc.modo || sc.cat || 'otro módulo';
+    }
+    function efAlcanceTexto() {
+        const ruta = efClave(document.getElementById('efRuta').value);
+        return efAlcance === 'GENERAL' ? 'Escaneo general' : (ruta ? 'Ruta ' + ruta : 'Todas las rutas');
+    }
+    function abrirExtraerFolios() {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso para borrar historiales pueden extraer folios.');
+        document.getElementById('modalExtraerFolios').style.display = 'flex';
+        efPoblarRutas(); efCambiarAlcance(efAlcance); efHistorial();
+    }
+    function cerrarExtraerFolios() { document.getElementById('modalExtraerFolios').style.display = 'none'; }
+    function efPoblarRutas() {
+        const cuenta = {};
+        scans.forEach(sc => { if (sc.modo === 'VALIDAR_RUTA' && sc.ubic) { const r = efClave(sc.ubic); cuenta[r] = (cuenta[r] || 0) + 1; } });
+        const sel = document.getElementById('efRuta'), prev = sel.value;
+        sel.innerHTML = '<option value="">Todas las rutas</option>' + Object.keys(cuenta).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+            .map(r => '<option value="' + efEsc(r) + '">Ruta ' + efEsc(r) + ' (' + cuenta[r] + ' escaneos)</option>').join('');
+        sel.value = prev;
+    }
+    function efCambiarAlcance(a) {
+        efAlcance = a;
+        document.getElementById('efBtnRuta').classList.toggle('on', a === 'RUTA');
+        document.getElementById('efBtnGeneral').classList.toggle('on', a === 'GENERAL');
+        document.getElementById('efRuta').style.display = a === 'RUTA' ? '' : 'none';
+        if (document.getElementById('efInput').value.trim()) efBuscar();
+    }
+    function efParse(txt) {
+        const out = [], vistos = new Set();
+        String(txt || '').split(/[\s,;]+/).forEach(x => { const k = efClave(x); if (k && !vistos.has(k)) { vistos.add(k); out.push(k); } });
+        return out;
+    }
+    function efBuscar() {
+        const folios = efParse(document.getElementById('efInput').value);
+        if (!folios.length) { efLimpiar(true); return; }
+        const ruta = efClave(document.getElementById('efRuta').value), pedidos = new Set(folios);
+        const hallados = new Set(), otros = {};
+        efHallados = [];
+        scans.forEach(sc => {
+            const k = efClave(sc.guia);
+            if (!pedidos.has(k)) return;
+            if (efEnAlcance(sc, efAlcance, ruta)) { efHallados.push(sc); hallados.add(k); }
+            else (otros[k] = otros[k] || new Set()).add(efEtiqueta(sc));
+        });
+        efHallados.sort((a, b) => efClave(a.ubic).localeCompare(efClave(b.ubic), undefined, { numeric: true }) || efClave(a.guia).localeCompare(efClave(b.guia)));
+        efNoHallados = folios.filter(k => !hallados.has(k)).map(k => ({ folio: k, otros: otros[k] ? Array.from(otros[k]) : [] }));
+        efSel = new Set(efHallados.map(s => s.key));
+        efPintar(folios.length, hallados.size);
+    }
+    function efLimpiar(soloResultados) {
+        if (!soloResultados) document.getElementById('efInput').value = '';
+        efHallados = []; efNoHallados = []; efSel = new Set();
+        document.getElementById('efResultado').hidden = true;
+    }
+    function efPintar(nPedidos, nFoliosHallados) {
+        document.getElementById('efResultado').hidden = false;
+        const cuentaFolio = {}; efHallados.forEach(s => { const k = efClave(s.guia); cuentaFolio[k] = (cuentaFolio[k] || 0) + 1; });
+        document.getElementById('efKpis').innerHTML = [
+            ['Folios pedidos', nPedidos, 'var(--primary)'],
+            ['Folios encontrados', nFoliosHallados, 'var(--success)'],
+            ['Registros a extraer', efHallados.length, 'var(--danger)'],
+            ['No encontrados', efNoHallados.length, efNoHallados.length ? 'var(--warning)' : 'var(--success)']
+        ].map(k => '<div class="ef-kpi" style="--k:' + k[2] + ';"><small>' + k[0] + '</small><b>' + k[1].toLocaleString('es-PE') + '</b></div>').join('');
+        const LIM = 1500;
+        document.getElementById('efTbody').innerHTML = efHallados.length ? efHallados.slice(0, LIM).map(s => {
+            const dup = cuentaFolio[efClave(s.guia)] > 1 ? '<span class="ef-dup">escaneado ' + cuentaFolio[efClave(s.guia)] + ' veces</span>' : '';
+            return '<tr><td><input type="checkbox" ' + (efSel.has(s.key) ? 'checked' : '') + ' onchange="efToggle(\'' + efEsc(s.key) + '\', this.checked)"></td><td class="c">' + efEsc(s.guia) + dup + '</td><td>' +
+                efEsc(s.ubic || '-') + '</td><td>' + efEsc(s.zona || '-') + '</td><td>' + efEsc(s.cat || '-') + '</td><td>' + efEsc(s.usuario || '-') + '</td><td>' + efEsc(s.hora || '-') + '</td></tr>';
+        }).join('') + (efHallados.length > LIM ? '<tr><td colspan="7" class="ef-vacio">Se muestran los primeros ' + LIM + '; la extracción incluye todos los seleccionados.</td></tr>' : '')
+            : '<tr><td colspan="7" class="ef-vacio">Ningún folio de la lista está escaneado en este alcance.</td></tr>';
+        const card = document.getElementById('efNoCard');
+        card.hidden = !efNoHallados.length;
+        document.getElementById('efNoTit').textContent = 'No encontrados en ' + efAlcanceTexto() + ' (' + efNoHallados.length + ')';
+        document.getElementById('efNoChips').innerHTML = efNoHallados.map(n => '<span class="ef-chip"' + (n.otros.length ? ' title="Sí existe en: ' + efEsc(n.otros.join(', ')) + '"' : '') + '>' + efEsc(n.folio) + (n.otros.length ? ' · en ' + efEsc(n.otros.join(', ')) : '') + '</span>').join('');
+        document.getElementById('efChkTodos').checked = true;
+        efActualizarBoton();
+    }
+    function efActualizarBoton() {
+        const b = document.getElementById('efBtnExtraer');
+        b.disabled = !efSel.size;
+        b.textContent = 'Extraer seleccionados (' + efSel.size + ')';
+    }
+    function efToggle(key, on) { if (on) efSel.add(key); else efSel.delete(key); efActualizarBoton(); }
+    function efToggleTodos(on) {
+        efSel = on ? new Set(efHallados.map(s => s.key)) : new Set();
+        document.querySelectorAll('#efTbody input[type=checkbox]').forEach(c => { c.checked = on; });
+        efActualizarBoton();
+    }
+    function efCopiarNo() {
+        const txt = efNoHallados.map(n => n.folio).join('\n');
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => alert('Lista copiada.')).catch(() => prompt('Copia la lista:', txt));
+        else prompt('Copia la lista:', txt);
+    }
+    function efDescargar() {
+        if (!efHallados.length && !efNoHallados.length) return alert('No hay datos para descargar.');
+        if (typeof XLSX === 'undefined') return alert('La librería de Excel no está cargada.');
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(efHallados.map(s => ({ 'Folio': s.guia, 'Ruta (ubic.)': s.ubic || '', 'Ruta asignada': s.ruta || '', 'Zona': s.zona || '', 'Categoría': s.cat || '', 'Bultos': s.bul || '', 'Usuario': s.usuario || '', 'Hora': s.hora || '' }))), 'Encontrados');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(efNoHallados.map(n => ({ 'Folio': n.folio, 'Existe en otro alcance': n.otros.join(', ') }))), 'No encontrados');
+        XLSX.writeFile(wb, 'Extraer_folios_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    }
+    async function efExtraer() {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso pueden borrar historiales.');
+        const sel = efHallados.filter(s => efSel.has(s.key));
+        if (!sel.length) return;
+        const unicos = new Set(sel.map(s => efClave(s.guia))).size, alc = efAlcanceTexto();
+        if (!confirm('🚨 Se extraerán ' + sel.length + ' registro(s) (' + unicos + ' folio(s)) de: ' + alc + '.\n\nQuedan respaldados y podrás restaurarlos desde el "Historial de extracciones". ¿Continuar?')) return;
+        const btn = document.getElementById('efBtnExtraer'); btn.disabled = true;
+        try {
+            const ok = await confirmarPreservarLQ(new Set(sel.map(s => s.key)));
+            if (!ok) { efActualizarBoton(); return; }
+            const id = Date.now() + '-' + Math.random().toString(36).slice(2, 6), regs = {};
+            sel.forEach(s => { const c = JSON.parse(JSON.stringify(s)); delete c.key; regs[s.key] = c; });
+            await rtdb.ref('folios_extraidos_datos/' + id).set(regs);          // 1) respaldo
+            await rtdb.ref('folios_extraidos_meta/' + id).set({ id: id, fecha: Date.now(), usuario: usuarioActivo || '-', alcance: alc, registros: sel.length, folios: unicos });
+            for (let i = 0; i < sel.length; i += 400) {                          // 2) borrado
+                const lote = {}; sel.slice(i, i + 400).forEach(s => { lote['escaneos_compartidos/' + s.key] = null; });
+                await rtdb.ref().update(lote);
+            }
+            alert('✅ Extraídos ' + sel.length + ' registro(s) (' + unicos + ' folio(s)) de ' + alc + '.');
+            document.getElementById('efInput').value = '';
+            efLimpiar(true); efPoblarRutas(); efHistorial();
+        } catch (err) {
+            console.error(err); alert('Error al extraer: ' + (err && err.message ? err.message : err));
+            efActualizarBoton();
+        }
+    }
+    function efHistorial() {
+        const tb = document.getElementById('efHist');
+        if (typeof rtdb === 'undefined' || !rtdb) { tb.innerHTML = '<tr><td colspan="6" class="ef-vacio">Sin conexión a la nube.</td></tr>'; return; }
+        rtdb.ref('folios_extraidos_meta').limitToLast(10).once('value').then(snap => {
+            const arr = []; snap.forEach(c => { arr.unshift(c.val()); });
+            tb.innerHTML = arr.length ? arr.map(m => '<tr><td>' + efEsc(new Date(m.fecha).toLocaleString('es-PE')) + '</td><td>' + efEsc(m.usuario) + '</td><td>' + efEsc(m.alcance) +
+                '</td><td style="text-align:right;">' + (m.folios || 0) + '</td><td style="text-align:right;">' + (m.registros || 0) + '</td><td><button type="button" class="ef-btn" onclick="efRestaurar(\'' + efEsc(m.id) + '\')">↩ Restaurar</button></td></tr>').join('')
+                : '<tr><td colspan="6" class="ef-vacio">Aún no hay extracciones.</td></tr>';
+        }).catch(err => { tb.innerHTML = '<tr><td colspan="6" class="ef-vacio">No se pudo leer: ' + efEsc(err && err.message ? err.message : err) + '</td></tr>'; });
+    }
+    async function efRestaurar(id) {
+        if (!puedeBorrarHistorial()) return alert('Solo usuarios con permiso pueden restaurar.');
+        if (!confirm('¿Restaurar los registros de esta extracción? Volverán a los escaneos como estaban.')) return;
+        try {
+            const snap = await rtdb.ref('folios_extraidos_datos/' + id).once('value');
+            const regs = snap.val();
+            if (!regs) return alert('No se encontró el respaldo de esta extracción.');
+            const keys = Object.keys(regs);
+            for (let i = 0; i < keys.length; i += 400) {
+                const lote = {}; keys.slice(i, i + 400).forEach(k => { lote['escaneos_compartidos/' + k] = regs[k]; });
+                await rtdb.ref().update(lote);
+            }
+            await rtdb.ref('folios_extraidos_datos/' + id).remove();
+            await rtdb.ref('folios_extraidos_meta/' + id).remove();
+            alert('✅ Restaurados ' + keys.length + ' registro(s).');
+            efHistorial(); efPoblarRutas();
+        } catch (err) { console.error(err); alert('Error al restaurar: ' + (err && err.message ? err.message : err)); }
+    }
+    window.abrirExtraerFolios = abrirExtraerFolios; window.cerrarExtraerFolios = cerrarExtraerFolios;
 
     function eliminarTodoFiltrado() {
         if (!puedeBorrarHistorial()) return alert("Acceso denegado.");
@@ -16452,8 +16720,11 @@
 
     window.cgEjecutarCruce = function () {
         if (!(cg.base && cg.gpo)) return;
+        if (nubePendiente(cg)) { alert('Espera a que termine de descargarse el cruce guardado en la nube y vuelve a presionar «Realizar cruce».'); return; }
+        var sumaGpo = null;
         try {
-            cg.filas = cruzar(cg.base, cg.gpo);
+            sumaGpo = sumarFilas(cg.filas, cruzar(cg.base, cg.gpo));   // la carga nueva se SUMA a lo ya guardado
+            cg.filas = sumaGpo.filas;
             aplicarReglas();
             setTimeout(revisarEnvio, 0);
         } catch (err) {
@@ -16466,6 +16737,12 @@
         el('cgResultado').hidden = false;
         cgRender();
         guardarNube();
+        var avG = el('cgAviso');
+        if (avG && sumaGpo) {
+            avG.className = 'cg-aviso';
+            avG.innerHTML = '✅ Carga sumada: <b>' + fmt(sumaGpo.agregadas) + '</b> fila(s) nueva(s)' + (sumaGpo.actualizadas ? ' y <b>' + fmt(sumaGpo.actualizadas) + '</b> actualizada(s) (ya estaban)' : '') + ' · total acumulado <b>' + fmt(cg.filas.length) + '</b> filas.';
+            avG.hidden = false;
+        }
     };
 
     // ---------- Segunda forma de cruzar: export del TMS (CSV o Excel) tal cual, sin Base ni GPO ----------
@@ -16602,6 +16879,9 @@
                 }
                 var filas = filasDesdeTMS(rows, info.m);
                 if (!filas.length) { ctMarcar('err', 'El archivo no trae filas con rastreo.'); return; }
+                if (nubePendiente(ct)) { ctMarcar('err', 'Espera a que termine de descargarse el cruce TMS de la nube y vuelve a subir el archivo.'); return; }
+                var sumaTms = sumarFilas(ct.filas, filas);     // la carga nueva se SUMA a lo ya guardado
+                filas = sumaTms.filas;
                 ct.filas = filas; ct.archivo = file.name;
                 ctAplicarReglas();
                 ctPoblar();
@@ -16612,7 +16892,8 @@
                 ctRevisarEnvio();
                 var cc = filas.filter(function (f) { return esClickCollect(f.forma); }).length;
                 var ct2 = filas.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
-                ctMarcar('ok', '✔ ' + file.name + ' · ' + fmt(filas.length) + ' filas · ' + fmt(cc) + ' Click & Collect, ' + fmt(ct2) + ' con tienda');
+                ctMarcar('ok', '✔ ' + file.name + ' · +' + fmt(sumaTms.agregadas) + ' nuevas' + (sumaTms.actualizadas ? ', ' + fmt(sumaTms.actualizadas) + ' actualizadas' : '') + ' · total acumulado ' + fmt(filas.length) + ' filas · ' + fmt(cc) + ' Click & Collect, ' + fmt(ct2) + ' con tienda');
+                guardarNubeTMS();
             } catch (err) {
                 console.error('Cruce TMS: error leyendo el archivo', err);
                 ctMarcar('err', 'No se pudo abrir el archivo: ' + err.message);
@@ -16809,7 +17090,7 @@
             ctBloquear(false);
         });
     };
-    window.abrirModalCruceTMS = function () { el('modalCruceTMS').style.display = 'flex'; ctPintarReglas(); };
+    window.abrirModalCruceTMS = function () { el('modalCruceTMS').style.display = 'flex'; ctPintarReglas(); pintarNubeTMS(); cargarDesdeNubeTMS(); };
     window.cerrarModalCruceTMS = function () { el('modalCruceTMS').style.display = 'none'; };
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && el('modalCruceTMS') && el('modalCruceTMS').style.display === 'flex') window.cerrarModalCruceTMS();
@@ -16830,23 +17111,44 @@
         return '<span class="cg-pill ' + (t === CG_SIN_TIENDA ? 'warn' : 'ok') + '">' + esc(t) + '</span>';
     }
 
+    // Suma una carga nueva a lo que ya hay: misma clave (rastreo + SKU) = se actualiza; clave nueva = se agrega.
+    function sumarFilas(actuales, nuevas) {
+        var idx = new Map(), out = [], agregadas = 0, actualizadas = 0;
+        function k(f) { return clave(f.rastreo) + '|' + clave(f.sku); }
+        (actuales || []).forEach(function (f) { idx.set(k(f), out.length); out.push(f); });
+        nuevas.forEach(function (f) {
+            var key = k(f);
+            if (idx.has(key)) { out[idx.get(key)] = f; actualizadas++; }
+            else { idx.set(key, out.length); out.push(f); agregadas++; }
+        });
+        return { filas: out, agregadas: agregadas, actualizadas: actualizadas };
+    }
+    function nubePendiente(o) { return !!(o.meta && (o.cargandoNube || o.nubeId !== o.meta.id)); }
+
+    // Un folio = un rastreo. La base trae una fila por SKU, así que un mismo folio puede repetirse: aquí se cuenta una sola vez.
+    function unicosPorFolio(filas) {
+        var vistos = new Set(), out = [];
+        filas.forEach(function (f) { var k = clave(f.rastreo); if (k && !vistos.has(k)) { vistos.add(k); out.push(f); } });
+        return out;
+    }
+
     window.cgRender = function () {
         if (!cg.filas.length && el('cgResultado').hidden) return;
         var act = estadosActivos();
         var base = cg.filas.filter(function (f) { return act[f.estadoN]; });
 
-        // KPIs (según estados marcados)
-        var unicos = {}; base.forEach(function (f) { unicos[clave(f.rastreo)] = 1; });
-        var conTienda = base.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
-        var revisar = base.filter(function (f) { return f.tienda === CG_SIN_TIENDA; }).length;
-        var sinGpo = cg.filas.filter(function (f) { return !f.enGpo; }).length;
-        var cc = base.filter(function (f) { return esClickCollect(f.forma); }).length;
-        var hd = base.filter(function (f) { return f.enGpo && !esClickCollect(f.forma); }).length;
+        // KPIs (según estados marcados): todo se cuenta por folio único (rastreo), no por fila/SKU
+        var baseU = unicosPorFolio(base);
+        var conTienda = baseU.filter(function (f) { return f.tienda && f.tienda !== CG_SIN_TIENDA; }).length;
+        var revisar = baseU.filter(function (f) { return f.tienda === CG_SIN_TIENDA; }).length;
+        var sinGpo = unicosPorFolio(cg.filas.filter(function (f) { return !f.enGpo; })).length;
+        var cc = baseU.filter(function (f) { return esClickCollect(f.forma); }).length;
+        var hd = baseU.filter(function (f) { return f.enGpo && !esClickCollect(f.forma); }).length;
         function pct(a, b) { return b ? (Math.round(a * 1000 / b) / 10).toLocaleString('es-PE') + ' %' : '—'; }
         el('cgKpis').innerHTML = [
-            ['Filas con estado elegido', fmt(base.length), 'var(--primary)', fmt(Object.keys(unicos).length) + ' rastreos únicos', ''],
-            ['Home Delivery', fmt(hd), 'var(--primary)', pct(hd, base.length) + ' del total', ''],
-            ['Click & Collect', fmt(cc), 'var(--primary)', pct(cc, base.length) + ' del total', ''],
+            ['Folios únicos con estado elegido', fmt(baseU.length), 'var(--primary)', fmt(base.length) + ' filas (SKU) en total', ''],
+            ['Home Delivery', fmt(hd), 'var(--primary)', pct(hd, baseU.length) + ' de los folios', ''],
+            ['Click & Collect', fmt(cc), 'var(--primary)', pct(cc, baseU.length) + ' de los folios', ''],
             ['Con tienda', fmt(conTienda), 'var(--success)', pct(conTienda, cc) + ' de los Click & Collect', ''],
             ['Sin tienda · revisar', fmt(revisar), revisar ? 'var(--warning)' : 'var(--success)', revisar ? 'Clic para ver el detalle' : 'Todo asignado', revisar ? CG_SIN_TIENDA : ''],
             ['Sin GPO', fmt(sinGpo), sinGpo ? 'var(--warning)' : 'var(--success)', sinGpo ? 'Rastreos no encontrados' : 'Todo encontrado', '']
@@ -16855,9 +17157,9 @@
         }).join('');
         el('cgKpis').onclick = function (e) { var k = e.target.closest ? e.target.closest('.cg-kpi.click') : null; if (k) window.cgFiltrarTienda(k.getAttribute('data-t'), true); };
 
-        // Resumen por tienda x estado
+        // Resumen por tienda x estado (folios únicos)
         var res = {}, estadosVistos = {};
-        base.forEach(function (f) {
+        baseU.forEach(function (f) {
             var t = f.tienda || 'Sin tienda (Home Delivery)';
             estadosVistos[f.estado] = 1;
             res[t] = res[t] || { total: 0 };
@@ -16897,6 +17199,7 @@
             return !terminos.length || terminos.some(function (t) { return f.txt.indexOf(t) !== -1; });
         });
         el('cgLblVisibles').textContent = fmt(cg.visibles.length);
+        el('cgLblFolios').textContent = fmt(unicosPorFolio(cg.visibles).length);
         var LIM = 3000, mostrar = cg.visibles.slice(0, LIM);
         el('cgTbody').innerHTML = mostrar.length ? mostrar.map(function (f, i) {
             return '<tr><td style="color:var(--text-muted);">' + (i + 1) + '</td><td class="cod">' + esc(f.rastreo) + '</td><td>' + esc(f.forma || '—') + '</td><td>' +
@@ -16922,10 +17225,10 @@
             return { 'Rastreo': f.rastreo, 'SKU': f.sku, 'Descripción': f.desc, 'Forma de entrega': f.forma, 'Estado TMS': f.estado,
                      'Nombre seller': f.seller, 'Distrito cliente': f.distrito, 'Comentario final': f.tienda };
         });
-        var resumen = {}, estadosRes = {};
-        cg.visibles.forEach(function (f) { if (f.estado) estadosRes[f.estado] = 1; });
+        var resumen = {}, estadosRes = {}, visiblesU = unicosPorFolio(cg.visibles);   // el resumen cuenta folios únicos
+        visiblesU.forEach(function (f) { if (f.estado) estadosRes[f.estado] = 1; });
         var colsRes = Object.keys(estadosRes).sort();
-        cg.visibles.forEach(function (f) {
+        visiblesU.forEach(function (f) {
             var t = f.tienda || 'Sin tienda (Home Delivery)';
             if (!resumen[t]) {
                 resumen[t] = { 'Comentario final': t };
@@ -17141,11 +17444,11 @@
         else if (cg.meta) {
             var d = new Date(cg.meta.fecha);
             txt.innerHTML = '☁ <b>Cruce guardado en la nube</b> · ' + esc(d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })) +
-                ' · por ' + esc(cg.meta.usuario || '-') + ' · ' + fmt(cg.meta.filas) + ' filas <small>· Base: ' + esc(cg.meta.base || '-') + ' · GPO: ' + esc(cg.meta.gpo || '-') + '</small>';
+                ' · por ' + esc(cg.meta.usuario || '-') + ' · ' + fmt(cg.meta.filas) + ' filas · ' + fmt(cg.meta.cargas || 1) + ' carga(s) <small>· Base: ' + esc(cg.meta.base || '-') + ' · GPO: ' + esc(cg.meta.gpo || '-') + '</small>';
             box.title = 'Base: ' + (cg.meta.base || '-') + ' · GPO: ' + (cg.meta.gpo || '-') + ' · Se mantiene hasta que se borre o se haga otro cruce.';
             box.classList.add('ok');
         } else {
-            txt.innerHTML = '☁ No hay ningún cruce guardado en la nube. Carga la base y el GPO y presiona «Realizar cruce».';
+            txt.innerHTML = '☁ No hay ningún cruce guardado en la nube. Carga la base y el GPO y presiona «Realizar cruce»; cada cruce nuevo se suma al anterior.';
         }
         btn.style.display = (cg.meta && puedeBorrarNube()) ? '' : 'none';
     }
@@ -17158,6 +17461,11 @@
         return f;
     }
 
+    function acumNombres(previo, nuevo) {
+        var l = previo ? String(previo).split(' + ') : [];
+        if (nuevo && l.indexOf(nuevo) === -1) l.push(nuevo);
+        return l.join(' + ');
+    }
     function guardarNube() {
         if (!nubeOk()) { pintarNube('err', '☁ No se pudo guardar en la nube: Firebase no está disponible. El cruce solo está en este dispositivo.'); return; }
         var datos = {}, n = 0, peso = 0;
@@ -17169,7 +17477,8 @@
         var meta = {
             id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), fecha: Date.now(),
             usuario: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '-',
-            base: cg.baseNombre || '', gpo: cg.gpoNombre || '', filas: cg.filas.length, bloques: n
+            base: acumNombres(cg.meta && cg.meta.base, cg.baseNombre), gpo: acumNombres(cg.meta && cg.meta.gpo, cg.gpoNombre),
+            filas: cg.filas.length, bloques: n, cargas: ((cg.meta && cg.meta.cargas) || 0) + 1
         };
         cg.nubeId = meta.id;               // así este equipo no vuelve a descargar lo que acaba de subir
         pintarNube('', '☁ Guardando el cruce en la nube…');
@@ -17236,6 +17545,108 @@
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && el('modalCruceGPO') && el('modalCruceGPO').style.display === 'flex') window.cerrarModalCruceGPO();
     });
+
+    // ---------- Persistencia en la nube del Cruce TMS (Firebase: nodo "cruce_tms") ----------
+    // Igual que el Cruce GPO: el último cruce TMS queda guardado para todos los usuarios/dispositivos
+    // hasta que alguien lo borre con "Borrar de la nube" o suba otro export (que lo reemplaza).
+    var NUBE_TMS = 'cruce_tms';
+    ct.meta = null; ct.nubeId = null; ct.cargandoNube = false;
+
+    function pintarNubeTMS(estado, msg) {
+        var box = el('ctNube'), txt = el('ctNubeTxt'), btn = el('ctBtnBorrarNube');
+        if (!box) return;
+        box.classList.remove('ok', 'err'); box.title = '';
+        if (estado) box.classList.add(estado);
+        if (msg) { txt.innerHTML = msg; }
+        else if (ct.meta) {
+            var d = new Date(ct.meta.fecha);
+            txt.innerHTML = '☁ <b>Cruce TMS guardado en la nube</b> · ' + esc(d.toLocaleDateString('es-PE') + ' ' + d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })) +
+                ' · por ' + esc(ct.meta.usuario || '-') + ' · ' + fmt(ct.meta.filas) + ' filas · ' + fmt(ct.meta.cargas || 1) + ' carga(s) <small>· Archivo: ' + esc(ct.meta.archivo || '-') + '</small>';
+            box.title = 'Archivo: ' + (ct.meta.archivo || '-') + ' · Se mantiene hasta que se borre o se suba otro export.';
+            box.classList.add('ok');
+        } else {
+            txt.innerHTML = '☁ No hay ningún cruce TMS guardado en la nube. Sube el export del TMS y se guardará solo; cada carga nueva se suma a la anterior.';
+        }
+        btn.style.display = (ct.meta && puedeBorrarNube()) ? '' : 'none';
+    }
+
+    function guardarNubeTMS() {
+        if (!nubeOk()) { pintarNubeTMS('err', '☁ No se pudo guardar en la nube: Firebase no está disponible. El cruce solo está en este dispositivo.'); return; }
+        var datos = {}, n = 0, peso = 0;
+        for (var i = 0; i < ct.filas.length; i += NUBE_BLOQUE) {
+            var txt = JSON.stringify(ct.filas.slice(i, i + NUBE_BLOQUE).map(filaACompacta));
+            peso += txt.length; datos['c' + n] = txt; n++;
+        }
+        if (peso > NUBE_MAX) { pintarNubeTMS('err', '☁ El cruce TMS es demasiado grande para guardarlo en la nube (' + fmt(ct.filas.length) + ' filas). Solo está en este dispositivo.'); return; }
+        var meta = {
+            id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), fecha: Date.now(),
+            usuario: (typeof usuarioActivo !== 'undefined' && usuarioActivo) ? usuarioActivo : '-',
+            archivo: acumNombres(ct.meta && ct.meta.archivo, ct.archivo), filas: ct.filas.length, bloques: n, cargas: ((ct.meta && ct.meta.cargas) || 0) + 1
+        };
+        ct.nubeId = meta.id;               // así este equipo no vuelve a descargar lo que acaba de subir
+        pintarNubeTMS('', '☁ Guardando el cruce TMS en la nube…');
+        rtdb.ref(NUBE_TMS).set({ meta: meta, datos: datos }).catch(function (err) {
+            console.error('Cruce TMS: no se pudo guardar en la nube', err);
+            ct.nubeId = null; ct.meta = null;
+            pintarNubeTMS('err', '☁ No se pudo guardar en la nube: ' + esc(err && err.message ? err.message : err) + '. El cruce solo está en este dispositivo.');
+        });
+    }
+
+    function cargarDesdeNubeTMS() {
+        var meta = ct.meta;
+        if (!meta || !nubeOk() || ct.cargandoNube || ct.nubeId === meta.id) return;
+        ct.cargandoNube = true;
+        pintarNubeTMS('', '☁ Descargando el cruce TMS guardado en la nube…');
+        rtdb.ref(NUBE_TMS + '/datos').once('value').then(function (snap) {
+            var d = snap.val() || {}, filas = [];
+            for (var i = 0; i < (meta.bloques || 0); i++) {
+                if (!d['c' + i]) continue;
+                JSON.parse(d['c' + i]).forEach(function (a) { filas.push(compactaAFila(a)); });
+            }
+            ct.filas = filas; ct.archivo = ''; ct.nubeId = meta.id;
+            ctAplicarReglas();
+            ctPoblar();
+            el('ctBuscar').value = '';
+            el('ctResultado').hidden = !filas.length;
+            ctRender();
+            ctRevisarEnvio();
+            if (filas.length) ctMarcar('ok', '☁ ' + (meta.archivo || 'Cruce TMS') + ' · ' + fmt(filas.length) + ' filas (cargado desde la nube)');
+            pintarNubeTMS();
+        }).catch(function (err) {
+            console.error('Cruce TMS: no se pudo leer de la nube', err);
+            pintarNubeTMS('err', '☁ No se pudo leer el cruce TMS de la nube: ' + esc(err && err.message ? err.message : err));
+        }).then(function () { ct.cargandoNube = false; });
+    }
+
+    window.ctBorrarNube = function () {
+        if (!ct.meta || !nubeOk()) return;
+        if (!puedeBorrarNube()) { alert('No tienes permiso para borrar el cruce TMS de la nube.'); return; }
+        if (!confirm('⚠️ Se borrará de la nube el cruce TMS guardado (' + fmt(ct.meta.filas) + ' filas) para TODOS los usuarios.\n\nEsta acción no se puede deshacer. ¿Continuar?')) return;
+        rtdb.ref(NUBE_TMS).remove().catch(function (err) { alert('No se pudo borrar: ' + (err && err.message ? err.message : err)); });
+    };
+
+    // Escucha solo el "meta" (pequeño). Los datos se bajan al abrir el módulo o cuando cambian estando abierto.
+    if (nubeOk()) {
+        rtdb.ref(NUBE_TMS + '/meta').on('value', function (snap) {
+            var meta = snap.val();
+            ct.meta = meta || null;
+            if (!meta) {
+                // alguien borró el cruce TMS: se limpia también la pantalla
+                if (ct.nubeId) {
+                    ct.nubeId = null; ct.filas = []; ct.visibles = [];
+                    el('ctResultado').hidden = true; el('ctTbody').innerHTML = ''; el('ctTablaResumen').innerHTML = ''; el('ctKpis').innerHTML = '';
+                    ctMarcar('', 'Sin archivo');
+                }
+                pintarNubeTMS();
+                return;
+            }
+            if (ct.nubeId === meta.id) { pintarNubeTMS(); return; }
+            pintarNubeTMS();
+            if (el('modalCruceTMS').style.display === 'flex') cargarDesdeNubeTMS();
+        }, function (err) { pintarNubeTMS('err', '☁ Sin acceso al nodo de la nube: ' + esc(err && err.message ? err.message : err)); });
+    } else {
+        pintarNubeTMS('err', '☁ Firebase no está disponible: el cruce TMS solo se guarda en este dispositivo.');
+    }
 
     // ---------- Reglas manuales: pantalla y guardado ----------
     function pintarReglas() {

@@ -2717,6 +2717,14 @@
                     </div>
                     <div class="desktop-panel-body" style="padding-top: 5px; overflow-y: auto;">
                         <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">Solo cuenta escaneos de ruta contra la Base de Ruta. No depende de la jornada elegida arriba.</div>
+                        <div id="filaRespaldoAvance" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; font-size:11px;">
+                            <label style="display:inline-flex; align-items:center; gap:5px; font-weight:800; color:var(--text-main); cursor:pointer;">
+                                <input type="checkbox" id="chkAvanceDesdeRespaldo" onchange="toggleAvanceDesdeRespaldo()" style="width:15px; height:15px; cursor:pointer;">
+                                📂 Ver avance desde un respaldo
+                            </label>
+                            <select id="selAvanceRespaldo" onchange="elegirRespaldoAvance(this.value)" style="display:none; flex:1; min-width:180px; max-width:360px; padding:6px 8px; font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main);"></select>
+                            <span id="lblAvanceRespaldo" style="font-weight:700; color:var(--text-muted);"></span>
+                        </div>
                         <div id="filtrosGlobalRutasOuterSlot">
                         <div id="filtrosGlobalRutasRow" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:6px; margin-bottom:12px;">
                             <div class="custom-filter-wrapper">
@@ -15429,6 +15437,76 @@
         renderizarVistaGlobal();
     }
 
+    // ===== Avance de Rutas desde un respaldo (historial_archivado) =====
+    // Con el check activo y un respaldo elegido, el panel usa esos registros en lugar de los escaneos en vivo.
+    let respaldoAvanceSel = null; // { key, datos: [...] }
+
+    function fuenteEscaneosAvance() {
+        return (respaldoAvanceSel && Array.isArray(respaldoAvanceSel.datos)) ? respaldoAvanceSel.datos : scans;
+    }
+
+    function refrescarAvanceRutasPrincipal() {
+        try { poblarFiltrosVistaGlobal(); } catch (e) { console.error(e); }
+        try { renderizarVistaGlobal(); } catch (e) { console.error(e); }
+        try { renderizarDashboardAvance(); } catch (e) { console.error(e); }
+    }
+
+    async function toggleAvanceDesdeRespaldo() {
+        const chk = document.getElementById('chkAvanceDesdeRespaldo');
+        const sel = document.getElementById('selAvanceRespaldo');
+        const lbl = document.getElementById('lblAvanceRespaldo');
+        if (!chk || !sel) return;
+        if (!chk.checked) {
+            respaldoAvanceSel = null;
+            sel.style.display = 'none';
+            if (lbl) lbl.textContent = '';
+            refrescarAvanceRutasPrincipal();
+            return;
+        }
+        if (!esAdmin()) {
+            const du = Object.values(usuariosPermitidos).find(u => u.nombre.toLowerCase() === usuarioActivo.toLowerCase());
+            if (!du || !du.permisos || !(du.permisos.respaldos_nube || du.permisos.ver_respaldos)) {
+                chk.checked = false;
+                return alert('No tienes permiso para consultar los respaldos de la nube.');
+            }
+        }
+        sel.style.display = '';
+        sel.innerHTML = '<option value="">Cargando respaldos...</option>';
+        try {
+            const snap = await rtdb.ref('historial_archivado').once('value');
+            respaldosNubeCache = snap.val() || {};
+        } catch (err) {
+            console.error(err);
+            chk.checked = false;
+            sel.style.display = 'none';
+            return alert('No se pudo cargar la lista de respaldos.');
+        }
+        const claves = Object.keys(respaldosNubeCache).sort().reverse();
+        if (claves.length === 0) {
+            sel.innerHTML = '<option value="">No hay respaldos guardados</option>';
+            return;
+        }
+        sel.innerHTML = '<option value="">— Elige un respaldo —</option>' + claves.map(k => {
+            const r = respaldosNubeCache[k] || {};
+            const n = Array.isArray(r.datos) ? r.datos.length : (r.datos ? Object.keys(r.datos).length : 0);
+            return `<option value="${k}">${r.fechaArchivo || k} · ${n} registro(s) · ${r.archivadoPor || '-'}</option>`;
+        }).join('');
+    }
+
+    function elegirRespaldoAvance(key) {
+        const lbl = document.getElementById('lblAvanceRespaldo');
+        if (!key) {
+            respaldoAvanceSel = null;
+            if (lbl) lbl.textContent = '';
+        } else {
+            const r = (respaldosNubeCache || {})[key] || {};
+            const datos = Array.isArray(r.datos) ? r.datos : (r.datos ? Object.values(r.datos) : []);
+            respaldoAvanceSel = { key, datos };
+            if (lbl) lbl.textContent = '📌 Mostrando respaldo del ' + (r.fechaArchivo || key);
+        }
+        refrescarAvanceRutasPrincipal();
+    }
+
     function poblarFiltrosVistaGlobal() {
         let dias = new Set(), rutas = new Set(), secs = new Set(), zonas = new Set();
 
@@ -15437,7 +15515,7 @@
         // escaneo, datos viejos, etc.) se colaban como opciones de filtro.
         const rutasValidasSet = new Set(baseDatosRutaNube.map(b => String(b.ruta).toUpperCase().trim()).filter(r => r !== ''));
 
-        scans.forEach(s => {
+        fuenteEscaneosAvance().forEach(s => {
             if (esRegistroDeRutaValido(s) && rutasValidasSet.has(String(s.ruta).toUpperCase())) {
                 dias.add(String(s.dia || "SIN ASIGNAR").toUpperCase());
                 rutas.add(String(s.ruta).toUpperCase());
@@ -15466,7 +15544,7 @@
 
         let grupos = {};
 
-        scans.forEach(s => {
+        fuenteEscaneosAvance().forEach(s => {
             if (!esRegistroDeRutaValido(s)) return;
 
             let dia = String(s.dia || "SIN ASIGNAR").toUpperCase();
@@ -15532,7 +15610,7 @@
         // "IMPRESO COLD" (mismo criterio ya validado en otras vistas de
         // etiquetado de la app), sin importar día/ruta/zona del filtro actual.
         let guiasEtiquetadas = new Set();
-        scans.forEach(s => {
+        fuenteEscaneosAvance().forEach(s => {
             if (s.cat === "IMPRESO COLD" && s.guia) {
                 guiasEtiquetadas.add(limpiarTexto(s.guia));
             }

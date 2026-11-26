@@ -1984,6 +1984,21 @@
 #modalCDVES .vr-body > .vr-table-card { flex: 1 1 auto; min-height: 260px; display: flex; flex-direction: column; }
 #modalCDVES .vr-table-card > .vr-table-scroll { flex: 1 1 0; min-height: 0; max-height: none; }
 
+
+        /* === Paneles de la pantalla principal: se pueden ocultar / mostrar === */
+        .panel-toggle-btn {
+            flex: 0 0 auto; width: 26px; height: 26px; margin-right: 8px; padding: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--bg);
+            color: inherit; font-size: 13px; line-height: 1; cursor: pointer;
+            transition: transform .2s ease;
+        }
+        .panel-toggle-btn:active { transform: scale(.92); }
+        .panel-toggle-btn .chev { display: inline-block; transition: transform .2s ease; }
+        .desktop-panel.panel-colapsado .panel-toggle-btn .chev { transform: rotate(-90deg); }
+        .desktop-panel.panel-colapsado > :not(.desktop-panel-title) { display: none !important; }
+        .desktop-panel.panel-colapsado { align-self: flex-start; }
+        .desktop-panel.panel-colapsado > .desktop-panel-title { margin-bottom: 0; padding-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -19520,6 +19535,46 @@
         sync();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+<script>
+/* Ocultar / mostrar los paneles de la pantalla principal (se recuerda la elección en este dispositivo) */
+(function () {
+    var IDS = ['panelRankingDesk', 'panelResumenAvanceRutasDesk', 'panelAvanceReprosDesk'];
+    var KEY = 'paneles_principal_colapsados_v1';
+    function leer() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
+    function guardar(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} }
+    function aplicar(panel, colapsado, btn) {
+        panel.classList.toggle('panel-colapsado', colapsado);
+        if (btn) {
+            btn.setAttribute('aria-expanded', colapsado ? 'false' : 'true');
+            btn.title = colapsado ? 'Mostrar este panel' : 'Ocultar este panel';
+        }
+    }
+    function iniciar() {
+        var estado = leer();
+        IDS.forEach(function (id) {
+            var panel = document.getElementById(id);
+            if (!panel || panel.querySelector(':scope > .desktop-panel-title .panel-toggle-btn')) return;
+            var titulo = panel.querySelector(':scope > .desktop-panel-title');
+            if (!titulo) return;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'panel-toggle-btn';
+            btn.innerHTML = '<span class="chev">▾</span>';
+            btn.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                var colapsar = !panel.classList.contains('panel-colapsado');
+                aplicar(panel, colapsar, btn);
+                var e = leer(); e[id] = colapsar; guardar(e);
+            });
+            titulo.insertBefore(btn, titulo.firstChild);
+            aplicar(panel, !!estado[id], btn);
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
+    else iniciar();
 })();
 </script>
 </body>

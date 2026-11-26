@@ -2763,7 +2763,7 @@
                             </div>
                             <div id="colListaAvanceRutas" style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:6px;">
                                 <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Rutas ordenadas por menor avance</div>
-                                <div id="listaAvanceRutasDash" style="display:flex; flex-direction:column; gap:6px; max-height:320px; overflow-y:auto; padding-right:4px;"></div>
+                                <div id="listaAvanceRutasDash" style="display:flex; flex-direction:column; gap:6px; max-height:460px; overflow-y:auto; padding-right:4px;"></div>
                             </div>
                         </div>
 
@@ -14711,10 +14711,20 @@
         // 3) Calcular faltantes por ruta.
         Object.keys(grupos).forEach(key => {
             const g = grupos[key];
+            // Guías programadas únicas (una guía repetida en la base no debe contarse dos veces,
+            // porque lo escaneado se cuenta por guía única y el avance nunca llegaría al 100%).
+            const vistas = new Set();
+            g.programados = g.programados.filter(guia => {
+                const k = limpiarTexto(guia);
+                if (vistas.has(k)) return false;
+                vistas.add(k);
+                return true;
+            });
             g.programado = g.programados.length;
             g.faltantesGuias = g.programados.filter(guia => !g.escaneadosSet.has(limpiarTexto(guia)));
             g.faltante = g.faltantesGuias.length;
-            g.escaneado = g.escaneadosSet.size;
+            // Escaneadas que sí corresponden a lo programado (programado = escaneado + faltante).
+            g.escaneado = g.programado > 0 ? (g.programado - g.faltante) : g.escaneadosSet.size;
         });
 
         return { grupos, inventariados };
@@ -15617,7 +15627,15 @@
         });
 
         Object.keys(grupos).forEach(key => {
-            const listaProgramados = progPorRutaDia[key] || [];
+            // Guías programadas únicas: una guía repetida en la Base de Ruta no debe contarse dos veces.
+            const _vistasProg = new Set();
+            const listaProgramados = (progPorRutaDia[key] || []).filter(seg => {
+                if (!seg) return true;
+                const k = limpiarTexto(seg);
+                if (_vistasProg.has(k)) return false;
+                _vistasProg.add(k);
+                return true;
+            });
             grupos[key].programado = listaProgramados.length;
 
             let escaneadasNormalizadas = new Set();
@@ -15628,6 +15646,11 @@
             const faltantesGuias = listaProgramados.filter(seg => seg && !escaneadasNormalizadas.has(limpiarTexto(seg)));
             grupos[key].faltante = faltantesGuias.length;
             grupos[key].faltantesGuias = faltantesGuias;
+            // Escaneadas que sí están programadas (programado = escaneadoUnico + faltante);
+            // sin programados se usa el total de escaneos como antes.
+            grupos[key].escaneadoUnico = grupos[key].programado > 0
+                ? (grupos[key].programado - faltantesGuias.length)
+                : grupos[key].totalFolios;
 
             const faltantesEtiquetado = listaProgramados.filter(seg => seg && !guiasEtiquetadas.has(limpiarTexto(seg)));
             grupos[key].etiquetado = listaProgramados.length - faltantesEtiquetado.length;
@@ -15664,8 +15687,8 @@
         if (listaBarra) {
             const datosOrdenados = claves.map(k => {
                 const g = grupos[k];
-                const pct = g.programado > 0 ? Math.min(100, (g.totalFolios / g.programado) * 100) : (g.totalFolios > 0 ? 100 : 0);
-                return { ruta: g.ruta, dia: g.dia, pct, escaneado: g.totalFolios, faltante: g.faltante, programado: g.programado };
+                const pct = g.programado > 0 ? Math.min(100, (g.escaneadoUnico / g.programado) * 100) : (g.escaneadoUnico > 0 ? 100 : 0);
+                return { ruta: g.ruta, dia: g.dia, pct, escaneado: g.escaneadoUnico, faltante: g.faltante, programado: g.programado };
             }).sort((a, b) => (a.pct - b.pct) || (b.faltante - a.faltante));
 
             if (datosOrdenados.length === 0) {
@@ -15676,11 +15699,12 @@
                     // 0% = sin iniciar (gris); no se pinta rojo para no alarmar con todo en cero
                     const color = d.pct >= 100 ? '#16a34a' : (d.pct >= 50 ? '#b9852f' : (d.pct > 0 ? '#b2453f' : '#94a3b8'));
                     return `
-                    <div title="Escaneado ${d.escaneado} de ${d.programado}" style="display:grid; grid-template-columns:minmax(90px,150px) 1fr 44px 74px; gap:10px; align-items:center; padding:6px 10px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; font-size:12px;">
+                    <div title="Escaneado ${d.escaneado} de ${d.programado}" style="display:grid; grid-template-columns:minmax(90px,150px) 1fr 40px 52px 60px; gap:8px; align-items:center; padding:6px 10px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; font-size:12px;">
                         <span style="font-weight:800; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🚚 ${d.ruta} <span style="font-weight:600; color:var(--text-muted); font-size:11px;">· ${d.dia}</span></span>
                         <div style="height:6px; background:var(--bg); border-radius:4px; overflow:hidden;"><div style="height:100%; width:${d.pct}%; background:${color};"></div></div>
                         <span style="font-weight:900; color:${color}; text-align:right;">${pctTxt}%</span>
-                        <span style="font-size:11px; font-weight:700; text-align:right; color:${d.faltante > 0 ? 'var(--danger)' : 'var(--success)'};">${d.faltante} falt.</span>
+                        <span style="font-size:10.5px; font-weight:700; text-align:right; color:var(--text-muted);">${d.escaneado}/${d.programado}</span>
+                        <span style="font-size:11px; font-weight:700; text-align:right; color:${d.faltante > 0 ? 'var(--danger)' : 'var(--success)'};">${d.faltante > 0 ? d.faltante + ' falt.' : '✓ listo'}</span>
                     </div>`;
                 }).join('');
             }
@@ -15743,7 +15767,7 @@
         let totalProgramado = 0, totalEscaneado = 0, totalFaltante = 0, totalBultosGlobal = 0;
         claves.forEach(k => {
             totalProgramado += grupos[k].programado;
-            totalEscaneado += grupos[k].totalFolios;
+            totalEscaneado += grupos[k].escaneadoUnico;
             totalFaltante += grupos[k].faltante;
             totalBultosGlobal += grupos[k].totalBultos;
         });
@@ -15761,8 +15785,9 @@
                     <div style="font-size:20px; font-weight:900; color:var(--text-main);">${totalRutas}</div>
                 </div>
                 <div style="flex:1; padding:10px; text-align:center; border-left:1px solid var(--border);">
-                    <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Escaneados / Bultos</div>
-                    <div style="font-size:20px; font-weight:900; color:var(--text-main);">${totalEscaneado} <span style="font-size:12px; color:var(--text-muted);">/ ${totalBultosGlobal}</span></div>
+                    <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Escaneados / Programados</div>
+                    <div style="font-size:20px; font-weight:900; color:var(--text-main);">${totalEscaneado} <span style="font-size:12px; color:var(--text-muted);">/ ${totalProgramado}</span></div>
+                    <div style="font-size:9.5px; font-weight:700; color:var(--text-muted);">${totalBultosGlobal} bultos</div>
                 </div>
                 <div style="flex:1; padding:10px; text-align:center; border-left:1px solid var(--border);">
                     <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Faltantes</div>
@@ -15798,7 +15823,7 @@
         // --- Filtros rápidos + orden ---
         let lista = claves.map(key => {
             const g = grupos[key];
-            const pct = g.programado > 0 ? Math.min(100, (g.totalFolios / g.programado) * 100) : (g.totalFolios > 0 ? 100 : 0);
+            const pct = g.programado > 0 ? Math.min(100, (g.escaneadoUnico / g.programado) * 100) : (g.escaneadoUnico > 0 ? 100 : 0);
             return { key, g, pct };
         });
         const totalRutasAntes = lista.length;

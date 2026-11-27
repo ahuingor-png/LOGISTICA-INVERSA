@@ -2804,6 +2804,7 @@
                 <div class="desktop-panel-body" style="padding-top: 5px; overflow-y: auto;">
                     <div id="resumenReprosPrincipalKPIs" style="display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; flex:0 0 auto;"></div>
                     <div id="listaAvanceReprosDash" style="display:flex; flex-direction:column; gap:6px;"></div>
+                    <div id="operariosReprosDash" style="margin-top:10px;"></div>
                 </div>
             </div>
     </div>
@@ -14773,6 +14774,58 @@
         return { grupos, inventariados };
     }
 
+    // Operarios que están escaneando Reprogramaciones (últimas 12 h): activo = escaneó hace <= 15 min.
+    function actualizarOperariosReprosPrincipal() {
+        const cont = document.getElementById('operariosReprosDash');
+        if (!cont) return;
+        const ahora = Date.now();
+        const VENTANA = 12 * 3600 * 1000, ACTIVO = 15 * 60 * 1000;
+        const por = {};
+        scansRepro.forEach(r => {
+            const ts = Number(r.timestamp) || 0;
+            if (!ts || ahora - ts > VENTANA) return;
+            const u = String(r.usuario || 'SIN USUARIO').toUpperCase();
+            if (!por[u]) por[u] = { codigos: new Set(), primero: ts, ultimo: ts, cats: {} };
+            const o = por[u];
+            o.codigos.add(limpiarTexto(r.codigo));
+            if (ts < o.primero) o.primero = ts;
+            if (ts > o.ultimo) o.ultimo = ts;
+            const c = r.resultado === 'INVENTARIADO' ? 'INVENTARIADO' : (r.categoria || 'OTRO');
+            o.cats[c] = (o.cats[c] || 0) + 1;
+        });
+        const lista = Object.keys(por).map(u => {
+            const o = por[u];
+            const activo = (ahora - o.ultimo) <= ACTIVO;
+            const horas = Math.max(0.25, (o.ultimo - o.primero) / 3600000);
+            return { u, n: o.codigos.size, activo, ultimo: o.ultimo, ritmo: o.codigos.size / horas, cats: o.cats };
+        }).sort((a, b) => (b.activo - a.activo) || (b.n - a.n));
+
+        const activos = lista.filter(x => x.activo).length;
+        const encabezado = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:10px; font-weight:900; color:var(--text-muted); text-transform:uppercase;">👥 Operarios escaneando · últimas 12 h</span>
+            <span style="font-size:10px; font-weight:800; color:${activos ? '#16a34a' : 'var(--text-muted)'};">${activos} activo${activos === 1 ? '' : 's'}</span></div>`;
+        if (!lista.length) {
+            cont.innerHTML = encabezado + '<div class="resumen-vacio">Nadie ha escaneado Reprogramaciones en las últimas 12 horas.</div>';
+            return;
+        }
+        const max = Math.max(...lista.map(x => x.n), 1);
+        const hace = ms => { const m = Math.floor(ms / 60000); return m < 1 ? 'ahora' : (m < 60 ? `hace ${m} min` : `hace ${Math.floor(m / 60)} h ${m % 60} min`); };
+        cont.innerHTML = encabezado + `<div style="display:flex; flex-direction:column; gap:6px;">` + lista.map(x => {
+            const col = x.activo ? '#16a34a' : '#94a3b8';
+            const detalle = Object.entries(x.cats).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${_escHtmlRepro(k)}: ${n}`).join(' · ');
+            return `<div title="${detalle}" style="padding:6px 10px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; font-size:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-weight:800; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${col}; margin-right:6px;${x.activo ? ' box-shadow:0 0 0 3px rgba(22,163,74,.2);' : ''}"></span>${_escHtmlRepro(x.u)}</span>
+                    <span style="font-weight:900; color:#0ea5e9;">${x.n} <span style="font-size:10px; font-weight:700; color:var(--text-muted);">escaneos</span></span>
+                </div>
+                <div style="height:5px; background:var(--bg); border-radius:4px; overflow:hidden; margin:5px 0 3px;"><div style="height:100%; width:${(x.n / max * 100).toFixed(0)}%; background:${col};"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; color:var(--text-muted);">
+                    <span>${x.activo ? '🟢 Trabajando' : '⚪ Inactivo'} · último ${hace(ahora - x.ultimo)}</span>
+                    <span>${x.ritmo.toFixed(0)}/h</span>
+                </div></div>`;
+        }).join('') + `</div>`;
+    }
+
     // Avance de Reprogramaciones en la pantalla principal (panel "Avance general de rutas").
     // Usa el mismo cálculo que la Vista de Repros pero sin los filtros del modal.
     function actualizarAvanceReprosPrincipal() {
@@ -14781,6 +14834,7 @@
         if (!kpis || !lista) return;
         const { grupos, inventariados } = obtenerDatosVistaRepros({});
         const claves = Object.keys(grupos);
+        try { actualizarOperariosReprosPrincipal(); } catch (e) { console.error('Operarios Repros:', e); }
 
         let tProg = 0, tEsc = 0, tFalt = 0;
         claves.forEach(k => { tProg += grupos[k].programado; tEsc += grupos[k].escaneado; tFalt += grupos[k].faltante; });
@@ -19615,6 +19669,14 @@
         if (ev.target === m && typeof cerrarModalExportarExcel === 'function') cerrarModalExportarExcel();
     });
 })();
+</script>
+
+<script>
+/* Refresca cada minuto los operarios de Reprogramaciones (estado activo / "hace X min") */
+setInterval(function () {
+    try { var p = document.getElementById('panelAvanceReprosDesk');
+          if (p && p.style.display !== 'none' && typeof actualizarOperariosReprosPrincipal === 'function') actualizarOperariosReprosPrincipal(); } catch (e) {}
+}, 60000);
 </script>
 </body>
 </html>

@@ -2009,6 +2009,99 @@
             border: 1px solid var(--border) !important;
             box-shadow: 0 20px 40px rgba(0,0,0,.35);
         }
+
+        /* ==========================================================
+           VISTA PRINCIPAL COMPACTA v2
+           - Columnas laterales más angostas, menos padding y tipografía más chica
+           - La zona central ya no hace scroll horizontal: en pantallas medianas el
+             Avance de Rutas ocupa toda la fila y Ranking + Reprogramaciones van debajo
+           - KPIs y cabeceras que se cortaban ahora se ajustan al ancho disponible
+           ========================================================== */
+        .desktop-container { gap: 10px; padding: 10px; }
+        body.is-admin .desktop-container,
+        body.tiene-panel-izquierdo .desktop-container { grid-template-columns: 232px minmax(0, 1fr) 292px; }
+        body.is-admin.admin-tools-oculto .desktop-container,
+        body.tiene-panel-izquierdo.admin-tools-oculto .desktop-container { grid-template-columns: minmax(0, 1fr) 292px; }
+        body.is-admin.panel-derecho-oculto .desktop-container,
+        body.tiene-panel-izquierdo.panel-derecho-oculto .desktop-container { grid-template-columns: 232px minmax(0, 1fr); }
+        body.is-admin.admin-tools-oculto.panel-derecho-oculto .desktop-container,
+        body.tiene-panel-izquierdo.admin-tools-oculto.panel-derecho-oculto .desktop-container { grid-template-columns: minmax(0, 1fr); }
+        @media (max-width: 1400px) {
+            body.is-admin .desktop-container,
+            body.tiene-panel-izquierdo .desktop-container { grid-template-columns: 208px minmax(0, 1fr) 260px; }
+            body.is-admin.admin-tools-oculto .desktop-container,
+            body.tiene-panel-izquierdo.admin-tools-oculto .desktop-container { grid-template-columns: minmax(0, 1fr) 260px; }
+            body.is-admin.panel-derecho-oculto .desktop-container,
+            body.tiene-panel-izquierdo.panel-derecho-oculto .desktop-container { grid-template-columns: 208px minmax(0, 1fr); }
+        }
+
+        .desktop-panel { padding: 10px 12px; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+        .desktop-panel-title { font-size: 11.5px; letter-spacing: .2px; padding-bottom: 6px; margin-bottom: 8px; gap: 6px; }
+        .desktop-panel-body { gap: 8px; }
+        .desktop-container .btn-header { font-size: 11px !important; padding: 6px 10px !important; }
+        .custom-filter-btn { padding: 5px 9px; font-size: 10.5px; white-space: nowrap; }
+
+        /* --- Menú lateral --- */
+        #panelMenuAdminDesk .admin-group-label { padding-top: 8px; }
+        #panelMenuAdminDesk .btn-header { padding: 6px 10px !important; }
+        .panel-stats { gap: 5px; padding-bottom: 8px; margin-bottom: 6px; }
+        .stat-cell { padding: 6px 8px; gap: 2px; }
+        .stat-num { font-size: 14px; }
+
+        /* --- Zona central --- */
+        #zonaCentralDesk { gap: 10px; overflow-x: hidden; overflow-y: auto; }
+        #panelRankingDesk { min-width: 230px; }
+        #panelResumenAvanceRutasDesk { min-width: 330px; }
+        #panelAvanceReprosDesk { min-width: 230px; }
+        #panelResumenAvanceRutasDesk #filaDonaListaAvance { min-height: 200px; }
+        #panelResumenAvanceRutasDesk #colListaAvanceRutas { min-width: 0 !important; flex: 1 1 200px; }
+
+        /* Solo en ventanas estrechas: Avance ocupa la fila completa y el resto va debajo en 2 columnas */
+        @media (max-width: 1280px) {
+            #zonaCentralDesk {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-auto-rows: min-content;
+                align-content: start;
+            }
+            #zonaCentralDesk > .desktop-panel { min-width: 0 !important; }
+            #panelResumenAvanceRutasDesk { grid-column: 1 / -1; }
+            /* si Reprogramaciones está oculto, el Ranking usa todo el ancho */
+            #zonaCentralDesk:has(#panelAvanceReprosDesk[style*="display: none"]) #panelRankingDesk,
+            #zonaCentralDesk:has(#panelAvanceReprosDesk[style*="display:none"]) #panelRankingDesk { grid-column: 1 / -1; }
+            #panelResumenAvanceRutasDesk #filaDonaListaAvance { min-height: 0; flex-wrap: nowrap !important; }
+            #panelResumenAvanceRutasDesk #listaAvanceRutasDash { max-height: 270px !important; flex: 0 1 auto; }
+        }
+
+        /* Cabeceras de panel: no se desbordan, los botones bajan de línea */
+        #zonaCentralDesk > .desktop-panel > .desktop-panel-title { flex-wrap: wrap; }
+        #zonaCentralDesk > .desktop-panel > .desktop-panel-title > div { flex-wrap: wrap; }
+        #panelRankingDesk > .desktop-panel-title > span { flex: 1 1 150px; min-width: 0; line-height: 1.35; }
+        #lblTotalRankingDesk { display: inline-block; margin: 2px 0 0 0 !important; font-size: 10px !important; }
+        #panelRankingDesk #bloqueRankingRendimientoDesk { gap: 10px !important; margin-bottom: 8px !important; }
+
+        /* Métricas por modo: cada modo en su mitad, con etiqueta, cifra y % apilados */
+        #bloqueMetricasModoDesk > div { flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; gap: 4px; padding: 8px 10px !important; min-width: 0; }
+        #bloqueMetricasModoDesk > div > div { text-align: left !important; min-width: 0; }
+        #bloqueMetricasModoDesk > div > div:first-child > div:first-child { flex-wrap: wrap; row-gap: 2px; font-size: 10.5px !important; }
+        #bloqueMetricasModoDesk .kpi-modo-valor { font-size: 22px !important; line-height: 1.05; }
+        #bloqueMetricasModoDesk > div > div:last-child > div:first-child { font-size: 9.5px !important; text-transform: none !important; font-weight: 700 !important; }
+        #bloqueMetricasModoDesk > div > div:last-child > div:last-child { font-size: 13px !important; }
+
+        /* KPIs que se cortaban (Avance de Rutas y Reprogramaciones) */
+        #resumenGlobalKPIs, #resumenReprosPrincipalKPIs { flex-wrap: wrap; }
+        #resumenGlobalKPIs > div, #resumenReprosPrincipalKPIs > div { flex: 1 1 78px !important; min-width: 0; padding: 7px 6px !important; }
+        #resumenGlobalKPIs > div > div:nth-child(2), #resumenReprosPrincipalKPIs > div > div:nth-child(2) { font-size: 17px !important; white-space: nowrap; }
+        #resumenGlobalKPIs > div > div:first-child, #resumenReprosPrincipalKPIs > div > div:first-child { font-size: 8.5px !important; line-height: 1.2; }
+
+        /* Dona más pequeña */
+        #donaAvanceGlobalBox { padding: 8px 12px !important; gap: 6px !important; }
+        #donaAvanceGlobalRing { width: 104px !important; height: 104px !important; }
+        #lblDonaAvanceGlobal { font-size: 19px !important; }
+
+        /* Panel derecho (Estado Modo Ruta) */
+        #panelDerechoColumna .desktop-panel-body { gap: 6px; }
+        #panelDerechoColumna table th, #panelDerechoColumna table td { padding: 4px 6px !important; font-size: 11px !important; }
     </style>
 </head>
 <body>
@@ -2837,12 +2930,15 @@
                     <button onclick="document.getElementById('ndFile').click()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬆ Subir Excel</button>
                     <span style="font-size:10px; font-weight:700; color:var(--text-muted);">o arrastra el archivo a esta ventana</span>
                     <button onclick="ndExportar()" style="background:var(--success); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬇ Exportar filtrado</button>
+                    <button onclick="document.getElementById('ndFileTMS').click()" title="Sube el archivo TMS: busca coincidencia por rastreo/guía y llena Estado Tms, TMS Guía y TMS OC (con ESTADO_TMS) y Descripción" style="background:var(--warning); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">⬆ Subir archivo TMS</button>
                     <button onclick="ndTogglePanelCargas()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🗂 Cargas</button>
+                    <button onclick="ndCompletarNube()" title="Se ejecuta solo al abrir y al subir un Excel. Vuelve a llenar Secuencia, Ruta, Pasillo, Ubicaciones y Bultos vacíos desde Cruce de Datos IL" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">🔗 Actualizar desde Cruce IL</button>
                     <button onclick="ndAbrirColumnas(event)" title="Elegir qué columnas ver" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">👁 Columnas<span id="ndColBadge"></span></button>
                     <button id="ndBtnVista" onclick="ndToggleVista()" style="background:var(--warning); color:#fff; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">📊 Estadísticas</button>
                     <button onclick="cerrarModalNoDespachado()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:4px 10px; border-radius:4px; font-size:12px; font-weight:700; cursor:pointer;">&times;</button>
                 </div>
             </div>
+            <input type="file" id="ndFileTMS" accept=".xlsx,.xls,.csv" style="display:none;" onchange="ndLeerTMS(this)">
             <input type="file" id="ndFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="ndLeerArchivo(this)">
         </div>
 
@@ -12533,7 +12629,7 @@
                     ${celdaC('', 'Ruta', s.ruta || 'S/P')}
                     ${celdaC('num', 'Bultos', s._sinBultos ? '' : (s.bul || 1))}
                     ${celdaC('w3', 'Ubic.', s.ubic)}
-                    ${celdaC('w3 num', 'Zona', s.zona)}
+                    <div class="hr-c hr-d w3 num ${vac(s.zona) ? 'vacio' : ''}" title="${vac(s.zona) ? '' : e(s.zona)}${s.fila ? ' · Fila ' + e(s.fila) : ''}"><span class="hr-lbl">Zona</span>${vac(s.zona) ? '—' : e(s.zona)}${s.fila ? `<span style="display:block; font-size:10px; font-weight:800; color:#0284c7; line-height:1.2;">Fila ${e(s.fila)}</span>` : ''}</div>
                     <div class="hr-c hr-d hr-catc"><span class="hr-lbl">Categoría</span>${s.cat ? `<span class="hr-cat ${esAviso ? 'aviso' : ''}" title="${e(s.cat)}">${e(s.cat)}</span>` : '—'}</div>
                     <div class="hr-c hr-d hr-fecha"><span class="hr-lbl">Fecha y hora</span><b>${e(fh.d)}</b>${fh.t ? `<em>${e(fh.t)}</em>` : ''}</div>
                     <div class="hr-c hr-user mut" title="${e(s.usuario || '')}">${e(s.usuario || '@?')}</div>
@@ -12550,7 +12646,7 @@
                     ${celda('', 'Ruta', s.ruta || "S/P")}
                     ${celda('num', 'Bultos', s._sinBultos ? '' : (s.bul || 1))}
                     ${celda('w3', 'Ubic.', s.ubic)}
-                    ${celda('w3 num', 'Zona', s.zona)}
+                    ${celda('w3 num', 'Zona', vac(s.zona) ? s.zona : (s.zona + (s.fila ? `<span style="display:block; font-size:10px; font-weight:800; color:#0284c7; line-height:1.2;">Fila ${s.fila}</span>` : '')))}
                     <div class="hr-c hr-d hr-catc">${s.cat ? `<span class="hr-lbl">Categoría</span><span class="hr-cat ${esAviso ? 'aviso' : ''}" title="${s.cat}">${s.cat}</span>` : '<span class="hr-lbl">Categoría</span>—'}</div>
                     <div class="hr-c hr-hora mut">${s.hora}</div>
                     <div class="hr-c hr-user mut">${s.usuario || "@?"}</div>
@@ -13387,6 +13483,16 @@
     const ND_VISIBLES = ['vueltas','transportista','bu','nruta','tipodevolucion','numeroorder','numrastreo','guiatms','estadodecarga','responsable','motivonocarga','comentarioil','ubicaciones','bultos','estadotms','descripcion','archivo'];
     const ND_FILTROS = [['vueltas','Vuelta'],['transportista','Transportista'],['bu','BU'],['nruta','N° Ruta'],['tipodevolucion','Tipo devolución'],['estadodecarga','Estado de carga'],['responsable','Responsable'],['motivonocarga','Motivo no carga'],['estadotms','Estado TMS'],['ubicaciones','Ubicación'],['archivo','Archivo cargado']];
 
+    // Encabezados que SIEMPRE debe tener la tabla (en este orden). Si el Excel no trae alguno, se agrega vacío.
+    const ND_ENCABEZADOS = ['Volver a rutear?','Estado de carga','Responsable','Motivo no carga','Comentario IL','Secuencia','Ruta','Pasillo','Ubicaciones','Bultos','Obs Inv Ruta','Concatenar','Estado Tms','OC','TMS Guía','TMS OC','Descripción'];
+    function ndEsEncabezado(c) { const n = ndNorm(c); return ND_ENCABEZADOS.some(h => ndNorm(h) === n); }
+    // pone primero los encabezados requeridos (en su orden) y después el resto de columnas del Excel
+    function ndOrdenarCols(cols) {
+        const usados = new Set(), frente = [];
+        ND_ENCABEZADOS.forEach(h => { const c = cols.find(x => ndNorm(x) === ndNorm(h) && !usados.has(x)); if (c) { usados.add(c); frente.push(c); } });
+        return frente.concat(cols.filter(c => !usados.has(c)));
+    }
+
     function ndNorm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
     function ndEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function ndSanKey(s) { return String(s).replace(/[.#$\[\]\/]/g, '_').trim(); }
@@ -13397,7 +13503,7 @@
         if (!ND.escuchando) {
             ND.escuchando = true;
             document.getElementById('ndEstadoNube').textContent = '⏳ conectando...';
-            rtdb.ref('no_despachado/filas').on('value', snap => { ND.filas = snap.val() || {}; document.getElementById('ndEstadoNube').textContent = '☁ sincronizado'; ndRenderTodo(); }, err => { document.getElementById('ndEstadoNube').textContent = '⚠ sin acceso a la nube'; alert('No se pudo leer la nube (no_despachado): ' + err.message + '\n\nRevisa las Reglas de Firebase.'); });
+            rtdb.ref('no_despachado/filas').on('value', snap => { ND.filas = snap.val() || {}; document.getElementById('ndEstadoNube').textContent = '☁ sincronizado'; ndRenderTodo(); if (!ND._autoCruce && Object.keys(ND.filas).length) { ND._autoCruce = true; ndCompletarNube(true); } }, err => { document.getElementById('ndEstadoNube').textContent = '⚠ sin acceso a la nube'; alert('No se pudo leer la nube (no_despachado): ' + err.message + '\n\nRevisa las Reglas de Firebase.'); });
             rtdb.ref('no_despachado/columnas').on('value', snap => { ND.columnas = snap.val() || []; ndRenderTodo(); });
             rtdb.ref('no_despachado/lotes').on('value', snap => { ND.lotes = snap.val() || {}; ndRenderPanelCargas(); });
         }
@@ -13412,6 +13518,7 @@
             rtdb.ref('no_despachado/columnas').off();
             rtdb.ref('no_despachado/lotes').off();
             ND.escuchando = false;
+            ND._autoCruce = false;
         }
     }
 
@@ -13434,7 +13541,9 @@
                     const tieneDatos = matriz.slice(1).some(r => String(r[i] == null ? '' : r[i]).trim() !== '');
                     if (tieneDatos || !/^columna\d+$/i.test(h)) idx.push(i);
                 });
-                const cols = idx.map(i => heads[i]);
+                let cols = idx.map(i => heads[i]);
+                const agregadas = [];
+                ND_ENCABEZADOS.forEach(h => { if (!cols.some(c => ndNorm(c) === ndNorm(h))) { const k = ndSanKey(h); cols.push(k); agregadas.push(k); } });
                 const nRastreo = cols.find(c => ndNorm(c) === 'numrastreo');
                 const nOrden = cols.find(c => ndNorm(c) === 'numeroorder');
                 const filas = {};
@@ -13442,10 +13551,12 @@
                 matriz.slice(1).forEach(r => {
                     const o = {};
                     let vacia = true;
-                    idx.forEach(i => { const v = String(r[i] == null ? '' : r[i]).trim(); o[heads[i]] = v; if (v) vacia = false; });
+                    idx.forEach(i => { const v = String(r[i] == null ? '' : r[i]).trim(); if (v || o[heads[i]] === undefined) o[heads[i]] = v; if (v) vacia = false; });
                     if (vacia) return;
                     let clave = ndSanKey((nRastreo && o[nRastreo]) || (nOrden && o[nOrden]) || '');
                     if (!clave) { sinClave++; clave = 'f_' + Date.now().toString(36) + '_' + n; }
+                    // encabezados que el Excel no trae: quedan vacíos (o conservan lo que ya había en la nube)
+                    agregadas.forEach(h => { o[h] = (ND.filas[clave] && ND.filas[clave][h]) || ''; });
                     if (filas[clave]) repetidas++;
                     o._n = n++;
                     filas[clave] = o;
@@ -13453,8 +13564,9 @@
                 const claves = Object.keys(filas);
                 if (!claves.length) throw new Error('No se encontraron filas con datos.');
                 const existentes = claves.filter(k => ND.filas[k]).length;
-                ND.pendiente = { archivo: file.name, cols, filas, total: claves.length, nuevas: claves.length - existentes, existentes, repetidas, sinClave };
+                ND.pendiente = { archivo: file.name, cols, agregadas, filas, total: claves.length, nuevas: claves.length - existentes, existentes, repetidas, sinClave };
                 ndRenderPreview();
+                ndCruzarPendiente();
             } catch (err) {
                 alert('No se pudo leer el Excel: ' + err.message);
             }
@@ -13467,10 +13579,11 @@
         const box = document.getElementById('ndPreview');
         const p = ND.pendiente;
         if (!p) { box.style.display = 'none'; box.innerHTML = ''; return; }
-        const muestra = Object.values(p.filas).slice(0, 6);
-        const colsMuestra = p.cols.filter(c => ND_VISIBLES.includes(ndNorm(c))).slice(0, 9);
-        const th = colsMuestra.map(c => '<th style="padding:4px 8px; text-align:left; font-size:10px; white-space:nowrap;">' + ndEsc(c) + '</th>').join('');
-        const tr = muestra.map(r => '<tr>' + colsMuestra.map(c => '<td style="padding:3px 8px; font-size:11px; white-space:nowrap; max-width:200px; overflow:hidden; text-overflow:ellipsis;">' + ndEsc(r[c]) + '</td>').join('') + '</tr>').join('');
+        const muestra = Object.values(p.filas).slice(0, 8);
+        const colsMuestra = p.cols;
+        const nuevas = new Set(p.agregadas || []);
+        const th = '<th style="padding:5px 8px; font-size:10px; color:var(--text-muted); border:1px solid var(--border);">#</th>' + colsMuestra.map(c => '<th style="padding:5px 8px; text-align:left; font-size:10px; white-space:nowrap; text-transform:uppercase; border:1px solid var(--border);' + (nuevas.has(c) ? ' background:rgba(63,136,98,.18);' : '') + '">' + ndEsc(c) + (nuevas.has(c) ? ' <span style="color:var(--success); font-size:9px;">+nueva</span>' : '') + '</th>').join('');
+        const tr = muestra.map((r, i) => '<tr style="' + (i % 2 ? 'background:rgba(100,116,139,0.07);' : '') + '"><td style="padding:3px 8px; font-size:10px; color:var(--text-muted); text-align:center; border:1px solid var(--border);">' + (i + 1) + '</td>' + colsMuestra.map(c => '<td style="padding:3px 8px; font-size:11px; white-space:nowrap; max-width:220px; overflow:hidden; text-overflow:ellipsis; border:1px solid var(--border);">' + ndEsc(r[c]) + '</td>').join('') + '</tr>').join('');
         box.style.display = 'block';
         box.innerHTML =
             '<div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">' +
@@ -13478,8 +13591,10 @@
             (p.repetidas ? ' · ' + p.repetidas + ' repetidas dentro del archivo' : '') + '</div>' +
             '<div style="display:flex; gap:6px;"><button id="ndBtnGuardar" onclick="ndGuardarPendiente()" style="background:var(--success); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">☁ Agregar a la tabla y guardar en la nube</button>' +
             '<button onclick="ndCancelarPendiente()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:8px 12px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Cancelar</button></div></div>' +
-            '<div style="overflow:auto; margin-top:8px; border:1px solid var(--border); border-radius:6px;"><table style="border-collapse:collapse; width:100%;"><thead style="background:var(--bg);"><tr>' + th + '</tr></thead><tbody>' + tr + '</tbody></table></div>' +
-            '<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Vista previa de las primeras filas. Las filas con el mismo num_rastreo se actualizan en lugar de duplicarse.</div>';
+            ((p.agregadas && p.agregadas.length) ? '<div style="font-size:11px; margin-top:6px; color:var(--success); font-weight:800;">➕ Encabezados agregados automáticamente (el Excel no los traía, van al final): ' + p.agregadas.map(ndEsc).join(', ') + '</div>' : '') +
+            ndCruceHtml(p) +
+            '<div style="overflow:auto; max-height:34vh; margin-top:8px; border:1px solid var(--border); border-radius:6px;"><table style="border-collapse:collapse; width:100%;"><thead style="background:var(--bg);"><tr>' + th + '</tr></thead><tbody>' + tr + '</tbody></table></div>' +
+            '<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Vista previa de las primeras filas (primero las columnas del archivo, al final las vacías). Las filas con el mismo num_rastreo se actualizan en lugar de duplicarse.</div>';
     }
 
     function ndCancelarPendiente() { ND.pendiente = null; ndRenderPreview(); }
@@ -13487,6 +13602,7 @@
     async function ndGuardarPendiente() {
         const p = ND.pendiente;
         if (!p) return;
+        if (p.cruzando) return alert('Espera: todavía se está cruzando con Cruce IL.');
         const btn = document.getElementById('ndBtnGuardar');
         btn.disabled = true; btn.textContent = '⏳ Guardando en la nube...';
         try {
@@ -13516,6 +13632,302 @@
         }
     }
 
+
+    // =====================================================================
+    //  CRUCE CON "CRUCE DE DATOS IL": llena Secuencia / Ruta / Pasillo
+    //  buscando el num_rastreo en lo cargado en Cruce IL (Firebase: datos_cruce_guardados).
+    //  Solo llena celdas VACÍAS (nunca pisa lo que trae el Excel). Si un rastreo
+    //  no tiene coincidencia, abre un modal para capturar esos datos a mano.
+    // =====================================================================
+    const ND_CRUCE_CAMPOS = [
+        { req: 1, n: 'secuencia', alias: ['secuencia', 'SECUENCIA', 'Secuencia', 'sec', 'SEC'] },
+        { req: 1, n: 'ruta',      alias: ['ruta', 'RUTA', 'Ruta'] },
+        { req: 1, n: 'pasillo',   alias: ['pasillo', 'PASILLO', 'Pasillo', 'PASILLO '] },
+        { req: 1, n: 'ubicaciones', alias: ['UBICACIÓN', 'UBICACION', 'Ubicación', 'Ubicacion', 'ubicacion', 'ubicación', 'UBICACIONES', 'Ubicaciones', 'ubicaciones'] },
+        { req: 1, n: 'bultos',    alias: ['BULTOS', 'Bultos', 'bultos'] },
+        { n: 'obsinvruta',   alias: ['CATEGORÍA', 'CATEGORIA', 'Categoría', 'Categoria', 'categoría', 'categoria'] },
+        { n: 'comentarioil', alias: ['COMENTARIO', 'Comentario', 'comentario'] }
+    ];
+
+    async function ndCargarMapaCruce() {
+        const snap = await rtdb.ref('datos_cruce_guardados/data').once('value');
+        const v = snap.val() || [];
+        const arr = Array.isArray(v) ? v : Object.values(v);
+        const mapa = {};
+        arr.forEach(r => {
+            if (!r) return;
+            const cod = String(r.codigoSeguimiento || '').trim().toUpperCase();
+            if (cod) mapa[cod] = r;
+        });
+        return mapa;
+    }
+    function ndGetAlias(r, alias) {
+        for (const a of alias) {
+            const v = r[a];
+            if (v == null) continue;
+            const s = String(v).trim();
+            // "-" y "POR UBICAR" son marcadores de Cruce IL (sin dato real): no se copian
+            if (s === '' || s === '-' || s.toUpperCase() === 'POR UBICAR') continue;
+            return s;
+        }
+        return '';
+    }
+    function ndCodigosFila(f, cols) {
+        const out = [];
+        for (const n of ['numrastreo', 'rastreo', 'codigoseguimiento', 'guiatms']) {
+            const c = cols.find(x => ndNorm(x) === n);
+            if (c && String(f[c] == null ? '' : f[c]).trim()) out.push(String(f[c]).trim().toUpperCase());
+        }
+        return out;
+    }
+    function ndCodigoFila(f, cols) { return ndCodigosFila(f, cols)[0] || ''; }
+    function ndVacio(v) { return String(v == null ? '' : v).trim() === ''; }
+
+    // llena las celdas vacías de filasObj con lo que haya en el mapa del Cruce IL
+    function ndAplicarCruce(filasObj, cols, mapa) {
+        const colDe = {};
+        ND_CRUCE_CAMPOS.forEach(c => { colDe[c.n] = cols.find(x => ndNorm(x) === c.n); });
+        let llenadas = 0, encontradas = 0;
+        const sin = [], cambios = {};
+        Object.keys(filasObj).forEach(k => {
+            const f = filasObj[k];
+            const cods = ndCodigosFila(f, cols);
+            const hit = cods.find(c => mapa[c]);
+            const r = hit ? mapa[hit] : null;
+            if (r) {
+                encontradas++;
+                ND_CRUCE_CAMPOS.forEach(c => {
+                    const col = colDe[c.n];
+                    if (!col || !ndVacio(f[col])) return;
+                    const v = ndGetAlias(r, c.alias);
+                    if (v) { f[col] = v; (cambios[k] = cambios[k] || {})[col] = v; llenadas++; }
+                });
+            } else if (ND_CRUCE_CAMPOS.some(c => c.req && colDe[c.n] && ndVacio(f[colDe[c.n]]))) {
+                sin.push(k);
+            }
+        });
+        // Concatenar = num_rastreo + "," (se llena aunque no haya coincidencia en Cruce IL)
+        const colConc = cols.find(x => ndNorm(x) === 'concatenar');
+        const colRas = cols.find(x => ndNorm(x) === 'numrastreo');
+        if (colConc && colRas) {
+            Object.keys(filasObj).forEach(k => {
+                const f = filasObj[k];
+                const ras = String(f[colRas] == null ? '' : f[colRas]).trim();
+                if (!ras || !ndVacio(f[colConc])) return;
+                const v = ras.replace(/,+$/, '') + ',';
+                f[colConc] = v; (cambios[k] = cambios[k] || {})[colConc] = v; llenadas++;
+            });
+        }
+        // OC = Guía TMS de la misma fila + "," al final
+        const colOC = cols.find(x => ndNorm(x) === 'oc');
+        const colGuia = cols.find(x => ndNorm(x) === 'guiatms');
+        if (colOC && colGuia) {
+            Object.keys(filasObj).forEach(k => {
+                const f = filasObj[k];
+                const g = String(f[colGuia] == null ? '' : f[colGuia]).trim();
+                if (!g || !ndVacio(f[colOC])) return;
+                const v = g.replace(/,+$/, '') + ',';
+                f[colOC] = v; (cambios[k] = cambios[k] || {})[colOC] = v; llenadas++;
+            });
+        }
+        return { llenadas, encontradas, sin, cambios };
+    }
+
+    async function ndEscribirUpd(upd) {
+        const keys = Object.keys(upd);
+        for (let i = 0; i < keys.length; i += 400) {
+            const lote = {};
+            keys.slice(i, i + 400).forEach(k => { lote[k] = upd[k]; });
+            await rtdb.ref().update(lote);
+        }
+    }
+
+    // --- al subir el Excel (antes de guardar) ---
+    async function ndCruzarPendiente() {
+        const p = ND.pendiente;
+        if (!p) return;
+        p.cruzando = true; ndRenderPreview();
+        try {
+            const mapa = await ndCargarMapaCruce();
+            if (ND.pendiente !== p) return;
+            const r = ndAplicarCruce(p.filas, p.cols, mapa);
+            p.cruce = { encontradas: r.encontradas, llenadas: r.llenadas, sin: r.sin, vacioCruce: !Object.keys(mapa).length };
+        } catch (err) {
+            p.cruce = { error: err.message, sin: [] };
+        }
+        p.cruzando = false;
+        ndRenderPreview();
+        if (p.cruce.sin && p.cruce.sin.length) ndAbrirCompletar('pendiente');
+    }
+
+    function ndCruceHtml(p) {
+        if (p.cruzando) return '<div style="font-size:11px; margin-top:6px; font-weight:800; color:var(--text-muted);">⏳ Buscando coincidencias en Cruce de Datos IL...</div>';
+        const c = p.cruce;
+        if (!c) return '';
+        if (c.error) return '<div style="font-size:11px; margin-top:6px; font-weight:800; color:var(--danger);">⚠ No se pudo leer Cruce IL: ' + ndEsc(c.error) + '</div>';
+        let h = '<div style="font-size:11px; margin-top:6px; font-weight:800; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">🔗 Cruce IL: <span style="color:var(--success);">' + c.encontradas + ' con coincidencia</span> · ' + c.llenadas + ' celdas llenadas (Secuencia, Ruta, Pasillo, Ubicaciones, Bultos, Obs Inv Ruta, Comentario IL, Concatenar)';
+        if (c.vacioCruce) h += ' · <span style="color:var(--warning);">Cruce IL no tiene datos cargados</span>';
+        if (c.sin.length) h += ' · <span style="color:var(--warning);">' + c.sin.length + ' sin coincidencia</span> <button onclick="ndAbrirCompletar(\'pendiente\')" style="background:var(--warning); color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">✏ Completar a mano</button>';
+        return h + '</div>';
+    }
+
+    // --- botón "Completar desde Cruce IL" para lo que ya está en la nube ---
+    async function ndCompletarNube(auto) {
+        if (!Object.keys(ND.filas).length) return auto ? null : alert('Aún no hay datos en la tabla.');
+        if (ND._cruzandoNube) return;
+        ND._cruzandoNube = true;
+        try {
+            const mapa = await ndCargarMapaCruce();
+            if (!Object.keys(mapa).length) return auto ? null : alert('Cruce de Datos IL no tiene datos cargados todavía.');
+            const cols = ndColumnasActivas().map(c => c.key).filter(k => k[0] !== '_');
+            const r = ndAplicarCruce(ND.filas, cols, mapa);
+            const upd = {};
+            Object.keys(r.cambios).forEach(k => Object.keys(r.cambios[k]).forEach(c => { upd['no_despachado/filas/' + k + '/' + c] = r.cambios[k][c]; }));
+            await ndEscribirUpd(upd);
+            ND._sinNube = r.sin;
+            ndRenderTabla();
+            if (!auto) alert('Cruce IL: ' + r.encontradas + ' con coincidencia, ' + r.llenadas + ' celdas llenadas, ' + r.sin.length + ' sin coincidencia.');
+            else if (r.llenadas) { const e = document.getElementById('ndEstadoNube'); if (e) e.textContent = '🔗 ' + r.llenadas + ' celdas completadas desde Cruce IL'; }
+            // el modal de revisión solo se abre solo si hay rastreos sin coincidencia y no hay otro modal abierto
+            if (r.sin.length && !document.getElementById('ndComp')) ndAbrirCompletar('nube');
+        } catch (err) {
+            if (!auto) alert('No se pudo cruzar con Cruce IL: ' + err.message);
+        } finally {
+            ND._cruzandoNube = false;
+        }
+    }
+
+    // --- modal para capturar a mano lo que no tuvo coincidencia ---
+    function ndAbrirCompletar(modo) {
+        const pend = modo === 'pendiente';
+        const cols = pend ? ND.pendiente.cols : ndColumnasActivas().map(c => c.key).filter(k => k[0] !== '_');
+        const fuente = pend ? ND.pendiente.filas : ND.filas;
+        const sin = (pend ? ND.pendiente.cruce.sin : ND._sinNube || []).slice();
+        const campos = ND_CRUCE_CAMPOS.filter(c => c.req).map(c => ({ n: c.n, col: cols.find(x => ndNorm(x) === c.n) })).filter(c => c.col);
+        const rastreoCol = cols.find(x => ndNorm(x) === 'numrastreo') || cols.find(x => ndNorm(x) === 'guiatms') || cols[0];
+        ND._comp = { modo, sin, campos, fuente, rastreoCol, bulk: {}, vals: sin.map(k => { const o = {}; campos.forEach(c => { o[c.n] = String(fuente[k][c.col] == null ? '' : fuente[k][c.col]); }); return o; }) };
+        const prev = document.getElementById('ndComp'); if (prev) prev.remove();
+        const box = document.createElement('div');
+        box.id = 'ndComp';
+        box.style.cssText = 'position:fixed; inset:0; z-index:9200; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:12px;';
+        const inp = 'padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text-main); font-size:12px; font-weight:700; width:100%; box-sizing:border-box;';
+        box.innerHTML = '<div style="background:var(--card-bg); color:var(--text-main); border-radius:12px; width:min(900px,100%); max-height:92vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,.4);">' +
+            '<div style="padding:14px 16px; border-bottom:1px solid var(--border);"><b style="font-size:14px;">✏ Sin coincidencia en Cruce de Datos IL</b>' +
+            '<div style="font-size:11px; color:var(--text-muted); margin-top:3px;">' + sin.length + ' registro(s) no se encontraron en Cruce IL. Captura ' + campos.map(c => ndEsc(c.col)).join(' / ') + ' (puedes dejar vacío lo que no sepas).</div></div>' +
+            '<div style="padding:10px 16px; border-bottom:1px solid var(--border); display:grid; grid-template-columns:repeat(' + (campos.length + 1) + ',1fr); gap:8px; align-items:end;">' +
+            campos.map(c => '<label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">' + ndEsc(c.col) + ' (para todas las vacías)<input style="' + inp + '" oninput="ND._comp.bulk[\'' + c.n + '\']=this.value"></label>').join('') +
+            '<button onclick="ndCompAplicarTodas()" style="background:var(--primary); color:#fff; border:none; padding:8px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Aplicar a todas</button></div>' +
+            '<div id="ndCompTabla" style="overflow:auto; flex:1; min-height:120px;"></div>' +
+            '<div style="padding:10px 16px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end;">' +
+            '<button onclick="ndCompCerrar()" style="background:var(--bg); border:1px solid var(--border); color:var(--text-main); padding:8px 14px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Omitir (dejar vacío)</button>' +
+            '<button id="ndCompBtnOk" onclick="ndCompGuardar()" style="background:var(--success); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Guardar datos</button></div></div>';
+        document.body.appendChild(box);
+        ndCompRenderTabla();
+    }
+    function ndCompRenderTabla() {
+        const C = ND._comp; if (!C) return;
+        const LIM = 300, borde = '1px solid var(--border)';
+        const inp = 'padding:4px 6px; border:1px solid var(--border); border-radius:5px; background:var(--bg); color:var(--text-main); font-size:12px; width:100%; box-sizing:border-box;';
+        const filas = C.sin.slice(0, LIM).map((k, i) => '<tr><td style="border:' + borde + '; padding:4px 8px; font-size:11px; font-weight:800; white-space:nowrap;">' + ndEsc(ndVal(C.fuente[k], C.rastreoCol)) + '</td>' +
+            C.campos.map(c => '<td style="border:' + borde + '; padding:3px;"><input style="' + inp + '" value="' + ndEsc(C.vals[i][c.n]) + '" oninput="ND._comp.vals[' + i + '][\'' + c.n + '\']=this.value"></td>').join('') + '</tr>').join('');
+        const mas = C.sin.length > LIM ? '<div style="padding:8px 12px; font-size:11px; color:var(--text-muted); font-weight:700;">Se muestran las primeras ' + LIM + ' de ' + C.sin.length + '. Las demás se llenan con “Aplicar a todas”.</div>' : '';
+        document.getElementById('ndCompTabla').innerHTML = '<table style="border-collapse:collapse; width:100%;"><thead><tr><th style="position:sticky; top:0; background:var(--border); border:' + borde + '; padding:6px 8px; font-size:10px; text-align:left;">RASTREO</th>' +
+            C.campos.map(c => '<th style="position:sticky; top:0; background:var(--border); border:' + borde + '; padding:6px 8px; font-size:10px; text-align:left; text-transform:uppercase;">' + ndEsc(c.col) + '</th>').join('') + '</tr></thead><tbody>' + filas + '</tbody></table>' + mas;
+    }
+    function ndCompAplicarTodas() {
+        const C = ND._comp; if (!C) return;
+        C.vals.forEach(o => C.campos.forEach(c => { const b = String(C.bulk[c.n] || '').trim(); if (b && ndVacio(o[c.n])) o[c.n] = b; }));
+        ndCompRenderTabla();
+    }
+    function ndCompCerrar() { const b = document.getElementById('ndComp'); if (b) b.remove(); }
+    async function ndCompGuardar() {
+        const C = ND._comp; if (!C) return;
+        const upd = {};
+        C.sin.forEach((k, i) => {
+            C.campos.forEach(c => {
+                const v = String(C.vals[i][c.n] || '').trim(), f = C.fuente[k];
+                if (v && v !== String(f[c.col] == null ? '' : f[c.col]).trim()) { f[c.col] = v; upd['no_despachado/filas/' + k + '/' + c.col] = v; }
+            });
+        });
+        if (C.modo === 'pendiente') {
+            const falta = C.sin.filter(k => C.campos.some(c => ndVacio(C.fuente[k][c.col])));
+            if (ND.pendiente && ND.pendiente.cruce) ND.pendiente.cruce.sin = falta;
+            ndCompCerrar(); ndRenderPreview();
+            return;
+        }
+        const btn = document.getElementById('ndCompBtnOk');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Guardando...'; }
+        try { await ndEscribirUpd(upd); ndCompCerrar(); ndRenderTabla(); showToast(); }
+        catch (err) { alert('Error al guardar: ' + err.message); if (btn) { btn.disabled = false; btn.textContent = 'Reintentar'; } }
+    }
+
+    // ---------- Copiar una columna como texto (respeta filtros y orden de la tabla) ----------
+    function ndCopiarColumna(i) {
+        const c = (ND._cols || [])[i]; if (!c) return;
+        const filas = ndFilasFiltradas().slice(0, ND.limite);
+        const texto = filas.map(f => ndVal(f, c.key).replace(/[\r\n\t]+/g, ' ')).join('\n');
+        const ok = () => { const e = document.getElementById('ndEstadoNube'); if (e) e.textContent = '📋 ' + filas.length + ' filas de "' + c.label + '" copiadas'; };
+        const respaldo = () => { const ta = document.createElement('textarea'); ta.value = texto; ta.style.cssText = 'position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) { alert('No se pudo copiar.'); } ta.remove(); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, respaldo); else respaldo();
+    }
+
+    // ---------- Archivo TMS: llena TMS Guía, TMS OC y Descripción por coincidencia ----------
+    // clave de cruce tolerante: mayúsculas, sin espacios ni comas sobrantes
+    function ndKeyTMS(v) { return String(v == null ? '' : v).replace(/[\s,;]+/g, '').toUpperCase(); }
+    function ndLeerTMS(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!Object.keys(ND.filas).length) { input.value = ''; return alert('Primero carga la tabla de Observaciones en ruta.'); }
+        const reader = new FileReader();
+        reader.onload = async e => {
+            try {
+                const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const filasX = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+                if (!filasX.length) throw new Error('El archivo está vacío.');
+                const heads = Object.keys(filasX[0]);
+                const buscar = lista => heads.filter(h => lista.includes(ndNorm(h)));
+                const clavesX = buscar(['numrastreo', 'rastreo', 'codigoseguimiento', 'guiatms', 'guia', 'tmsguia', 'codigo']);
+                const hGuia = buscar(['tmsguia', 'guiatms', 'guia'])[0];
+                const hOC = buscar(['tmsoc', 'oc', 'ordendecompra', 'numerooc'])[0];
+                const hDesc = buscar(['descripcion', 'descripciondelproducto', 'nombreproducto', 'producto'])[0];
+                const hEst = buscar(['estadotms'])[0] || buscar(['estadotms2', 'estado'])[0];
+                if (!clavesX.length) throw new Error('No encontré una columna de rastreo/guía para cruzar. Encabezados: ' + heads.join(', '));
+                const mapa = {};
+                filasX.forEach(r => clavesX.forEach(h => { const k = ndKeyTMS(r[h]); if (k && !mapa[k]) mapa[k] = r; }));
+                const cols = ndColumnasActivas().map(c => c.key).filter(k => k[0] !== '_');
+                const colsDe = n => cols.filter(x => ndNorm(x) === n); const cG = colsDe('tmsguia'), cO = colsDe('tmsoc'), cD = colsDe('descripcion'), cE = colsDe('estadotms');
+                const upd = {}; let enc = 0, sin = 0, celdas = 0; const porCol = {};
+                Object.keys(ND.filas).forEach(k => {
+                    const f = ND.filas[k];
+                    // la coincidencia usa solo las columnas num_rastreo y Guía TMS de la tabla
+                    const cods = ['numrastreo', 'guiatms'].map(n => cols.find(x => ndNorm(x) === n)).filter(Boolean)
+                        .map(c => ndKeyTMS(f[c])).filter(Boolean);
+                    const hit = cods.find(c => mapa[c]);
+                    if (!hit) { sin++; return; }
+                    enc++;
+                    const r = mapa[hit];
+                    [[cG, hEst], [cO, hEst], [cD, hDesc], [cE, hEst]].forEach(([lista, h]) => {
+                        if (!h) return;
+                        const v = String(r[h] == null ? '' : r[h]).trim();
+                        // se escribe en TODAS las columnas con ese nombre (ej. "TMS Guía" y "TMS_GUÍA" si existen ambas)
+                        lista.forEach(col => {
+                            if (v && v !== String(f[col] == null ? '' : f[col]).trim()) { upd['no_despachado/filas/' + k + '/' + col] = v; f[col] = v; celdas++; porCol[col] = (porCol[col] || 0) + 1; }
+                        });
+                    });
+                });
+                await ndEscribirUpd(upd);
+                ndRenderTabla();
+                const detalle = '\n\nColumna del archivo usada para el estado: ' + (hEst || '(no encontrada)') + '\nColumnas de la tabla destino encontradas: ' + [cG, cO, cD, cE].map(l => l.length ? l.map(c => c + ' (' + (porCol[c] || 0) + ' llenadas)').join(' + ') : '—').join(' · ') + '\nEncabezados del archivo: ' + heads.join(', ');
+                const muestra = detalle + (enc ? '' : '\n\nColumnas del archivo usadas para cruzar: ' + clavesX.join(', ') + '\nEjemplo en el archivo: ' + Object.keys(mapa).slice(0, 3).join(' | ') + '\nEjemplo en la tabla: ' + Object.values(ND.filas).slice(0, 3).map(f => ndKeyTMS(f[cols.find(x => ndNorm(x) === 'numrastreo')])).join(' | '));
+                alert('Archivo TMS: ' + enc + ' con coincidencia, ' + celdas + ' celdas llenadas, ' + sin + ' sin coincidencia.' +
+                    (hDesc ? '' : '\n⚠ No encontré columna de Descripción.') + (hEst ? '' : '\n⚠ No encontré columna ESTADO_TMS.') + muestra);
+            } catch (err) { alert('No se pudo leer el archivo TMS: ' + err.message); }
+            input.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
     // ---------- Datos / filtros ----------
     function ndColumnasActivas() {
         let cols = (ND.columnas || []).slice();
@@ -13524,6 +13936,7 @@
             Object.values(ND.filas).forEach(f => Object.keys(f).forEach(k => { if (k[0] !== '_') set.add(k); }));
             cols = Array.from(set);
         }
+        ND_ENCABEZADOS.forEach(h => { if (!cols.some(c => ndNorm(c) === ndNorm(h))) cols.push(h); });
         const lista = cols.map(c => ({ key: c, label: c, n: ndNorm(c) }));
         lista.push({ key: '_archivo', label: 'Archivo', n: 'archivo' });
         return lista;
@@ -13589,7 +14002,7 @@
                 const activo = Array.isArray(ND.filtros[c.key]);
                 return '<th style="position:sticky; top:0; z-index:3; background:var(--border); color:var(--text-main); border:' + borde + '; padding:5px 6px; font-size:10px; text-align:left; text-transform:uppercase; letter-spacing:.3px; overflow:hidden;">' +
                     '<div style="display:flex; align-items:center; gap:4px;"><span title="' + ndEsc(c.label) + '" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + ndEsc(c.label) + '</span>' +
-                    '<button onclick="ndAbrirFiltro(event,' + i + ')" title="Filtrar" style="flex:none; border:1px solid ' + (activo ? 'var(--primary)' : 'var(--border)') + '; background:' + (activo ? 'var(--primary)' : 'var(--card-bg)') + '; color:' + (activo ? '#fff' : 'var(--text-main)') + '; width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">' + (activo ? '⧩' : '▼') + '</button>' +
+                    (c.n === 'concatenar' || c.n === 'oc' ? '<button onclick="ndCopiarColumna(' + i + ')" title="Copiar esta columna como texto (una fila por línea) para pegarla en Excel" style="flex:none; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); height:20px; border-radius:4px; font-size:10px; cursor:pointer; padding:0 4px;">📋</button>' : '') + '<button onclick="ndAbrirFiltro(event,' + i + ')" title="Filtrar" style="flex:none; border:1px solid ' + (activo ? 'var(--primary)' : 'var(--border)') + '; background:' + (activo ? 'var(--primary)' : 'var(--card-bg)') + '; color:' + (activo ? '#fff' : 'var(--text-main)') + '; width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">' + (activo ? '⧩' : '▼') + '</button>' +
                     '<button onclick="ndOcultarCol(' + i + ')" title="Ocultar esta columna" style="flex:none; border:1px solid var(--border); background:var(--card-bg); color:var(--text-muted); width:20px; height:20px; border-radius:4px; font-size:9px; cursor:pointer; padding:0;">✕</button></div>' +
                     '<span onmousedown="ndIniciarResize(event,' + i + ')" style="position:absolute; top:0; right:0; bottom:0; width:6px; cursor:col-resize;"></span></th>';
             }).join('') + '</tr>';
@@ -16721,6 +17134,7 @@
             "Bultos": s.bul || 1,
             "Ubicación": s.ubic || "-",
             "Zona": s.zona || "-",
+            "Fila": s.fila || "",
             "Categoría": s.cat || "-",
             "Modo (interno)": s.modo || "(sin campo modo)",
             "Forzado": s.forzado === true ? "SI" : "NO",
@@ -16962,7 +17376,7 @@
             return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p;
         };
         const wrapR = document.getElementById('wrapRankingDesk');
-        if (wrapR) wrapR.style.height = Math.min(420, Math.max(130, labelsChart.length * 48 + 44)) + 'px';
+        if (wrapR) wrapR.style.height = Math.min(340, Math.max(120, labelsChart.length * 38 + 36)) + 'px';
         const lblTotRank = document.getElementById('lblTotalRankingDesk');
         if (lblTotRank) lblTotRank.textContent = dataChart.reduce((acc, n) => acc + n, 0) + ' escaneos';
         if (canvasObj) {
@@ -17018,7 +17432,7 @@
                             backgroundColor: colorsChart, 
                             borderRadius: 6,
                             barPercentage: 0.7,
-                            maxBarThickness: 34
+                            maxBarThickness: 26
                         }]
                     },
                     plugins: [renderDataLabelsHorizontal],
@@ -17029,9 +17443,9 @@
                         plugins: { legend: { display: false } },
                         scales: { 
                             x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, max: maxNice(maxVal) }, 
-                            y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } 
+                            y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 10 }, callback: function(v) { const l = String(this.getLabelForValue(v)); return l.length > 11 ? l.slice(0, 10) + '…' : l; } } } 
                         },
-                        layout: { padding: { right: 80 } } // Espacio para el texto de la derecha
+                        layout: { padding: { right: 44 } } // Espacio para el texto de la derecha
                     }
                 });
             }

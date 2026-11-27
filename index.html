@@ -1999,6 +1999,16 @@
         .desktop-panel.panel-colapsado > :not(.desktop-panel-title) { display: none !important; }
         .desktop-panel.panel-colapsado { align-self: flex-start; }
         .desktop-panel.panel-colapsado > .desktop-panel-title { margin-bottom: 0; padding-bottom: 8px; }
+
+        /* === Descargar Excel (Historial): ventana flotante (modal real), no pantalla completa === */
+        #modalExportarExcel { padding: 16px; box-sizing: border-box; }
+        #modalExportarExcel .modal-content {
+            width: 100% !important; max-width: 380px !important;
+            height: auto !important; max-height: 85vh !important;
+            overflow-y: auto; border-radius: 16px !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,.35);
+        }
     </style>
 </head>
 <body>
@@ -3788,10 +3798,14 @@
                         <div class="custom-filter-menu" id="filtroResumenRutaZonaMenu"></div>
                     </div>
                 </div>
-                <div style="display:flex; gap:4px; margin-bottom:4px;">
-                    <button onclick="limpiarFiltrosResumenRuta()" style="flex:1; background:var(--card-bg); border:1px solid var(--border); padding:6px 8px; border-radius:5px; font-size:10px; font-weight:800; cursor:pointer;">✕ Limpiar Filtros</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-bottom:4px;">
+                    <div class="custom-filter-wrapper">
+                        <button class="custom-filter-btn" id="filtroResumenRutaUbicBtn" onclick="toggleDateDropdown('filtroResumenRutaUbicMenu', event)" style="width:100%; padding:6px; font-size:10px;">📌 Ubic. (Todas) ▼</button>
+                        <div class="custom-filter-menu" id="filtroResumenRutaUbicMenu"></div>
+                    </div>
+                    <button onclick="limpiarFiltrosResumenRuta()" style="background:var(--card-bg); border:1px solid var(--border); padding:6px 8px; border-radius:5px; font-size:10px; font-weight:800; cursor:pointer;">✕ Limpiar Filtros</button>
                 </div>
-                <input type="text" id="filtroResumenRutaTexto" oninput="actualizarResumenRutasDesk()" placeholder="Buscar Seguimiento o Zona... use * de comodín" style="width:100%; padding:6px; font-size:10px; font-weight:700; border:1px solid var(--border); border-radius:5px; background:var(--card-bg); color:var(--text-main); text-transform:uppercase; box-sizing:border-box;">
+                <input type="text" id="filtroResumenRutaTexto" oninput="actualizarResumenRutasDesk()" placeholder="Buscar seguimiento, zona o ubicación... use * de comodín" style="width:100%; padding:6px; font-size:10px; font-weight:700; border:1px solid var(--border); border-radius:5px; background:var(--card-bg); color:var(--text-main); text-transform:uppercase; box-sizing:border-box;">
             </div>
 
             <div id="contenedorResumenRutasDesk" style="display:none;">
@@ -5717,7 +5731,7 @@
     }
 
     function poblarFiltrosResumenRuta() {
-        let dias = new Set(), rutas = new Set(), secs = new Set(), zonas = new Set();
+        let dias = new Set(), rutas = new Set(), secs = new Set(), zonas = new Set(), ubics = new Set();
 
         // Igual que en poblarFiltrosVistaGlobal: restringir a rutas que existen en
         // la Base de Ruta cargada actualmente, para que el filtro no muestre
@@ -5732,6 +5746,7 @@
                 if (s.ruta) rutas.add(String(s.ruta).toUpperCase());
                 if (s.sec) secs.add(String(s.sec).toUpperCase());
                 if (s.zona) zonas.add(String(s.zona).toUpperCase());
+                ubics.add(String(s.ubic || "").trim().toUpperCase() || "SIN UBICACIÓN");
             }
         });
 
@@ -5739,16 +5754,18 @@
         poblarMenuMultiSelect('filtroResumenRutaRutaMenu', 'filtroResumenRutaRutaBtn', rutas, '🚚 Rutas', actualizarResumenRutasDesk);
         poblarMenuMultiSelect('filtroResumenRutaSecMenu', 'filtroResumenRutaSecBtn', secs, '🔢 Sec.', actualizarResumenRutasDesk);
         poblarMenuMultiSelect('filtroResumenRutaZonaMenu', 'filtroResumenRutaZonaBtn', zonas, '📍 Zonas', actualizarResumenRutasDesk);
+        poblarMenuMultiSelect('filtroResumenRutaUbicMenu', 'filtroResumenRutaUbicBtn', ubics, '📌 Ubic.', actualizarResumenRutasDesk);
     }
 
     function limpiarFiltrosResumenRuta() {
-        ['filtroResumenRutaDiaMenu', 'filtroResumenRutaRutaMenu', 'filtroResumenRutaSecMenu', 'filtroResumenRutaZonaMenu'].forEach(menuId => {
+        ['filtroResumenRutaDiaMenu', 'filtroResumenRutaRutaMenu', 'filtroResumenRutaSecMenu', 'filtroResumenRutaZonaMenu', 'filtroResumenRutaUbicMenu'].forEach(menuId => {
             document.querySelectorAll(`#${menuId} input[type="checkbox"]`).forEach(chk => chk.checked = false);
         });
         actualizarEtiquetaMultiSelect('filtroResumenRutaDiaMenu', 'filtroResumenRutaDiaBtn', '📅 Días');
         actualizarEtiquetaMultiSelect('filtroResumenRutaRutaMenu', 'filtroResumenRutaRutaBtn', '🚚 Rutas');
         actualizarEtiquetaMultiSelect('filtroResumenRutaSecMenu', 'filtroResumenRutaSecBtn', '🔢 Sec.');
         actualizarEtiquetaMultiSelect('filtroResumenRutaZonaMenu', 'filtroResumenRutaZonaBtn', '📍 Zonas');
+        actualizarEtiquetaMultiSelect('filtroResumenRutaUbicMenu', 'filtroResumenRutaUbicBtn', '📌 Ubic.');
         const texto = document.getElementById('filtroResumenRutaTexto');
         if (texto) texto.value = "";
         actualizarResumenRutasDesk();
@@ -5764,6 +5781,7 @@
         const fRuta = leerJornadasSeleccionadas('filtroResumenRutaRutaMenu');
         const fSec = leerJornadasSeleccionadas('filtroResumenRutaSecMenu');
         const fZona = leerJornadasSeleccionadas('filtroResumenRutaZonaMenu');
+        const fUbic = leerJornadasSeleccionadas('filtroResumenRutaUbicMenu');
         const fTexto = document.getElementById('filtroResumenRutaTexto') ? document.getElementById('filtroResumenRutaTexto').value : "";
         
         if (scans.length === 0 || jornadasFiltro.length === 0) {
@@ -5792,13 +5810,16 @@
                 if (fRuta.length && !fRuta.includes(r)) return;
                 if (fSec.length && !fSec.includes(sec)) return;
                 if (fZona.length && !fZona.includes(z)) return;
-                if (fTexto && !coincideWildcard(s.guia, fTexto) && !coincideWildcard(z, fTexto)) return;
+                let ub = String(s.ubic || "").trim().toUpperCase() || "SIN UBICACIÓN";
+                if (fUbic.length && !fUbic.includes(ub)) return;
+                if (fTexto && !coincideWildcard(s.guia, fTexto) && !coincideWildcard(z, fTexto) && !coincideWildcard(ub, fTexto)) return;
                 
                 if(!resumen[r]) resumen[r] = { dia: diaRuta, zonas: {} };
-                if(!resumen[r].zonas[z]) resumen[r].zonas[z] = { folios: 0, bultos: 0 };
+                if(!resumen[r].zonas[z]) resumen[r].zonas[z] = { folios: 0, bultos: 0, ubics: {} };
                 
                 resumen[r].zonas[z].folios += 1;
                 resumen[r].zonas[z].bultos += (parseInt(s.bul) || 1);
+                resumen[r].zonas[z].ubics[ub] = (resumen[r].zonas[z].ubics[ub] || 0) + 1;
             }
         });
 
@@ -5807,6 +5828,7 @@
             return;
         }
 
+        const mostrarUbics = fUbic.length > 0 || String(fTexto || '').trim() !== '';
         let html = '';
         for (let ruta in resumen) {
             let diaRuta = resumen[ruta].dia;
@@ -5841,7 +5863,13 @@
                 
                 html += `
                     <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 8px 12px; font-weight: 800; color: var(--text-main); font-size: 11px;">${zona}</td>
+                        <td style="padding: 8px 12px; font-weight: 800; color: var(--text-main); font-size: 11px;">${zona}${(() => {
+                            if (!mostrarUbics) return '';
+                            const u = Object.entries(resumen[ruta].zonas[zona].ubics || {}).sort((a, b) => a[0].localeCompare(b[0]));
+                            if (!u.length) return '';
+                            const chips = u.slice(0, 12).map(([k, n]) => `<span style="display:inline-block; margin:2px 3px 0 0; padding:1px 6px; border-radius:8px; background:var(--bg); border:1px solid var(--border); font-size:9px; font-weight:700; color:var(--text-muted);">📌 ${k} · ${n}</span>`).join('');
+                            return `<div style="margin-top:2px; font-weight:600;">${chips}${u.length > 12 ? `<span style="font-size:9px; color:var(--text-muted);">+${u.length - 12} más</span>` : ''}</div>`;
+                        })()}</td>
                         <td style="text-align:center; font-weight: 900; color: #0ea5e9;">${f}</td>
                         <td style="text-align:center; font-weight: 900; color: #3f8862;">${b}</td>
                     </tr>`;
@@ -19575,6 +19603,17 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
     else iniciar();
+})();
+</script>
+
+<script>
+/* Tocar fuera de la ventana de "Descargar Excel" la cierra */
+(function () {
+    var m = document.getElementById('modalExportarExcel');
+    if (!m) return;
+    m.addEventListener('click', function (ev) {
+        if (ev.target === m && typeof cerrarModalExportarExcel === 'function') cerrarModalExportarExcel();
+    });
 })();
 </script>
 </body>

@@ -2073,12 +2073,8 @@
             #panelResumenAvanceRutasDesk #listaAvanceRutasDash { max-height: 270px !important; flex: 0 1 auto; }
         }
 
-        /* === Pantallas medianas/celular (incluye "sitio de escritorio" en el móvil): Avance primero, luego Ranking y Repros === */
+        /* === Hasta 1280px: Ranking, Avance y Reprogramaciones apilados, a ancho completo, en ese orden === */
         @media (max-width: 1280px) {
-            #panelResumenAvanceRutasDesk { order: -1; }
-        }
-        /* === Hasta ~1050px: todos los paneles a ancho completo, una sola columna === */
-        @media (max-width: 1050px) {
             #zonaCentralDesk {
                 display: flex !important;
                 flex-direction: column;

@@ -89,7 +89,7 @@
 
         /* ===== Vista de Repros: diseño corporativo ===== */
         #modalVistaRepros .vr-content { padding: 0 !important; background: var(--bg) !important; overflow: hidden; }
-        #modalVistaRepros .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 1480px; margin: 0 auto; }
+        #modalVistaRepros .vr-shell { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: none; margin: 0; }
         #modalVistaRepros .vr-head { background: var(--card-bg); padding: 16px 22px 14px; border-bottom: 1px solid var(--border); box-shadow: 0 1px 3px rgba(15,23,42,.05); }
         #modalVistaRepros .vr-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
         #modalVistaRepros .vr-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -151,6 +151,91 @@
         #modalVistaRepros .vr-pill.warn { background: rgba(185,133,47,.16); color: var(--warning); }
         #modalVistaRepros .vr-row-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
         #modalVistaRepros .vr-row-del:hover { background: rgba(178,69,63,.12); color: var(--danger); }
+        #modalVistaRepros .vr-vista-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card-bg); }
+        #modalVistaRepros .vr-vista-switch button { border: none; background: transparent; padding: 8px 14px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; font-family: inherit; }
+        #modalVistaRepros .vr-vista-switch button + button { border-left: 1px solid var(--border); }
+        #modalVistaRepros .vr-vista-switch button.on { background: var(--primary); color: #fff; }
+        /* Modo "Tabla de reprogramación": se ocultan filtros/acciones/avance del historial y se usan segmentaciones propias */
+        #modalVistaRepros.vr-modo-tabla .vr-filters, #modalVistaRepros.vr-modo-tabla .vr-actions,
+        #modalVistaRepros.vr-modo-tabla #vrToggleAvance, #modalVistaRepros.vr-modo-tabla #vrAvanceWrap { display: none !important; }
+        #modalVistaRepros.vr-modo-tabla .vr-titlebar { margin-bottom: 0; }
+        /* Segmentaciones estilo Excel */
+        #modalVistaRepros .vr-slicers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+        #modalVistaRepros .vr-slicer { border: 1px solid var(--border); background: var(--card-bg); display: flex; flex-direction: column; min-width: 0; }
+        #modalVistaRepros .vr-slicer-h { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 6px 10px; font-size: 12px; color: var(--text-main); }
+        #modalVistaRepros .vr-slicer-clear { border: none; background: transparent; cursor: pointer; color: var(--text-muted); padding: 2px; display: inline-flex; }
+        #modalVistaRepros .vr-slicer-clear:hover { color: var(--danger); }
+        #modalVistaRepros .vr-slicer-b { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 8px 10px; max-height: 150px; overflow-y: auto; }
+        #modalVistaRepros .vr-slc { border: 1px solid #cfd8c3; background: #f1f3f0; color: #6b7280; font-size: 12px; font-weight: 600; padding: 8px 12px; cursor: pointer; font-family: inherit; text-align: left; flex: 1 1 auto; min-width: 90px; }
+        #modalVistaRepros .vr-slc.on { background: #92d050; border-color: #7fb83a; color: #1b2a0c; }
+        #modalVistaRepros .vr-slc.off { opacity: .45; }
+        #modalVistaRepros .vr-slc:hover { filter: brightness(.96); }
+        /* Encabezados verdes con filtro ▼ */
+        #modalVistaRepros #tablaReprogramacionRepros th { background: #70ad47; color: #111; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; padding: 6px 8px; border-right: 1px solid rgba(255,255,255,.55); }
+        #modalVistaRepros .vr-th-flex { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+        #modalVistaRepros .vr-colf { border: 1px solid #8a8a8a; background: #fff; color: #333; font-size: 9px; width: 18px; height: 18px; line-height: 1; cursor: pointer; padding: 0; flex-shrink: 0; }
+        #modalVistaRepros .vr-colf.act { background: #fde68a; border-color: #b9852f; color: #7a4f00; }
+        /* Buscador ancho */
+        #modalVistaRepros .vr-search-wide { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 2px solid var(--text-main); border-radius: 6px; background: var(--card-bg); min-width: 260px; }
+        #modalVistaRepros .vr-search-wide input { flex: 1; border: none; outline: none; background: transparent; padding: 10px 0; font-size: 13px; color: var(--text-main); font-family: inherit; }
+        /* Menú de filtro de columna */
+        #vrColMenuReprog { position: fixed; z-index: 9500; width: 270px; background: #fff; color: #1f2937; border: 1px solid #9ca3af; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.25); padding: 8px; display: none; font-family: inherit; }
+        #vrColMenuReprog input[type=text] { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #9ca3af; border-radius: 4px; font-size: 12px; margin-bottom: 6px; }
+        #vrColMenuReprog .vrcm-lista { max-height: 240px; overflow-y: auto; border: 1px solid #e5e7eb; padding: 4px 6px; }
+        #vrColMenuReprog label { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 3px 0; cursor: pointer; }
+        #vrColMenuReprog label small { margin-left: auto; color: #6b7280; }
+        #vrColMenuReprog .vrcm-pie { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; }
+        #vrColMenuReprog .vrcm-pie button { border: none; background: none; color: #2563eb; cursor: pointer; font-size: 11px; font-weight: 700; padding: 2px; }
+        /* Tabla Crossdock (misma apariencia que la tabla de reprogramación) */
+        #modalVistaRepros #tablaCrossdockRepros th { background: #70ad47; color: #111; font-size: 11px; font-weight: 700; text-transform: none; letter-spacing: 0; padding: 4px 6px; border-right: 1px solid rgba(255,255,255,.55); }
+        #modalVistaRepros #tablaCrossdockRepros { font-size: 11px; }
+        #modalVistaRepros #tablaCrossdockRepros td { font-size: 11px; padding: 5px 8px; }
+        #modalVistaRepros #tablaCrossdockRepros td.vr-cod { font-weight: 700; }
+        /* Crossdock no tiene segmentaciones: la tabla aprovecha todo el alto disponible */
+        #modalVistaRepros.vr-modo-tabla #vrCardCrossdock .vr-table-scroll { max-height: calc(100vh - 215px); min-height: 320px; }
+        #modalVistaRepros .vr-xd-si { color: #15803d; font-weight: 800; }
+        #modalVistaRepros .vr-xd-no { color: #b91c1c; font-weight: 800; }
+        #modalResponsableXd .vr-pop-card { background: var(--card-bg); color: var(--text-main); width: min(420px, 94vw); border-radius: 14px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.3); overflow: hidden; }
+        #modalResponsableXd .vr-pop-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 800; }
+        #modalResponsableXd .vr-pop-b { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+        #modalResponsableXd .vr-pop-b label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; }
+        #modalResponsableXd .vr-pop-b input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-main); font-size: 13px; font-family: inherit; text-transform: none; letter-spacing: 0; font-weight: 500; }
+        #modalResponsableXd .vr-pop-b input:focus { outline: 2px solid var(--primary); }
+        #modalResponsableXd .vr-pop-nota { font-size: 11px; color: var(--text-muted); }
+        #modalResponsableXd .vr-pop-f { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--border); }
+        /* Vista "Tabla de reprogramación": contenido más compacto (solo aquí) */
+        #modalVistaRepros.vr-modo-tabla .vr-body { padding: 12px 16px 18px; }
+        #modalVistaRepros.vr-modo-tabla #tablaReprogramacionRepros { font-size: 11px; }
+        #modalVistaRepros.vr-modo-tabla #tablaReprogramacionRepros th { font-size: 11px; padding: 4px 6px; }
+        #modalVistaRepros.vr-modo-tabla #tablaReprogramacionRepros td { font-size: 11px; padding: 5px 8px; }
+        #modalVistaRepros.vr-modo-tabla #tablaReprogramacionRepros td.vr-cod { font-size: 11px; }
+        #modalVistaRepros.vr-modo-tabla .vr-colf { width: 16px; height: 16px; font-size: 8px; }
+        #modalVistaRepros.vr-modo-tabla .vr-slicers { padding: 8px 12px; gap: 10px; }
+        #modalVistaRepros.vr-modo-tabla .vr-slicer-h { font-size: 11px; padding: 4px 6px 4px 8px; }
+        #modalVistaRepros.vr-modo-tabla .vr-slicer-b { max-height: 110px; padding: 3px 6px 8px; }
+        #modalVistaRepros.vr-modo-tabla .vr-slc { font-size: 11px; padding: 6px 10px; }
+        #modalVistaRepros.vr-modo-tabla .vr-search-wide input { font-size: 12px; padding: 7px 0; }
+        #modalVistaRepros.vr-modo-tabla .vr-table-toolbar .vr-btn { font-size: 11px; padding: 6px 10px; }
+        #modalVistaRepros.vr-modo-tabla .vr-visible-count { font-size: 11px; }
+        #modalVistaRepros.vr-modo-tabla .vr-table-scroll { max-height: calc(100vh - 360px); min-height: 220px; }
+        /* Edición de celdas */
+        #modalVistaRepros .vr-celda-ed { width: 100%; min-width: 80px; box-sizing: border-box; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); padding: 3px 5px; font-size: 11px; font-family: inherit; border-radius: 3px; }
+        #modalVistaRepros .vr-celda-ed:focus { outline: 2px solid var(--primary); background: var(--card-bg); }
+        #modalVistaRepros td.vr-editada { background: rgba(185,133,47,.14); }
+        #modalVistaRepros .vr-btn.vr-activo { background: var(--primary); color: #fff; border-color: var(--primary); }
+        #modalVistaRepros .vr-acc-btn { border: none; background: transparent; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 4px; }
+        #modalVistaRepros .vr-acc-btn:hover { background: rgba(0,0,0,.08); }
+        /* Ventana para agregar una línea manual */
+        #modalAgregarReprog .vr-pop-card { background: var(--card-bg); color: var(--text-main); width: min(660px, 94vw); max-height: 92vh; border-radius: 14px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.3); overflow: hidden; }
+        #modalAgregarReprog .vr-pop-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 800; }
+        #modalAgregarReprog .vr-pop-b { padding: 16px 18px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+        #modalAgregarReprog .vr-pop-b label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; }
+        #modalAgregarReprog .vr-pop-b input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-main); font-size: 13px; font-family: inherit; text-transform: none; letter-spacing: 0; font-weight: 500; }
+        #modalAgregarReprog .vr-pop-b input:focus { outline: 2px solid var(--primary); }
+        #modalAgregarReprog .vr-pop-b .vr-full { grid-column: 1 / -1; }
+        #modalAgregarReprog .vr-pop-f { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--border); }
+        #modalAgregarReprog .vr-pop-nota { grid-column: 1 / -1; font-size: 11px; color: var(--text-muted); }
+        @media (max-width: 600px) { #modalAgregarReprog .vr-pop-b { grid-template-columns: 1fr; } }
         #modalVistaRepros .vr-empty { text-align: center; color: var(--text-muted); padding: 28px 12px !important; font-style: italic; }
         @media (max-width: 800px) {
             #modalVistaRepros .vr-filters, #modalVistaRepros .vr-kpis { grid-template-columns: repeat(2, 1fr); }
@@ -1338,6 +1423,146 @@
             body.imprimiendo-rps #modalReporteSender .rps-table tr { page-break-inside: avoid; }
             body.imprimiendo-rps #modalReporteSender * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
+        #modalElegirReporte .elr-card { background: var(--card-bg); color: var(--text-main); width: min(720px, 94vw); border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,.3); overflow: hidden; }
+        #modalElegirReporte .elr-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 800; }
+        #modalElegirReporte .elr-x { background: var(--bg); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 14px; font-weight: 800; cursor: pointer; color: var(--text-main); }
+        #modalElegirReporte .elr-b { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px; }
+        #modalElegirReporte .elr-op { border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
+        #modalElegirReporte .elr-t { font-size: 14px; font-weight: 800; }
+        #modalElegirReporte .elr-d { font-size: 12px; color: var(--text-muted); line-height: 1.45; flex: 1; }
+        #modalElegirReporte .elr-n { font-size: 12px; font-weight: 700; }
+        @media (max-width: 640px) { #modalElegirReporte .elr-b { grid-template-columns: 1fr; } }
+        #modalReporteTabla { align-items: stretch; justify-content: center; padding: 0; background: rgba(15,23,42,.78); }
+        #modalReporteTabla .rtb-wrap { display: flex; flex-direction: column; width: 100%; max-width: 860px; height: 100%; }
+        #modalReporteTabla .rtb-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+        #modalReporteTabla .rtb-bar b { font-size: 13px; font-weight: 800; color: var(--text-main); }
+        #modalReporteTabla .rtb-bar-btns { display: flex; gap: 8px; }
+        #modalReporteTabla .rtb-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; font-size: 12px; font-weight: 700; font-family: inherit; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); cursor: pointer; }
+        #modalReporteTabla .rtb-btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+        #modalReporteTabla .rtb-scroll { flex: 1; overflow: auto; padding: 14px; }
+        #modalReporteTabla .rtb-paper { background: #fff; color: #0f172a; max-width: 794px; margin: 0 auto; padding: 28px 30px 24px; border-radius: 4px; box-shadow: 0 8px 28px rgba(0,0,0,.35); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        #modalReporteTabla .rtb-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 3px solid #0f172a; }
+        #modalReporteTabla .rtb-logo { height: 64px; width: auto; display: block; }
+        #modalReporteTabla .rtb-ttl { text-align: right; }
+        #modalReporteTabla .rtb-ttl h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: #0f172a; }
+        #modalReporteTabla .rtb-ttl span { display: block; margin-top: 3px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #64748b; }
+        #modalReporteTabla .rtb-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+        #modalReporteTabla .rtb-meta div { padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; }
+        #modalReporteTabla .rtb-meta small { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: #64748b; }
+        #modalReporteTabla .rtb-meta strong { display: block; margin-top: 2px; font-size: 13px; font-weight: 700; color: #0f172a; word-break: break-word; }
+        #modalReporteTabla .rtb-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+        #modalReporteTabla .rtb-kpis div { padding: 8px 10px; border-left: 4px solid #0f172a; background: #f1f5f9; border-radius: 4px; }
+        #modalReporteTabla .rtb-kpis small { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: #64748b; }
+        #modalReporteTabla .rtb-kpis strong { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        #modalReporteTabla .rtb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        #modalReporteTabla .rtb-table th { background: #0f172a; color: #fff; text-align: left; padding: 8px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+        #modalReporteTabla .rtb-table td { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; }
+        #modalReporteTabla .rtb-table th.n, #modalReporteTabla .rtb-table td.n { text-align: right; width: 80px; font-variant-numeric: tabular-nums; }
+        #modalReporteTabla .rtb-table th.i, #modalReporteTabla .rtb-table td.i { width: 42px; color: #94a3b8; }
+        #modalReporteTabla .rtb-table td.c { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 600; }
+        #modalReporteTabla .rtb-table tr.sub td { background: #f1f5f9; font-weight: 800; border-bottom: 1px solid #cbd5e1; }
+        #modalReporteTabla .rtb-table tr.tot td { background: #0f172a; color: #fff; font-weight: 800; font-size: 12.5px; }
+        #modalReporteTabla .rtb-foot { margin-top: 12px; font-size: 10px; color: #94a3b8; text-align: center; }
+        @media (max-width: 600px) {
+            #modalReporteTabla .rtb-scroll { padding: 8px; }
+            #modalReporteTabla .rtb-paper { padding: 16px 14px; }
+            #modalReporteTabla .rtb-logo { height: 48px; }
+            #modalReporteTabla .rtb-ttl h1 { font-size: 16px; }
+            #modalReporteTabla .rtb-meta, #modalReporteTabla .rtb-kpis { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+            #modalReporteTabla .rtb-table { font-size: 11px; }
+        }
+        @media print {
+            @page { size: A4; margin: 12mm; }
+            body.imprimiendo-rtb > *:not(#modalReporteTabla) { display: none !important; }
+            body.imprimiendo-rtb { background: #fff !important; }
+            body.imprimiendo-rtb #modalReporteTabla { position: static !important; display: block !important; background: #fff !important; padding: 0 !important; height: auto !important; backdrop-filter: none !important; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-wrap { display: block; max-width: none; height: auto; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-bar { display: none !important; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-scroll { overflow: visible; padding: 0; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-paper { box-shadow: none; max-width: none; padding: 0; border-radius: 0; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-table thead { display: table-header-group; }
+            body.imprimiendo-rtb #modalReporteTabla .rtb-table tr { page-break-inside: avoid; }
+            body.imprimiendo-rtb #modalReporteTabla * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+        #modalReporteTabla .rtb-paper { max-width: 1000px; }
+        #modalReporteTabla .rtb-wrap { max-width: 1040px; }
+        #modalReporteTabla .rtb-meta { grid-template-columns: repeat(2, 1fr); }
+        #modalReporteTabla .rtb-table td.c { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; }
+        #modalReporteTabla .rtb-sec { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #475569; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+        #modalReporteTabla .rtb-kgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 14px 0 4px; }
+        #modalReporteTabla .rtb-kcard { padding: 8px 12px; border-left: 4px solid var(--kpi, #0f172a); background: #f1f5f9; border-radius: 4px; }
+        #modalReporteTabla .rtb-kpi-label { font-size: 9.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #64748b; }
+        #modalReporteTabla .rtb-kpi-val { font-size: 24px; font-weight: 800; color: var(--kpi, #0f172a); font-variant-numeric: tabular-nums; line-height: 1.25; }
+        #modalReporteTabla .rtb-tms { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+        #modalReporteTabla .rtb-tms-c { border: 1px solid #e2e8f0; border-left: 6px solid var(--c); border-radius: 6px; padding: 6px 10px; background: #fff; }
+        #modalReporteTabla .rtb-tms-n { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: #64748b; }
+        #modalReporteTabla .rtb-tms-v { display: flex; align-items: baseline; justify-content: space-between; }
+        #modalReporteTabla .rtb-tms-v b { font-size: 20px; font-variant-numeric: tabular-nums; }
+        #modalReporteTabla .rtb-tms-v span { font-size: 11px; font-weight: 700; color: #64748b; }
+        #modalReporteTabla .rtb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        #modalReporteTabla .rtb-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px 10px; background: #fff; break-inside: avoid; page-break-inside: avoid; }
+        #modalReporteTabla .rtb-h { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; text-align: center; color: #0f172a; margin-bottom: 4px; }
+        #modalReporteTabla .rtb-cv { position: relative; height: 230px; }
+        #modalReporteTabla .rtb-pv { border-collapse: collapse; width: 100%; font-size: 12px; }
+        #modalReporteTabla .rtb-pv th { background: #0f172a; color: #fff; text-align: left; padding: 6px 10px; font-size: 10.5px; letter-spacing: .5px; text-transform: uppercase; }
+        #modalReporteTabla .rtb-pv td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; }
+        #modalReporteTabla .rtb-pv .n { text-align: right; font-variant-numeric: tabular-nums; width: 110px; }
+        #modalReporteTabla .rtb-pv tr.z td { background: #e2e8f0; font-weight: 800; }
+        #modalReporteTabla .rtb-pv tr.s td { font-weight: 700; background: #f8fafc; }
+        #modalReporteTabla .rtb-pv tr.t td { background: #0f172a; color: #fff; font-weight: 800; }
+        #modalReporteTabla .rtb-chk { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; }
+        @media (max-width: 700px) { #modalReporteTabla .rtb-grid { grid-template-columns: 1fr; } }
+        #modalReporteTabla .db-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 10px; }
+        #modalReporteTabla .db-kpi { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px 10px; background: #fff; break-inside: avoid; }
+        #modalReporteTabla .db-kpi-t { display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: #64748b; }
+        #modalReporteTabla .db-kpi-t i { font-style: normal; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 6px; font-size: 12px; }
+        #modalReporteTabla .db-kpi-v { font-size: 30px; font-weight: 800; color: #0f172a; line-height: 1.15; margin-top: 6px; font-variant-numeric: tabular-nums; }
+        #modalReporteTabla .db-kpi-v.txt { font-size: 15px; line-height: 2.1; text-transform: capitalize; }
+        #modalReporteTabla .db-kpi-s { font-size: 10.5px; color: #64748b; margin-bottom: 8px; }
+        #modalReporteTabla .db-bar { height: 5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        #modalReporteTabla .db-bar b { display: block; height: 100%; border-radius: 4px; }
+        #modalReporteTabla .db-ban { display: flex; gap: 10px; align-items: center; padding: 9px 12px; border: 1px solid #fde68a; background: #fffbeb; border-radius: 8px; font-size: 12px; color: #78350f; margin-bottom: 12px; }
+        #modalReporteTabla .db-ban i { flex: none; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #d97706; color: #d97706; font-style: normal; font-weight: 800; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+        #modalReporteTabla .db-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+        #modalReporteTabla .db-col { display: flex; flex-direction: column; gap: 12px; }
+        #modalReporteTabla .db-card { border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+        #modalReporteTabla .db-ch { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 12px 14px 10px; border-bottom: 1px solid #f1f5f9; }
+        #modalReporteTabla .db-ct { font-size: 12px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: #0f172a; }
+        #modalReporteTabla .db-cs { font-size: 10.5px; color: #64748b; margin-top: 2px; }
+        #modalReporteTabla .db-pill { flex: none; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: #0f172a; color: #fff; }
+        #modalReporteTabla .db-cb { padding: 10px 14px 12px; }
+        #modalReporteTabla .db-cf { display: flex; justify-content: space-between; padding: 9px 14px; background: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 10.5px; color: #64748b; }
+        #modalReporteTabla .db-cf b { color: #0f172a; }
+        #modalReporteTabla .db-r { padding: 6px 0; }
+        #modalReporteTabla .db-rt { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+        #modalReporteTabla .db-rn { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #0f172a; }
+        #modalReporteTabla .db-rn i { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+        #modalReporteTabla .db-rn small { display: block; font-size: 10px; font-weight: 500; color: #94a3b8; }
+        #modalReporteTabla .db-rv { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        #modalReporteTabla .db-rv b { font-size: 14px; color: #0f172a; }
+        #modalReporteTabla .db-rv em { font-style: normal; font-size: 10.5px; color: #94a3b8; margin-left: 5px; }
+        #modalReporteTabla .db-crit { text-decoration: none; margin-left: 8px; font-size: 8.5px; font-weight: 800; letter-spacing: .6px; padding: 2px 6px; border-radius: 99px; background: #d97706; color: #fff; vertical-align: middle; }
+        #modalReporteTabla .db-r.crit { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 7px 10px; margin-bottom: 4px; }
+        #modalReporteTabla .db-r.dom { background: #f1f5f9; border-radius: 6px; padding: 6px 8px; }
+        #modalReporteTabla .db-dona { display: flex; align-items: center; gap: 14px; }
+        #modalReporteTabla .db-donut { width: 140px; flex: none; }
+        #modalReporteTabla .db-dn { font-size: 22px; font-weight: 800; fill: #0f172a; }
+        #modalReporteTabla .db-dl { font-size: 7px; font-weight: 700; letter-spacing: 1px; fill: #94a3b8; }
+        #modalReporteTabla .db-ley { flex: 1; min-width: 0; }
+        #modalReporteTabla .db-ley .db-r { padding: 4px 0; }
+        #modalReporteTabla .db-mm { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        #modalReporteTabla .db-mm div { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px; padding: 8px 10px; }
+        #modalReporteTabla .db-mm small, #modalReporteTabla .db-dom small { display: block; font-size: 8.5px; font-weight: 800; letter-spacing: .8px; color: #94a3b8; }
+        #modalReporteTabla .db-mm strong { font-size: 12px; color: #0f172a; }
+        #modalReporteTabla .db-dom { display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: #fff; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
+        #modalReporteTabla .db-dom strong { font-size: 13px; }
+        #modalReporteTabla .db-dom-p { text-align: right; }
+        #modalReporteTabla .db-dom-p b { font-size: 22px; }
+        @media (max-width: 760px) { #modalReporteTabla .db-kpis { grid-template-columns: 1fr 1fr; } #modalReporteTabla .db-cols { grid-template-columns: 1fr; } #modalReporteTabla .db-dona { flex-direction: column; } }
+        #modalReporteTabla .rtb-firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin: 70px 30px 10px; }
+        #modalReporteTabla .rtb-firmas span { display: block; border-top: 1.5px solid #0f172a; }
+        #modalReporteTabla .rtb-firmas small { display: block; text-align: center; margin-top: 6px; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .6px; }
+        @media print { body.imprimiendo-rtb #modalReporteTabla .rtb-firmas { page-break-inside: avoid; } }
         @media (max-width: 900px) {
             #modalVistaSender .vr-filters, #modalVistaSender .vr-kpis { grid-template-columns: repeat(2, 1fr); }
             #modalVistaSender .vr-head { padding: 12px 14px; }
@@ -3226,8 +3451,16 @@
                 </div>
                 </div>
 
-                <div class="vr-section-title" style="margin-top:22px;">Historial de escaneos</div>
-                <div class="vr-table-card">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:22px; margin-bottom:10px;">
+                    <div class="vr-section-title" id="vrTituloSeccion" style="margin:0 auto 0 0;">Historial de escaneos</div>
+                    <div class="vr-vista-switch" role="tablist" aria-label="Vista del historial">
+                        <button type="button" id="vrBtnVistaHistorial" class="on" onclick="cambiarVistaHistorialRepros('historial')">Historial</button>
+                        <button type="button" id="vrBtnVistaReprogramacion" onclick="cambiarVistaHistorialRepros('reprogramacion')">Tabla de reprogramación</button>
+                        <button type="button" id="vrBtnVistaCrossdock" onclick="cambiarVistaHistorialRepros('crossdock')">Tabla Crossdock</button>
+                    </div>
+                    <button type="button" class="vr-btn vr-btn-primary" onclick="abrirElegirReporte()" title="Elegir el reporte: Reprogramaciones o Crossdock">📄 Reportes</button>
+                </div>
+                <div class="vr-table-card" id="vrCardHistorial">
                     <div class="vr-table-toolbar">
                         <div class="vr-search">
                             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -3245,6 +3478,52 @@
                                 </tr>
                             </thead>
                             <tbody id="tbodyHistorialRepros"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Vista alterna: misma data del historial (respeta filtros y búsqueda), con columnas de reprogramación -->
+                <div class="vr-table-card" id="vrCardReprogramacion" style="display:none;">
+                    <div class="vr-slicers" id="vrSlicersReprog"></div>
+                    <div class="vr-table-toolbar">
+                        <div class="vr-search-wide">
+                            <span style="font-size:14px;">🔎</span>
+                            <input type="text" id="inpBuscarReprogramacion" placeholder="Buscar en toda la tabla...  (los filtros por columna están en los encabezados ▼)" oninput="pintarTablaReprogramacion()">
+                        </div>
+                        <button class="vr-btn vr-btn-ghost" onclick="limpiarSlicersReprog()" title="Quita todos los filtros y la búsqueda">✕ Limpiar filtros</button>
+                        <button class="vr-btn vr-btn-ghost" onclick="abrirModalAgregarReprog()" title="Agregar una línea manualmente">➕ Agregar línea</button>
+                        <button class="vr-btn vr-btn-ghost" id="btnEditarReprog" onclick="toggleEdicionReprog()" title="Editar los campos de la tabla">✏️ Editar tabla</button>
+                        <input type="file" id="inpArchivoTmsReprog" accept=".xlsx,.xls,.csv" style="display:none;" onchange="cargarArchivoTmsReprog(this)">
+                        <button class="vr-btn vr-btn-ghost" onclick="document.getElementById('inpArchivoTmsReprog').click()" title="Carga el Excel del TMS y cruza por RASTREO / ORDER_NUMBER"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg> Cargar TMS</button>
+                        <button class="vr-btn vr-btn-primary" onclick="descargarTablaReprogramacion()" title="Descarga en Excel esta tabla"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg> Descargar tabla</button>
+                        <span class="vr-visible-count" style="width:100%;"><b id="lblReprogVisibles">0</b> de <b id="lblReprogTotal">0</b> folio(s) <span id="lblTmsReprog" style="font-weight:700; margin-left:8px;"></span></span>
+                    </div>
+                    <div class="vr-table-scroll">
+                        <table class="vr-table" id="tablaReprogramacionRepros">
+                            <thead><tr id="vrTheadReprog"></tr></thead>
+                            <tbody id="tbodyReprogramacionRepros"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla Crossdock: solo los folios con Observación = ENTREGADO A CROSSDOCK de la tabla de reprogramación -->
+                <div class="vr-table-card" id="vrCardCrossdock" style="display:none;">
+                    <div class="vr-table-toolbar">
+                        <div class="vr-search-wide">
+                            <span style="font-size:14px;">🔎</span>
+                            <input type="text" id="inpBuscarCrossdock" placeholder="Buscar en la tabla...  (separa con coma para combinar)" oninput="pintarTablaCrossdock()">
+                        </div>
+                        <button class="vr-btn vr-btn-ghost" onclick="abrirModalResponsableXd()" title="Asigna el responsable para toda la columna">👤 Responsable: <b id="lblResponsableXd">—</b></button>
+                        <button class="vr-btn vr-btn-ghost" onclick="document.getElementById('inpArchivoTmsReprog').click()" title="Carga el Excel del TMS (el mismo de la tabla de reprogramación)">📂 Cargar TMS</button>
+                        <button class="vr-btn vr-btn-primary" onclick="descargarTablaCrossdock()" title="Descarga en Excel esta tabla">⬇ Descargar</button>
+                        <span class="vr-visible-count" style="width:100%;"><b id="lblXdVisibles">0</b> folio(s) entregados a Crossdock <span id="lblXdTms" style="font-weight:700; margin-left:8px;"></span></span>
+                    </div>
+                    <div class="vr-table-scroll">
+                        <table class="vr-table" id="tablaCrossdockRepros">
+                            <thead><tr>
+                                <th>Fecha de Registro</th><th>Folio</th><th>Fecha de Reprogramación</th><th>Responsable</th><th>Extracción?</th><th>TMS</th><th>Flujo</th>
+                            </tr></thead>
+                            <tbody id="tbodyCrossdockRepros"></tbody>
                         </table>
                     </div>
                 </div>
@@ -3763,6 +4042,93 @@
             </div>
         </div>
         <div class="rps-scroll"><div class="rps-paper" id="rpsPaper"></div></div>
+    </div>
+</div>
+
+<!-- Selector de reportes -->
+<div id="modalElegirReporte" class="modal" style="z-index: 9150;">
+    <div class="elr-card">
+        <div class="elr-h"><span>📄 Reportes</span><button type="button" onclick="cerrarElegirReporte()" class="elr-x">&times;</button></div>
+        <div class="elr-b">
+            <div class="elr-op">
+                <div class="elr-t">Reporte de reprogramaciones</div>
+                <div class="elr-d">Dashboard con tarjetas, Estados TMS, gráficos y el detalle Zona › Status › ESTADO - TMS. Toma lo que se ve en la Tabla de reprogramación.</div>
+                <div class="elr-n" id="elrNRepro"></div>
+                <button type="button" class="vr-btn vr-btn-primary" id="elrBtnRepro" onclick="elegirReporte('repro')">Ver reporte</button>
+            </div>
+            <div class="elr-op">
+                <div class="elr-t">Reporte Crossdock</div>
+                <div class="elr-d">Entrega a Crossdock con responsable, Estados TMS, gráficos y firmas de Entrega / Recibe. Toma lo que se ve en la Tabla Crossdock.</div>
+                <div class="elr-n" id="elrNXd"></div>
+                <button type="button" class="vr-btn vr-btn-primary" id="elrBtnXd" onclick="elegirReporte('xd')">Ver reporte</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reporte imprimible / Excel de la Tabla de reprogramación y de la Tabla Crossdock -->
+<div id="modalReporteTabla" class="modal" style="z-index: 9200;">
+    <div class="rtb-wrap">
+        <div class="rtb-bar">
+            <b>Vista previa del reporte</b>
+            <div class="rtb-bar-btns">
+                <label class="rtb-chk"><input type="checkbox" id="chkRtbDetalle" onchange="_rtbMostrar()"> Incluir detalle de folios</label>
+                <button type="button" class="rtb-btn primary" onclick="imprimirReporteTabla()">🖨 Imprimir / PDF</button>
+                <button type="button" class="rtb-btn" onclick="descargarReporteTabla()">⬇ Excel</button>
+                <button type="button" class="rtb-btn" onclick="cerrarReporteTabla(); abrirElegirReporte();">← Reportes</button>
+                <button type="button" class="rtb-btn" onclick="cerrarReporteTabla()">Cerrar</button>
+            </div>
+        </div>
+        <div class="rtb-scroll"><div class="rtb-paper" id="rtbPaper"></div></div>
+    </div>
+</div>
+
+<!-- Responsable de la Tabla Crossdock (se aplica a toda la columna) -->
+<div id="modalResponsableXd" class="modal" style="z-index: 9100;">
+    <div class="vr-pop-card">
+        <div class="vr-pop-h">
+            <span>👤 Responsable de la Tabla Crossdock</span>
+            <button type="button" onclick="cerrarModalResponsableXd()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:14px; font-weight:800; cursor:pointer; color:var(--text-main);">&times;</button>
+        </div>
+        <div class="vr-pop-b">
+            <label>Nombre del responsable<input type="text" id="inpResponsableXd" placeholder="Escribe el nombre" autocomplete="off" onkeydown="if(event.key==='Enter'){guardarResponsableXd();}"></label>
+            <div class="vr-pop-nota">Este nombre se coloca en toda la columna "Responsable".</div>
+        </div>
+        <div class="vr-pop-f">
+            <button type="button" class="vr-btn vr-btn-ghost" onclick="cerrarModalResponsableXd()">Cancelar</button>
+            <button type="button" class="vr-btn vr-btn-primary" onclick="guardarResponsableXd()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar línea manual a la Tabla de reprogramación -->
+<div id="modalAgregarReprog" class="modal" style="z-index: 9100;">
+    <div class="vr-pop-card">
+        <div class="vr-pop-h">
+            <span>➕ Agregar línea a la tabla de reprogramación</span>
+            <button type="button" onclick="cerrarModalAgregarReprog()" style="background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:6px; font-size:14px; font-weight:800; cursor:pointer; color:var(--text-main);">&times;</button>
+        </div>
+        <div class="vr-pop-b">
+            <label class="vr-full">FOLIO *<input type="text" id="arp_folio" placeholder="Folio / rastreo" autocomplete="off"></label>
+            <label>Pistoleo<input type="text" id="arp_pistoleo" list="dl_arp_pistoleo" placeholder="Ej. PICKING CUARENTENA" autocomplete="off"></label>
+            <label>Ubicación<input type="text" id="arp_ubi" placeholder="Ej. DIN0147" autocomplete="off"></label>
+            <label>ESTADO - TMS<input type="text" id="arp_estado" list="dl_arp_estado" placeholder="Vacío = el del TMS cargado" autocomplete="off"></label>
+            <label>Flujo<input type="text" id="arp_flujo" value="Home Delivery" autocomplete="off"></label>
+            <label>Zona<input type="text" id="arp_zona" list="dl_arp_zona" placeholder="Ej. OBSERVADOS" autocomplete="off"></label>
+            <label>Status<input type="text" id="arp_status" placeholder="Vacío = automático" autocomplete="off"></label>
+            <label>Fecha Inventario<input type="date" id="arp_fInv"></label>
+            <label>Fecha de Reprogramación<input type="date" id="arp_fecha"></label>
+            <label class="vr-full">Observación<input type="text" id="arp_obs" placeholder="Vacío = automático" autocomplete="off"></label>
+            <div class="vr-pop-nota">Status y Observación se calculan solos con tus fórmulas si los dejas vacíos; ESTADO - TMS y Fecha de Reprogramación se toman del TMS cargado si el folio coincide.</div>
+            <datalist id="dl_arp_pistoleo"></datalist>
+            <datalist id="dl_arp_estado"></datalist>
+            <datalist id="dl_arp_zona"></datalist>
+        </div>
+        <div class="vr-pop-f">
+            <button type="button" class="vr-btn vr-btn-ghost" onclick="cerrarModalAgregarReprog()">Cancelar</button>
+            <button type="button" class="vr-btn vr-btn-ghost" onclick="guardarAgregarReprog(true)">Guardar y agregar otra</button>
+            <button type="button" class="vr-btn vr-btn-primary" onclick="guardarAgregarReprog(false)">Guardar</button>
+        </div>
     </div>
 </div>
 
@@ -15410,6 +15776,10 @@
         filas.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         historialReprosFilasActuales = filas;
         filtrarHistorialReprosTexto();
+        const cardRep = document.getElementById('vrCardReprogramacion');
+        if (cardRep && cardRep.style.display !== 'none') { try { pintarTablaReprogramacion(); } catch (e) { console.error(e); } }
+        const cardXd = document.getElementById('vrCardCrossdock');
+        if (cardXd && cardXd.style.display !== 'none') { try { pintarTablaCrossdock(); } catch (e) { console.error(e); } }
     }
 
     // Guarda las filas ya filtradas por los dropdowns (categoría/ruta/usuario/jornada);
@@ -15460,6 +15830,1412 @@
                 <td>${_escHtmlRepro(r.usuario)}</td>
                 ${puedeBorrar ? `<td class="vr-td-acc">${r.key ? `<button type="button" class="vr-row-del" title="Eliminar este escaneo" aria-label="Eliminar" onclick="eliminarEscaneoRepro('${r.key}')">${iconoBorrar}</button>` : ''}</td>` : ''}
             </tr>`).join('') : `<tr><td colspan="11" class="vr-empty">Sin escaneos de Repros para estos filtros.</td></tr>`;
+    }
+
+    // ===== Tabla de reprogramación (vista alterna del historial) =====
+    // FOLIO = código del historial; Pistoleo = ruta/resultado del escaneo; Status = lógica de la fórmula.
+    // Ubicación y Zona vienen del historial; Flujo por defecto = Home Delivery; el resto queda vacío.
+    function cambiarVistaHistorialRepros(vista) {
+        const rep = vista === 'reprogramacion';
+        const xd = vista === 'crossdock';
+        const tabla = rep || xd;
+        document.getElementById('vrCardHistorial').style.display = tabla ? 'none' : '';
+        document.getElementById('vrCardReprogramacion').style.display = rep ? '' : 'none';
+        document.getElementById('vrCardCrossdock').style.display = xd ? '' : 'none';
+        document.getElementById('vrBtnVistaHistorial').classList.toggle('on', !tabla);
+        document.getElementById('vrBtnVistaReprogramacion').classList.toggle('on', rep);
+        document.getElementById('vrBtnVistaCrossdock').classList.toggle('on', xd);
+        document.getElementById('modalVistaRepros').classList.toggle('vr-modo-tabla', tabla);
+        const t = document.getElementById('vrTituloSeccion');
+        if (t) t.textContent = rep ? 'Tabla de reprogramación' : (xd ? 'Tabla Crossdock' : 'Historial de escaneos');
+        if (rep) pintarTablaReprogramacion();
+        if (xd) {
+            pintarTablaCrossdock();
+            // Primera vez sin responsable: se pide con el modal
+            if (!_responsableXd() && !window._xdPidioResp) { window._xdPidioResp = true; abrirModalResponsableXd(); }
+        }
+    }
+
+    // ===== Cruce con el Excel del TMS =====
+    // Se busca el folio escaneado contra RASTREO y ORDER_NUMBER. Si coincide:
+    // ESTADO - TMS = ESTADO_TMS, Fecha de Reprogramación = FECHA_REPROGRAMACION y
+    // Fecha Inventario = día en que se cargó el archivo.
+    let tmsReprogMapa = {};      // clave limpia -> { estado, fRep }
+    let tmsReprogFechaCarga = ''; // YYYY-MM-DD del día de carga
+    try {
+        const g = JSON.parse(localStorage.getItem('tms_reprog_data') || 'null');
+        if (g && g.mapa) { tmsReprogMapa = g.mapa; tmsReprogFechaCarga = g.fecha || ''; }
+    } catch (e) {}
+
+    function _tmsReprog(r) {
+        if (r._mf) return { estado: r._mf.estado || '', fRep: r._mf.fRep || '', fInv: r._mf.fInv || '' };
+        const m = tmsReprogMapa[limpiarTexto(r.codigo)];
+        return m ? { estado: m.estado || '', fRep: m.fRep || '', fInv: tmsReprogFechaCarga } : { estado: '', fRep: '', fInv: '' };
+    }
+
+    function _fechaTmsATexto(v) {
+        if (v == null || v === '') return '';
+        if (v instanceof Date && !isNaN(v)) {
+            return v.getFullYear() + '-' + String(v.getMonth() + 1).padStart(2, '0') + '-' + String(v.getDate()).padStart(2, '0');
+        }
+        if (typeof v === 'number' && v > 20000 && v < 80000) {
+            const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+            return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
+        }
+        return String(v).trim().slice(0, 10);
+    }
+
+    function cargarArchivoTmsReprog(input) {
+        const file = input.files && input.files[0];
+        input.value = '';
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+                const filas = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+                if (!filas.length) return alert('El archivo no tiene filas.');
+                const col = (fila, nombre) => {
+                    const k = Object.keys(fila).find(x => limpiarTexto(x) === limpiarTexto(nombre));
+                    return k === undefined ? '' : fila[k];
+                };
+                if (!Object.keys(filas[0]).some(k => limpiarTexto(k) === 'RASTREO')) {
+                    return alert('No encontré la columna RASTREO en el archivo.');
+                }
+                const mapa = {}, fechaEstado = {};
+                filas.forEach(f => {
+                    const reg = {
+                        estado: String(col(f, 'ESTADO_TMS') || '').trim(),
+                        fRep: _fechaTmsATexto(col(f, 'FECHA_REPROGRAMACION'))
+                    };
+                    const fe = String(col(f, 'FECHA_ESTADO') instanceof Date ? col(f, 'FECHA_ESTADO').toISOString() : col(f, 'FECHA_ESTADO'));
+                    [col(f, 'RASTREO'), col(f, 'ORDER_NUMBER')].forEach(c => {
+                        const k = limpiarTexto(c);
+                        if (!k) return;
+                        // Si el código se repite, gana el registro con FECHA_ESTADO más reciente.
+                        if (!mapa[k] || fe >= (fechaEstado[k] || '')) { mapa[k] = reg; fechaEstado[k] = fe; }
+                    });
+                });
+                const hoy = new Date();
+                tmsReprogFechaCarga = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+                tmsReprogMapa = mapa;
+                try { localStorage.setItem('tms_reprog_data', JSON.stringify({ fecha: tmsReprogFechaCarga, mapa })); } catch (err) {}
+                const filasHist = obtenerFilasReprogBase();
+                const coinc = filasHist.filter(r => mapa[limpiarTexto(r.codigo)]).length;
+                pintarTablaReprogramacion();
+                alert(`✅ TMS cargado: ${filas.length} fila(s) en el archivo.\nCoincidencias con la tabla: ${coinc} de ${filasHist.length}.`);
+            } catch (err) {
+                console.error(err);
+                alert('❌ No se pudo leer el archivo de Excel.');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Pistoleo = texto del escaneo en el historial: la RUTA con la que se pistoleó
+    // (PICKING CUARENTENA, PICKING REPROGRAMACIONES, SOLICITUD POST VENTA, ANULADO,
+    // FALLO DE ENTREGA…) o "INVENTARIADO" cuando el folio no estaba en la base.
+    function _pistoleoReprog(r) {
+        if (r._mf) return String(r._mf.pistoleo || '').trim();
+        const sinBase = r.resultado === 'INVENTARIADO' || !r.ruta || r.ruta === '-';
+        if (sinBase) return 'INVENTARIADO';
+        return String(r.ruta || r._ruta || '').trim();
+    }
+
+    // Observación (misma lógica de la fórmula de Excel):
+    function _observacionReprog(r) {
+        const P = _pistoleoReprog(r).trim().toUpperCase();
+        if (P === 'PICKING REPROGRAMACIONES' || P === 'PICKING CUARENTENA' || P === 'SOLICITUD POST VENTA') return 'ENTREGADO A CROSSDOCK';
+        if (P === 'FALLO DE ENTREGA' || P === 'ANULADO') return 'CANCELADO / ANULADO';
+        const fRep = String(_tmsReprog(r).fRep || '').trim();
+        if (fRep === '' || fRep === '0' || fRep.toLowerCase() === 'null') return 'SIN FECHA DE REPROGRAMACION';
+        const hoy = new Date();
+        const hoyTxt = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+        // Fecha anterior o igual a hoy = vencida; posterior = futura.
+        return fRep <= hoyTxt ? 'PROGRAMACION VENCIDA' : 'PROGRAMACION FUTURA';
+    }
+
+    // Status (misma lógica de la fórmula de Excel):
+    function _statusReprog(r) {
+        const P = _pistoleoReprog(r).toUpperCase();
+        const zona = String(r.zona || '').trim().toUpperCase();
+        const fRep = _tmsReprog(r).fRep;
+        const hoy = new Date();
+        const hoyTxt = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+        if (P.includes('SOLICITUD POST VENTA')) return 'Solicitud Post Venta';
+        if (P.includes('INVENTARIADO') && zona === 'OBSERVADOS') return 'Inventario Cuarentena';
+        if (P.includes('INVENTARIADO')) return 'Inventario Post venta';
+        if (P.includes('PICKING REPROGRAMACIONES') || P.includes('PICKING CUARENTENA')) return 'PICKING';
+        if (P.includes('ANULADO') || P.includes('FALLO DE ENTREGA')) return 'EXTRAIDO';
+        if (fRep !== '' && fRep < hoyTxt) return zona === 'OBSERVADOS' ? 'OBS POST VENTA' : 'INV POST VENTA';
+        return 'SOLICITUD POST VENTA';
+    }
+
+    // Columnas de la tabla: cada una tiene su filtro ▼ en el encabezado.
+    const REPROG_COLS = [
+        { key: 'folio',    titulo: 'FOLIO',                   get: r => r.codigo },
+        { key: 'pistoleo', titulo: 'Pistoleo',                get: r => _pistoleoReprog(r) },
+        { key: 'ubi',      titulo: 'Ubicación',               get: r => r.ubi },
+        { key: 'estado',   titulo: 'ESTADO - TMS',            get: r => _tmsReprog(r).estado },
+        { key: 'flujo',    titulo: 'Flujo',                   get: r => 'Home Delivery' },
+        { key: 'zona',     titulo: 'Zona',                    get: r => r.zona },
+        { key: 'status',   titulo: 'Status',                  get: r => _statusReprog(r) },
+        { key: 'fInv',     titulo: 'Fecha Inventario',        get: r => _tmsReprog(r).fInv },
+        { key: 'fecha',    titulo: 'Fecha de Reprogramación', get: r => _tmsReprog(r).fRep },
+        { key: 'obs',      titulo: 'Observación',             get: r => _observacionReprog(r) }
+    ];
+    // Segmentaciones visibles arriba (estilo Excel)
+    const REPROG_SLICER_KEYS = ['pistoleo', 'estado', 'fecha'];
+
+    // Filtros: clave de columna -> Set de valores permitidos. Sin clave = sin filtro (todo).
+    // Las segmentaciones y los ▼ de los encabezados comparten este mismo estado.
+    let reprogFiltro = {};
+    let reprogBase = [];          // [{ r, v:{col:valor} }]
+    let reprogFilasVisibles = [];
+    let reprogSlicerOpc = {};     // key -> valores de los botones
+    let reprogMenuKey = null;     // columna con el menú ▼ abierto
+    let reprogMenuVals = [];      // valores mostrados en el menú
+
+    // Todas las filas del historial de Repros, sin los filtros del encabezado del modal.
+    function obtenerFilasReprogBase() {
+        const { grupos, inventariados } = obtenerDatosVistaRepros({});
+        let filas = [];
+        Object.keys(grupos).forEach(k => { filas = filas.concat(grupos[k].escaneados.map(r => ({ ...r, _ruta: grupos[k].ruta }))); });
+        filas = filas.concat(inventariados.map(r => ({ ...r, _ruta: 'SIN BASE (INVENTARIADO)' })));
+        filas.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        return filas;
+    }
+
+    function _reprogTerminos() {
+        const inp = document.getElementById('inpBuscarReprogramacion');
+        return (inp ? inp.value.trim().toUpperCase() : '').split(',').map(t => t.trim()).filter(Boolean);
+    }
+    function _reprogPasa(x, terminos, excepto) {
+        const okBusq = terminos.every(t =>
+            Object.values(x.v).some(val => val.toUpperCase().includes(t)));
+        if (!okBusq) return false;
+        return REPROG_COLS.every(c => {
+            if (c.key === excepto) return true;
+            const f = reprogFiltro[c.key];
+            return !f || f.has(x.v[c.key]);
+        });
+    }
+    // Valores de una columna con su conteo (respetando búsqueda y los demás filtros).
+    function _reprogValores(key, soloDisponibles) {
+        const terminos = _reprogTerminos();
+        const cuenta = {};
+        reprogBase.forEach(x => {
+            const val = x.v[key];
+            if (cuenta[val] === undefined) cuenta[val] = 0;
+            if (_reprogPasa(x, terminos, key)) cuenta[val]++;
+        });
+        let vals = Object.keys(cuenta).sort((a, b) => {
+            if (a === '' && b !== '') return 1;
+            if (b === '' && a !== '') return -1;
+            return a.localeCompare(b, 'es', { numeric: true });
+        });
+        if (soloDisponibles) vals = vals.filter(v => cuenta[v] > 0);
+        return vals.map(v => [v, cuenta[v]]);
+    }
+    function _reprogFijarPermitidos(key, permitidos, disponibles) {
+        if (disponibles.every(v => permitidos.has(v))) delete reprogFiltro[key];
+        else reprogFiltro[key] = permitidos;
+    }
+
+    // ----- Segmentaciones -----
+    function toggleSlicerReprog(key, idx) {
+        const val = (reprogSlicerOpc[key] || [])[idx];
+        if (val === undefined) return;
+        let f = reprogFiltro[key];
+        if (!f) f = new Set([val]);                 // primer clic: solo esa opción (como Excel)
+        else if (f.has(val)) f.delete(val); else f.add(val);
+        if (f.size === 0) delete reprogFiltro[key]; else reprogFiltro[key] = f;
+        pintarTablaReprogramacion();
+    }
+    function limpiarSlicerReprog(key) {
+        delete reprogFiltro[key];
+        pintarTablaReprogramacion();
+    }
+    function limpiarSlicersReprog() {
+        reprogFiltro = {};
+        const i = document.getElementById('inpBuscarReprogramacion');
+        if (i) i.value = '';
+        cerrarMenuColReprog();
+        pintarTablaReprogramacion();
+    }
+
+    // ----- Menú ▼ de cada encabezado -----
+    function _menuColReprog() {
+        let m = document.getElementById('vrColMenuReprog');
+        if (!m) {
+            m = document.createElement('div');
+            m.id = 'vrColMenuReprog';
+            document.body.appendChild(m);
+        }
+        return m;
+    }
+    function cerrarMenuColReprog() {
+        const m = document.getElementById('vrColMenuReprog');
+        if (m) m.style.display = 'none';
+        reprogMenuKey = null;
+    }
+    document.addEventListener('click', (e) => {
+        const m = document.getElementById('vrColMenuReprog');
+        if (m && m.style.display !== 'none' && !m.contains(e.target)) cerrarMenuColReprog();
+    });
+    document.addEventListener('scroll', (e) => {
+        const m = document.getElementById('vrColMenuReprog');
+        if (m && m.style.display !== 'none' && !m.contains(e.target)) cerrarMenuColReprog();
+    }, true);
+
+    function abrirMenuColReprog(key, ev) {
+        if (ev) ev.stopPropagation();
+        if (reprogMenuKey === key) return cerrarMenuColReprog();
+        reprogMenuKey = key;
+        const col = REPROG_COLS.find(c => c.key === key);
+        const m = _menuColReprog();
+        m.innerHTML = `
+            <input type="text" id="vrColMenuBuscar" placeholder="Buscar en ${_escHtmlRepro(col.titulo)}…" oninput="pintarListaMenuColReprog()">
+            <div class="vrcm-lista" id="vrColMenuLista"></div>
+            <div class="vrcm-pie"><button type="button" onclick="limpiarSlicerReprog('${key}')">Borrar filtro</button><button type="button" onclick="cerrarMenuColReprog()">Cerrar</button></div>`;
+        const rect = ev && ev.currentTarget ? ev.currentTarget.getBoundingClientRect() : { left: 40, bottom: 120 };
+        m.style.display = 'block';
+        m.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 285)) + 'px';
+        m.style.top = (rect.bottom + 4) + 'px';
+        pintarListaMenuColReprog();
+        const b = document.getElementById('vrColMenuBuscar'); if (b) b.focus();
+    }
+    function pintarListaMenuColReprog() {
+        const key = reprogMenuKey;
+        const cont = document.getElementById('vrColMenuLista');
+        if (!key || !cont) return;
+        const q = ((document.getElementById('vrColMenuBuscar') || {}).value || '').trim().toUpperCase();
+        let vals = _reprogValores(key, true);
+        if (q) vals = vals.filter(([v]) => (v === '' ? '(VACÍO)' : v.toUpperCase()).includes(q));
+        reprogMenuVals = vals.map(x => x[0]);
+        const f = reprogFiltro[key];
+        const todosMarcados = vals.length > 0 && vals.every(([v]) => !f || f.has(v));
+        const LIM = 400;
+        cont.innerHTML = `<label><input type="checkbox" ${todosMarcados ? 'checked' : ''} onchange="toggleTodoMenuColReprog(this.checked)"> <b>(Seleccionar todo)</b></label>` +
+            vals.slice(0, LIM).map(([v, n], i) => `<label><input type="checkbox" ${(!f || f.has(v)) ? 'checked' : ''} onchange="toggleValorMenuColReprog(${i}, this.checked)"> ${_escHtmlRepro(v === '' ? '(Vacío)' : v)} <small>${n}</small></label>`).join('') +
+            (vals.length > LIM ? `<div style="font-size:11px;color:#6b7280;padding:4px 0;">Mostrando ${LIM} de ${vals.length}. Usa el buscador para acotar.</div>` : '') +
+            (vals.length === 0 ? '<div style="font-size:11px;color:#6b7280;padding:4px 0;">Sin resultados</div>' : '');
+    }
+    function _menuAplicar(cambio) {
+        const key = reprogMenuKey; if (!key) return;
+        const disp = _reprogValores(key, true).map(x => x[0]);
+        const permitidos = new Set(reprogFiltro[key] ? [...reprogFiltro[key]] : disp);
+        cambio(permitidos);
+        _reprogFijarPermitidos(key, permitidos, disp);
+        pintarTablaReprogramacion();
+    }
+    function toggleValorMenuColReprog(idx, marcado) {
+        const v = reprogMenuVals[idx]; if (v === undefined) return;
+        _menuAplicar(set => { if (marcado) set.add(v); else set.delete(v); });
+    }
+    function toggleTodoMenuColReprog(marcado) {
+        const mostrados = reprogMenuVals.slice();
+        _menuAplicar(set => mostrados.forEach(v => { if (marcado) set.add(v); else set.delete(v); }));
+    }
+
+    // ===== Líneas manuales y edición de celdas (se guardan en este navegador) =====
+    let reprogManuales = [];   // ids de las líneas agregadas a mano
+    let reprogEdits = {};      // id de fila -> { columna: valor } (ediciones y datos de líneas manuales)
+    let reprogEditMode = false;
+    try {
+        const g = JSON.parse(localStorage.getItem('reprog_manual') || 'null');
+        if (g) { reprogManuales = g.manuales || []; reprogEdits = g.ediciones || {}; }
+    } catch (e) {}
+    function _guardarReprogManual() {
+        try { localStorage.setItem('reprog_manual', JSON.stringify({ manuales: reprogManuales, ediciones: reprogEdits })); } catch (e) {}
+    }
+
+    // Valores efectivos de una fila: automático (historial + TMS + fórmulas) con las ediciones encima.
+    function _reprogConstruirV(r) {
+        const id = r.key || ('c:' + r.codigo);
+        const ed = reprogEdits[id] || {};
+        const pick = (k, auto) => (ed[k] !== undefined ? String(ed[k]) : String(auto == null ? '' : auto));
+        const folio = pick('folio', r.codigo);
+        const tms = _tmsReprog({ codigo: folio });
+        const pistoleo = ed.pistoleo !== undefined ? String(ed.pistoleo) : (r._manual ? '' : _pistoleoReprog(r));
+        const zona = pick('zona', r.zona);
+        const ubi = pick('ubi', r.ubi);
+        const estado = pick('estado', tms.estado);
+        const fecha = pick('fecha', tms.fRep);
+        const fInv = pick('fInv', tms.fInv);
+        const flujo = pick('flujo', 'Home Delivery');
+        const er = { codigo: folio, zona, ubi, _mf: { pistoleo, estado, fRep: fecha, fInv } };
+        const status = ed.status !== undefined ? String(ed.status) : _statusReprog(er);
+        const obs = ed.obs !== undefined ? String(ed.obs) : _observacionReprog(er);
+        return { id, v: { folio, pistoleo, ubi, estado, flujo, zona, status, fInv, fecha, obs } };
+    }
+
+    function _reprogPintarSlicers() {
+        const cont = document.getElementById('vrSlicersReprog');
+        if (!cont) return;
+        const scrolls = {};
+        cont.querySelectorAll('.vr-slicer-b').forEach(el => { scrolls[el.dataset.k] = el.scrollTop; });
+        const iconoLimpiar = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/><path d="M17 3l5 5M22 3l-5 5" stroke="#b2453f"/></svg>';
+        cont.innerHTML = REPROG_SLICER_KEYS.map(key => {
+            const col = REPROG_COLS.find(c => c.key === key);
+            const vals = _reprogValores(key, false);
+            reprogSlicerOpc[key] = vals.map(x => x[0]);
+            const f = reprogFiltro[key];
+            const botones = vals.map(([val, n], i) => `<button type="button" class="vr-slc ${(!f || f.has(val)) ? 'on' : ''} ${n === 0 ? 'off' : ''}" onclick="toggleSlicerReprog('${key}', ${i})">${_escHtmlRepro(val === '' ? '(Vacío)' : val)}</button>`).join('');
+            return `<div class="vr-slicer">
+                <div class="vr-slicer-h"><span>${col.titulo}</span><button type="button" class="vr-slicer-clear" title="Borrar filtro" onclick="limpiarSlicerReprog('${key}')">${iconoLimpiar}</button></div>
+                <div class="vr-slicer-b" data-k="${key}">${botones || '<span style="font-size:11px;color:var(--text-muted);">Sin datos</span>'}</div>
+            </div>`;
+        }).join('');
+        cont.querySelectorAll('.vr-slicer-b').forEach(el => { if (scrolls[el.dataset.k]) el.scrollTop = scrolls[el.dataset.k]; });
+    }
+
+    function _reprogPintarEtiquetas() {
+        const visibles = reprogFilasVisibles.length;
+        const lbl = document.getElementById('lblReprogVisibles'); if (lbl) lbl.textContent = visibles;
+        const lblT = document.getElementById('lblReprogTotal'); if (lblT) lblT.textContent = reprogBase.length;
+        const lt = document.getElementById('lblTmsReprog');
+        if (lt) {
+            const n = Object.keys(tmsReprogMapa).length;
+            const coinc = reprogBase.filter(x => tmsReprogMapa[limpiarTexto(x.v.folio)]).length;
+            lt.textContent = n ? `· TMS cargado (${tmsReprogFechaCarga}) · ${coinc} coincidencia(s)` : '';
+        }
+    }
+
+    function _reprogAccionesHtml(x) {
+        const id = _escHtmlRepro(x.id);
+        if (x.r._manual) return `<button type="button" class="vr-acc-btn" data-row="${id}" title="Eliminar esta línea" onclick="eliminarLineaManualReprog(this)">🗑️</button>`;
+        const ed = reprogEdits[x.id];
+        if (ed && Object.keys(ed).length) return `<button type="button" class="vr-acc-btn" data-row="${id}" title="Restaurar los valores originales de esta fila" onclick="restaurarFilaReprog(this)">↺</button>`;
+        return '';
+    }
+
+    function pintarTablaReprogramacion() {
+        const tbody = document.getElementById('tbodyReprogramacionRepros');
+        const thead = document.getElementById('vrTheadReprog');
+        if (!tbody || !thead) return;
+
+        // Historial vacío = tablas vacías (las líneas manuales no se muestran hasta que haya datos)
+        const filasHist = obtenerFilasReprogBase();
+        const manuales = filasHist.length ? reprogManuales.slice().reverse().map(id => ({ key: id, codigo: '', zona: '', ubi: '', _manual: true })) : [];
+        reprogBase = manuales.concat(filasHist).map(r => {
+            const c = _reprogConstruirV(r);
+            return { r, id: c.id, v: c.v };
+        });
+        const terminos = _reprogTerminos();
+        const visibles = reprogBase.filter(x => _reprogPasa(x, terminos, null));
+        reprogFilasVisibles = visibles;
+
+        // Encabezados verdes con ▼
+        thead.innerHTML = REPROG_COLS.map(c => `<th><div class="vr-th-flex"><span>${c.titulo}</span><button type="button" class="vr-colf ${reprogFiltro[c.key] ? 'act' : ''}" title="Filtrar ${c.titulo}" onclick="abrirMenuColReprog('${c.key}', event)">▼</button></div></th>`).join('') + (reprogEditMode ? '<th style="width:44px;"></th>' : '');
+
+        _reprogPintarSlicers();
+        _reprogPintarEtiquetas();
+
+        const nCols = REPROG_COLS.length + (reprogEditMode ? 1 : 0);
+        tbody.innerHTML = visibles.length ? visibles.map(x => {
+            const e = reprogEdits[x.id] || {};
+            const tds = REPROG_COLS.map(c => {
+                const editada = !x.r._manual && e[c.key] !== undefined;
+                const cls = [c.key === 'folio' ? 'vr-cod' : '', editada ? 'vr-editada' : ''].filter(Boolean).join(' ');
+                const contenido = reprogEditMode
+                    ? `<input class="vr-celda-ed" value="${_escHtmlRepro(x.v[c.key])}" data-row="${_escHtmlRepro(x.id)}" data-col="${c.key}" onchange="editarCeldaReprog(this)">`
+                    : _escHtmlRepro(x.v[c.key]);
+                return `<td${cls ? ` class="${cls}"` : ''}>${contenido}</td>`;
+            }).join('');
+            return `<tr>${tds}${reprogEditMode ? `<td class="vr-acc" style="text-align:center;">${_reprogAccionesHtml(x)}</td>` : ''}</tr>`;
+        }).join('') : `<tr><td colspan="${nCols}" class="vr-empty">Sin folios para estos filtros.</td></tr>`;
+
+        if (reprogMenuKey) pintarListaMenuColReprog();
+        pintarTablaCrossdock();
+    }
+
+    // ----- Editar la tabla -----
+    function toggleEdicionReprog() {
+        reprogEditMode = !reprogEditMode;
+        const b = document.getElementById('btnEditarReprog');
+        if (b) {
+            b.textContent = reprogEditMode ? '✔ Terminar edición' : '✏️ Editar tabla';
+            b.classList.toggle('vr-activo', reprogEditMode);
+        }
+        pintarTablaReprogramacion();
+    }
+
+    function editarCeldaReprog(inp) {
+        const id = inp.dataset.row, key = inp.dataset.col;
+        const x = reprogBase.find(b => b.id === id);
+        if (!x) return;
+        const nuevo = inp.value.trim();
+        if (nuevo === x.v[key]) return;
+        const ed = reprogEdits[id] || (reprogEdits[id] = {});
+        delete ed[key];
+        const auto = _reprogConstruirV(x.r).v[key];          // valor sin esta edición
+        const vacioEsAuto = (key === 'status' || key === 'obs') && nuevo === '';
+        if (!(nuevo === auto || vacioEsAuto)) ed[key] = nuevo;
+        if (!x.r._manual && Object.keys(ed).length === 0) delete reprogEdits[id];
+        _guardarReprogManual();
+
+        x.v = _reprogConstruirV(x.r).v;
+        const tr = inp.closest('tr');
+        if (tr) {
+            tr.querySelectorAll('input.vr-celda-ed').forEach(i => { if (i !== inp) i.value = x.v[i.dataset.col]; });
+            inp.value = x.v[key];
+            const cur = reprogEdits[id] || {};
+            REPROG_COLS.forEach((c, i) => {
+                const td = tr.children[i];
+                if (td) td.classList.toggle('vr-editada', !x.r._manual && cur[c.key] !== undefined);
+            });
+            const acc = tr.querySelector('.vr-acc'); if (acc) acc.innerHTML = _reprogAccionesHtml(x);
+        }
+        _reprogPintarSlicers();
+        _reprogPintarEtiquetas();
+        pintarTablaCrossdock();   // el cambio se refleja de inmediato en la Tabla Crossdock
+    }
+
+    function restaurarFilaReprog(btn) {
+        const id = btn.dataset.row;
+        if (!confirm('¿Restaurar los valores originales de esta fila?')) return;
+        delete reprogEdits[id];
+        _guardarReprogManual();
+        pintarTablaReprogramacion();
+    }
+
+    function eliminarLineaManualReprog(btn) {
+        const id = btn.dataset.row;
+        const x = reprogBase.find(b => b.id === id);
+        if (!confirm(`¿Eliminar la línea manual "${x ? x.v.folio : id}"?`)) return;
+        reprogManuales = reprogManuales.filter(m => m !== id);
+        delete reprogEdits[id];
+        _guardarReprogManual();
+        pintarTablaReprogramacion();
+    }
+
+    // ----- Agregar línea manual -----
+    function _hoyISOReprog() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function abrirModalAgregarReprog() {
+        ['folio', 'pistoleo', 'ubi', 'estado', 'zona', 'status', 'fecha', 'obs'].forEach(k => { const el = document.getElementById('arp_' + k); if (el) el.value = ''; });
+        document.getElementById('arp_flujo').value = 'Home Delivery';
+        document.getElementById('arp_fInv').value = _hoyISOReprog();
+        // Sugerencias a partir de lo que ya hay en la tabla
+        const unicos = (key, extra) => {
+            const set = new Set(extra || []);
+            reprogBase.forEach(x => { if (x.v[key]) set.add(x.v[key]); });
+            return [...set].sort().map(v => `<option value="${_escHtmlRepro(v)}"></option>`).join('');
+        };
+        document.getElementById('dl_arp_pistoleo').innerHTML = unicos('pistoleo', ['PICKING CUARENTENA', 'PICKING REPROGRAMACIONES', 'SOLICITUD POST VENTA', 'INVENTARIADO', 'ANULADO', 'FALLO DE ENTREGA']);
+        document.getElementById('dl_arp_estado').innerHTML = unicos('estado', ['Cuarentena', 'En custodia', 'Fallo de entrega', 'Reenvío a cliente', 'Entregado']);
+        document.getElementById('dl_arp_zona').innerHTML = unicos('zona', ['OBSERVADOS']);
+        document.getElementById('modalAgregarReprog').style.display = 'flex';
+        setTimeout(() => { const f = document.getElementById('arp_folio'); if (f) f.focus(); }, 50);
+    }
+    function cerrarModalAgregarReprog() {
+        document.getElementById('modalAgregarReprog').style.display = 'none';
+    }
+    function guardarAgregarReprog(agregarOtra) {
+        const g = k => document.getElementById('arp_' + k).value.trim();
+        const folio = g('folio');
+        if (!folio) { alert('El FOLIO es obligatorio.'); document.getElementById('arp_folio').focus(); return; }
+        const ya = reprogBase.some(x => limpiarTexto(x.v.folio) === limpiarTexto(folio));
+        if (ya && !confirm(`El folio "${folio}" ya existe en la tabla. ¿Agregarlo de todos modos?`)) return;
+        const id = 'm_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const ed = { folio };
+        // Vacío = automático (TMS / fórmulas); solo se guarda lo que se escribió.
+        ['pistoleo', 'ubi', 'estado', 'flujo', 'zona', 'status', 'fInv', 'fecha', 'obs'].forEach(k => { const v = g(k); if (v !== '') ed[k] = v; });
+        reprogManuales.push(id);
+        reprogEdits[id] = ed;
+        _guardarReprogManual();
+        pintarTablaReprogramacion();
+        if (agregarOtra) {
+            ['folio', 'ubi', 'status', 'obs'].forEach(k => { document.getElementById('arp_' + k).value = ''; });
+            document.getElementById('arp_folio').focus();
+        } else {
+            cerrarModalAgregarReprog();
+        }
+    }
+
+    // ===== Reporte / Dashboard (Tabla de reprogramación y Tabla Crossdock) =====
+    // Vista en pantalla (Chart.js) + descarga en Excel con Dashboard, Resumen dinámico y Datos (ExcelJS).
+    const RPT_PAL = ['#5b9bd5', '#ed7d31', '#a5a5a5', '#ffc000', '#70ad47', '#4472c4', '#9e480e', '#636363', '#997300', '#264478'];
+    const RPT_TMS_COL = { 'CUARENTENA': '#ffc000', 'EN CUSTODIA': '#a5a5a5', 'FALLO DE ENTREGA': '#9dc3e6', 'REENVIO A CLIENTE': '#ff4d4d', 'ENTREGADO': '#70ad47' };
+    function _rptNorm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim(); }
+    function _rptColTms(k, i) { return RPT_TMS_COL[_rptNorm(k)] || RPT_PAL[(i + 5) % RPT_PAL.length]; }
+    function _rptCuenta(filas, fn, vacio, orden) {
+        const m = {};
+        filas.forEach(f => { let k = String(fn(f) == null ? '' : fn(f)).trim(); if (!k) k = vacio || '(Vacío)'; m[k] = (m[k] || 0) + 1; });
+        const arr = Object.entries(m);
+        if (orden === 'nombre') return arr.sort((a, b) => a[0].localeCompare(b[0], 'es', { numeric: true }));
+        return arr.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+    }
+    function _rptPct(n, t) { return t ? Math.round(n * 100 / t) + '%' : '0%'; }
+    function _rptFechaLarga(iso) {
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+        if (!m) return iso || '(Todas)';
+        try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return iso; }
+    }
+    // Pivot Zona > Status > ESTADO-TMS
+    function _rptPivot(filas) {
+        const z = {};
+        filas.forEach(f => {
+            const zn = String(f.zona || '').trim() || '(Sin zona)', st = String(f.status || '').trim() || '(Sin status)', tm = String(f.estado || '').trim() || '(Sin estado)';
+            if (!z[zn]) z[zn] = {};
+            if (!z[zn][st]) z[zn][st] = {};
+            z[zn][st][tm] = (z[zn][st][tm] || 0) + 1;
+        });
+        const suma = o => Object.values(o).reduce((a, b) => a + b, 0);
+        return Object.keys(z).map(zn => {
+            const sts = Object.keys(z[zn]).map(st => {
+                const tms = Object.entries(z[zn][st]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+                return { status: st, total: suma(z[zn][st]), tms };
+            }).sort((a, b) => b.total - a.total || a.status.localeCompare(b.status, 'es'));
+            return { zona: zn, total: sts.reduce((a, s) => a + s.total, 0), status: sts };
+        }).sort((a, b) => b.total - a.total || a.zona.localeCompare(b.zona, 'es'));
+    }
+
+    // Datos del reporte de reprogramación
+    function _rptDatosReprog(filas) {
+        const total = filas.length;
+        const zonas = _rptCuenta(filas, f => f.zona, '(Sin zona)');
+        const crossdock = filas.filter(f => /CROSS\s*DOCK/i.test(f.obs || '')).length;
+        const sinFecha = filas.filter(f => /SIN FECHA/i.test(f.obs || '')).length;
+        const vencida = filas.filter(f => /VENCIDA/i.test(f.obs || '')).length;
+        const kpis = [{ l: 'Total de rastreos', v: total, c: '#375623', bg: 'FFE2EFDA' }]
+            .concat(zonas.slice(0, 3).map(([k, n], i) => ({ l: k, v: n, c: RPT_PAL[i], bg: 'FFDDEBF7' })))
+            .concat([{ l: 'Entregado a Crossdock', v: crossdock, c: '#2563eb', bg: 'FFDDEBF7' }, { l: 'Sin fecha de reprogramación', v: sinFecha, c: '#b45309', bg: 'FFFFF2CC' }, { l: 'Programación vencida', v: vencida, c: '#b91c1c', bg: 'FFFCE4D6' }]);
+        const tms = _rptCuenta(filas, f => f.estado, '(Sin estado)');
+        const obs = _rptCuenta(filas, f => f.obs);
+        const status = _rptCuenta(filas, f => f.status);
+        const ubis = _rptCuenta(filas, f => f.ubi, '(Sin ubicación)');
+        return {
+            total, kpis, tms, obs, status, ubis, zonas, pivot: _rptPivot(filas),
+            charts: [
+                { id: 'obs', titulo: 'Observaciones', tipo: 'bar', horizontal: true, items: obs },
+                { id: 'stDona', titulo: 'Estatus', tipo: 'doughnut', items: status },
+                { id: 'stBar', titulo: 'Estatus (cantidad)', tipo: 'bar', items: status },
+                { id: 'ubi', titulo: 'Ubicaciones', tipo: 'bar', horizontal: true, items: ubis.slice(0, 15) }
+            ]
+        };
+    }
+    // Datos del reporte de Crossdock
+    function _rptDatosCrossdock(filas) {
+        const total = filas.length;
+        const conFecha = filas.filter(f => String(f.fRep || '').trim()).length;
+        const tms = _rptCuenta(filas, f => f.tms, '(Sin estado)');
+        const extr = _rptCuenta(filas, f => f.extr);
+        const fechas = _rptCuenta(filas, f => f.fRep, 'SIN FECHA', 'nombre');
+        const resp = _responsableXd() || '—';
+        return {
+            total, tms, extr, fechas,
+            kpis: [
+                { l: 'Folios en Crossdock', v: total, c: '#375623', bg: 'FFE2EFDA' },
+                { l: 'Con fecha de reprogramación', v: conFecha, c: '#2563eb', bg: 'FFDDEBF7' },
+                { l: 'Sin fecha de reprogramación', v: total - conFecha, c: '#b45309', bg: 'FFFFF2CC' },
+                { l: 'Responsable', v: resp, c: '#636363', bg: 'FFEDEDED', texto: true }
+            ],
+            charts: [
+                { id: 'xExtr', titulo: 'Extracción', tipo: 'bar', horizontal: true, items: extr },
+                { id: 'xTms', titulo: 'Estados TMS', tipo: 'doughnut', items: tms, tmsColores: true },
+                { id: 'xFec', titulo: 'Fecha de Reprogramación', tipo: 'bar', items: fechas }
+            ]
+        };
+    }
+
+    // ----- Gráficos (Chart.js) -----
+    let _rptCharts = [];
+    function _rptDestruir() { _rptCharts.forEach(c => { try { c.destroy(); } catch (e) {} }); _rptCharts = []; }
+    function _rptTexto() {
+        try { return getComputedStyle(document.getElementById('modalVistaRepros')).getPropertyValue('--text-main').trim() || '#222'; } catch (e) { return '#222'; }
+    }
+    function _rptPluginValores(txt, horizontal) {
+        return {
+            id: 'rptValores',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx, t = chart.config.type;
+                ctx.save(); ctx.font = 'bold 11px sans-serif';
+                chart.data.datasets.forEach((ds, di) => {
+                    const meta = chart.getDatasetMeta(di);
+                    const tot = ds.data.reduce((a, b) => a + b, 0);
+                    meta.data.forEach((el, i) => {
+                        const v = ds.data[i]; if (v == null) return;
+                        if (t === 'doughnut') {
+                            if (v * 100 / tot < 4) return;
+                            const p = el.tooltipPosition();
+                            ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(Math.round(v * 100 / tot) + '%', p.x, p.y);
+                        } else if (horizontal) {
+                            ctx.fillStyle = txt; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(v, el.x + 5, el.y);
+                        } else {
+                            ctx.fillStyle = txt; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(v, el.x, el.y - 3);
+                        }
+                    });
+                });
+                ctx.restore();
+            }
+        };
+    }
+    const _rptPluginFondo = { id: 'rptFondo', beforeDraw(chart) { const c = chart.ctx; c.save(); c.globalCompositeOperation = 'destination-over'; c.fillStyle = '#ffffff'; c.fillRect(0, 0, chart.width, chart.height); c.restore(); } };
+    function _rptGrafico(canvas, spec, exp, claro) {
+        if (typeof Chart === 'undefined' || !spec.items.length) return null;
+        const labels = spec.items.map(x => x[0]), vals = spec.items.map(x => x[1]);
+        const dona = spec.tipo === 'doughnut', hor = !dona && !!spec.horizontal;
+        const colores = spec.tmsColores ? labels.map((l, i) => _rptColTms(l, i)) : labels.map((_, i) => RPT_PAL[i % RPT_PAL.length]);
+        const txt = (exp || claro) ? '#222222' : _rptTexto();
+        const grid = (exp || claro) ? 'rgba(0,0,0,.08)' : 'rgba(128,128,128,.2)';
+        const cfg = {
+            type: dona ? 'doughnut' : 'bar',
+            data: { labels, datasets: [{ data: vals, backgroundColor: dona ? colores : '#5b9bd5', borderWidth: dona ? 1 : 0, borderColor: '#ffffff' }] },
+            options: {
+                animation: false, responsive: !exp, maintainAspectRatio: false,
+                devicePixelRatio: exp ? 2 : window.devicePixelRatio,
+                indexAxis: hor ? 'y' : 'x',
+                layout: { padding: { top: 18, right: hor ? 36 : 10, bottom: 4, left: 4 } },
+                plugins: {
+                    legend: { display: dona, position: 'right', labels: { color: txt, boxWidth: 12, font: { size: 11 } } },
+                    title: exp ? { display: true, text: spec.titulo, color: '#111111', font: { size: 15, weight: 'bold' } } : { display: false }
+                },
+                scales: dona ? {} : {
+                    x: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, precision: 0 }, grid: { display: !hor, color: grid } },
+                    y: { beginAtZero: true, ticks: { color: txt, font: { size: 10 }, precision: 0 }, grid: { display: hor ? false : true, color: grid } }
+                }
+            },
+            plugins: [_rptPluginValores(txt, hor)].concat(exp ? [_rptPluginFondo] : [])
+        };
+        return new Chart(canvas.getContext('2d'), cfg);
+    }
+    // PNG de un gráfico (para el Excel)
+    function _rptImagen(spec, w, h) {
+        try {
+            if (typeof Chart === 'undefined') return null;
+            const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+            const ch = _rptGrafico(cv, spec, true);
+            if (!ch) return null;
+            const url = cv.toDataURL('image/png');
+            ch.destroy();
+            return url;
+        } catch (e) { console.error(e); return null; }
+    }
+
+    // ----- HTML de la vista en pantalla -----
+    function _rptHtmlKpis(kpis) {
+        return '<div class="rtb-kgrid">' + kpis.map(k => `<div class="rtb-kcard" style="--kpi:${k.c}"><div class="rtb-kpi-label">${_escHtmlRepro(k.l)}</div><div class="rtb-kpi-val" ${k.texto ? 'style="font-size:16px; line-height:1.9;"' : ''}>${_escHtmlRepro(String(k.v))}</div></div>`).join('') + '</div>';
+    }
+    function _rptHtmlTms(items, total) {
+        if (!items.length) return '';
+        return '<div class="rtb-sec" style="margin:6px 0 8px;">Estados TMS</div><div class="rtb-tms">' +
+            items.map(([k, n], i) => `<div class="rtb-tms-c" style="--c:${_rptColTms(k, i)}"><div class="rtb-tms-n">${_escHtmlRepro(k)}</div><div class="rtb-tms-v"><b>${n}</b><span>${_rptPct(n, total)}</span></div></div>`).join('') +
+            `<div class="rtb-tms-c" style="--c:#70ad47"><div class="rtb-tms-n">Total general</div><div class="rtb-tms-v"><b>${total}</b><span>100%</span></div></div></div>`;
+    }
+    function _rptHtmlGraficos(charts, prefijo) {
+        return '<div class="rtb-grid">' + charts.map(c => `<div class="rtb-card"><div class="rtb-h">${_escHtmlRepro(c.titulo)}</div><div class="rtb-cv"><canvas id="${prefijo}${c.id}"></canvas></div></div>`).join('') + '</div>';
+    }
+    function _rptPintarGraficos(charts, prefijo) {
+        charts.forEach(c => { const cv = document.getElementById(prefijo + c.id); if (cv) { const g = _rptGrafico(cv, c, false, true); if (g) _rptCharts.push(g); } });
+    }
+    function _rptHtmlPivot(pivot, total) {
+        let h = '<div class="rtb-sec" style="margin:16px 0 8px;">Detalle por Zona › Status › ESTADO - TMS</div><div><table class="rtb-pv"><thead><tr><th>Zona</th><th>Status</th><th>ESTADO - TMS</th><th class="n">CANT. RASTREOS</th></tr></thead><tbody>';
+        pivot.forEach(z => {
+            h += `<tr class="z"><td colspan="3">${_escHtmlRepro(z.zona)}</td><td class="n">${z.total}</td></tr>`;
+            z.status.forEach(s => {
+                h += `<tr class="s"><td></td><td colspan="2">${_escHtmlRepro(s.status)}</td><td class="n">${s.total}</td></tr>`;
+                s.tms.forEach(([t, n]) => { h += `<tr><td></td><td></td><td>${_escHtmlRepro(t)}</td><td class="n">${n}</td></tr>`; });
+            });
+        });
+        return h + `<tr class="t"><td colspan="3">Total general</td><td class="n">${total}</td></tr></tbody></table></div>`;
+    }
+
+    // ===== Excel con estilo (ExcelJS) =====
+    function _rptCargarExcelJS() {
+        return new Promise((res, rej) => {
+            if (window.ExcelJS) return res(window.ExcelJS);
+            const sc = document.createElement('script');
+            sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'; sc.crossOrigin = 'anonymous';
+            sc.onload = () => window.ExcelJS ? res(window.ExcelJS) : rej(new Error('ExcelJS no disponible'));
+            sc.onerror = () => rej(new Error('No se pudo cargar ExcelJS'));
+            document.head.appendChild(sc);
+        });
+    }
+    const _XL_L = { style: 'thin', color: { argb: 'FFBFBFBF' } };
+    const _XL_BORDE = { top: _XL_L, left: _XL_L, bottom: _XL_L, right: _XL_L };
+    function _xlArgb(hex) { return 'FF' + String(hex).replace('#', '').toUpperCase(); }
+    function _xl(c, o) {
+        o = o || {};
+        if (o.v !== undefined) c.value = o.v;
+        c.font = { name: 'Calibri', size: o.sz || 11, bold: !!o.b, color: { argb: o.fc || 'FF111111' } };
+        if (o.bg) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.bg } };
+        c.alignment = { horizontal: o.h || 'left', vertical: 'middle', wrapText: !!o.wrap, indent: o.indent || 0 };
+        if (o.borde) c.border = _XL_BORDE;
+    }
+    function _xlDescargar(buf, nombre) {
+        const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    }
+    function _xlHoyDMY() { return _hoyISOReprog().split('-').reverse().join('-'); }
+
+    // ===== Dashboard del Excel (diseño "Resumen de Rastros": compacto, cabecera azul marino) =====
+    function _wrapLbl(t, n) {
+        const w = String(t).split(/\s+/), out = []; let cur = '';
+        w.forEach(x => { if (cur && (cur + ' ' + x).length > n) { out.push(cur); cur = x; } else cur = (cur ? cur + ' ' : '') + x; });
+        if (cur) out.push(cur);
+        return out.length > 1 ? out : (out[0] || '');
+    }
+    // modo: 'hor' (barras horizontales), 'ver' (barras verticales), 'pie' (torta)
+    function _rptImagenRef(spec, w, h, modo) {
+        try {
+            if (typeof Chart === 'undefined' || !spec || !spec.items.length) return null;
+            const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+            const vals = spec.items.map(x => x[1]);
+            const tot = vals.reduce((a, b) => a + b, 0) || 1, max = Math.max.apply(null, vals);
+            const AZ = '#5b9bd5', NV = '#0b2042';
+            const PIE = ['#5b9bd5', '#e5a335', '#a5a5a5', '#f6c242', '#70ad47', '#4472c4', '#9e480e', '#636363'];
+            const labels = spec.items.map(([k]) => modo === 'hor' ? _wrapLbl(k, 22) : (modo === 'ver' ? _wrapLbl(k, 14) : String(k)));
+            const plug = {
+                id: 'refVal',
+                afterDatasetsDraw(chart) {
+                    const ctx = chart.ctx; ctx.save();
+                    chart.getDatasetMeta(0).data.forEach((el, i) => {
+                        const v = vals[i]; if (v == null) return;
+                        if (modo === 'pie') {
+                            const p = el.getProps(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], true);
+                            const a = (p.startAngle + p.endAngle) / 2, r = p.outerRadius + 14;
+                            ctx.font = '10px sans-serif'; ctx.fillStyle = '#222'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(Math.round(v * 100 / tot) + '%', p.x + Math.cos(a) * r, p.y + Math.sin(a) * r);
+                        } else if (modo === 'hor') {
+                            ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = NV; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(v, el.x + 5, el.y);
+                        } else {
+                            ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = NV; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(v, el.x, el.y - 3);
+                        }
+                    });
+                    ctx.restore();
+                }
+            };
+            const pie = modo === 'pie', hor = modo === 'hor';
+            const ch = new Chart(cv.getContext('2d'), {
+                type: pie ? 'pie' : 'bar',
+                data: { labels, datasets: [{ data: vals, backgroundColor: pie ? vals.map((_, i) => PIE[i % PIE.length]) : AZ, borderWidth: pie ? 1 : 0, borderColor: '#ffffff', maxBarThickness: hor ? 18 : 34, barPercentage: hor ? 0.8 : 0.55, categoryPercentage: 0.95 }] },
+                options: {
+                    animation: false, responsive: false, maintainAspectRatio: false, devicePixelRatio: 2,
+                    indexAxis: hor ? 'y' : 'x',
+                    layout: { padding: pie ? { top: 18, bottom: 18, left: 18, right: 6 } : { top: 14, right: hor ? 30 : 8, bottom: 2, left: 4 } },
+                    plugins: { legend: { display: pie, position: 'right', labels: { color: '#333', boxWidth: 8, boxHeight: 8, font: { size: 10 } } }, title: { display: false } },
+                    scales: pie ? {} : (hor
+                        ? { x: { display: false, beginAtZero: true, suggestedMax: max * 1.15 }, y: { grid: { display: false }, border: { display: false }, ticks: { color: NV, font: { size: 10, weight: 'bold' } } } }
+                        : { x: { grid: { display: false }, border: { display: false }, ticks: { color: '#222', font: { size: 9 } } }, y: { display: false, beginAtZero: true, suggestedMax: max * 1.2 } })
+                },
+                plugins: [plug, _rptPluginFondo]
+            });
+            const url = cv.toDataURL('image/png');
+            ch.destroy();
+            return url;
+        } catch (e) { console.error(e); return null; }
+    }
+
+    function _xlDashboard(wb, cfg) {
+        const ws = wb.addWorksheet('Dashboard', { views: [{ showGridLines: false }] });
+        const NAVY = 'FF0B2042', BG = 'FFEEF2F8', WHITE = 'FFFFFFFF', GRIS = 'FFF2F2F2', PILL = 'FFBDD7EE', CLARO = 'FFA9C0DC';
+        const NC = 18;
+        [9, 9, 9, 9, 9, 2, 9, 9, 9, 9, 9, 9, 9, 2, 9, 9, 9, 9].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+        const H = {};
+        const setH = (r, pt) => { H[r] = pt; ws.getRow(r).height = pt; };
+        const alt = r => (H[r] || 15) * 4 / 3;                       // alto de la fila r (1-based) en px
+        const posY = (fila0, px) => { let r = fila0, rest = px; while (rest >= alt(r + 1) && r < 400) { rest -= alt(r + 1); r++; } return r + rest / alt(r + 1); };
+        const rellenar = (r1, c1, r2, c2, argb) => { for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) ws.getCell(r, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } }; };
+        const bordeBlanco = (r1, c1, r2, c2) => { const b = { style: 'thick', color: { argb: WHITE } }; for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) ws.getCell(r, c).border = { top: b, left: b, bottom: b, right: b }; };
+        const titulo = (r, c1, c2, txt) => { ws.mergeCells(r, c1, r, c2); _xl(ws.getCell(r, c1), { v: String(txt).toUpperCase(), b: true, sz: 14, fc: NAVY, bg: WHITE, h: 'center' }); setH(r, 22); };
+
+        // Datos
+        const horiz = cfg.charts.filter(c => c.tipo === 'bar' && c.horizontal);
+        const obsC = horiz[0], ubiC = horiz[1];
+        const dona = cfg.charts.find(c => c.tipo === 'doughnut');
+        const barV = cfg.charts.find(c => c.tipo === 'bar' && !c.horizontal);
+        const tmsF = (cfg.tms || []).slice(0, 6), n = tmsF.length;
+
+        // Filas: 5 espaciador · 6 títulos · 7..6+n estados · 7+n pie · 8+n espaciador · obs título · 9 filas de gráfico · pie
+        const fT = 7 + n, oT = 9 + n, oF = oT + 10, last = oF;
+        const pxTotal = Math.round((22 + 20 * n + 14 + 6 + 22 + 135 + 14) * 4 / 3);
+        rellenar(1, 1, 4, NC, NAVY);
+        rellenar(5, 1, last + 1, NC, BG);
+        setH(5, 6);
+
+        // Cabecera
+        const tit = /reprogram/i.test(cfg.titulo) ? 'Resumen de Rastros' : cfg.titulo;
+        ws.mergeCells(1, 1, 2, 12); _xl(ws.getCell(1, 1), { v: tit, b: true, sz: 22, fc: WHITE, bg: NAVY, h: 'left', indent: 1 });
+        ws.mergeCells(3, 1, 4, 12); _xl(ws.getCell(3, 1), { v: cfg.subtitulo, sz: 10, fc: CLARO, bg: NAVY, h: 'left', indent: 1 });
+        const k0 = cfg.kpis[0], k1 = cfg.kpis[1], k2 = cfg.kpis[2];
+        ws.mergeCells(1, 13, 2, 15); _xl(ws.getCell(1, 13), { v: k0 ? k0.l : 'Total', sz: 12, fc: WHITE, bg: NAVY, h: 'right' });
+        ws.mergeCells(1, 16, 2, 18); _xl(ws.getCell(1, 16), { v: cfg.total, b: true, sz: 30, fc: WHITE, bg: NAVY, h: 'center' });
+        if (k1) { ws.mergeCells(3, 13, 4, 15); _xl(ws.getCell(3, 13), { v: k1.l + '   ' + k1.v, b: true, sz: 10, fc: NAVY, bg: PILL, h: 'center', wrap: true }); }
+        if (k2) { ws.mergeCells(3, 16, 4, 18); _xl(ws.getCell(3, 16), { v: k2.l + '   ' + k2.v, b: true, sz: 10, fc: NAVY, bg: PILL, h: 'center', wrap: true }); }
+        setH(1, 22); setH(2, 22); setH(3, 15); setH(4, 15);
+
+        // IZQUIERDA: Estados TMS (chips de color) + Observaciones
+        rellenar(6, 1, fT, 5, WHITE);
+        titulo(6, 1, 5, 'Estados TMS');
+        tmsF.forEach(([k, v], i) => {
+            const r = 7 + i, hex = _rptColTms(k, i).replace('#', '');
+            const lum = 0.299 * parseInt(hex.substr(0, 2), 16) + 0.587 * parseInt(hex.substr(2, 2), 16) + 0.114 * parseInt(hex.substr(4, 2), 16);
+            ws.mergeCells(r, 1, r, 2); _xl(ws.getCell(r, 1), { v: k, sz: 10, fc: lum < 140 ? WHITE : 'FF111111', bg: _xlArgb(hex), h: 'center' });
+            _xl(ws.getCell(r, 3), { v: v, b: true, sz: 12, fc: NAVY, bg: GRIS, h: 'center' });
+            ws.mergeCells(r, 4, r, 5); _xl(ws.getCell(r, 4), { v: _rptPct(v, cfg.total), b: true, sz: 12, fc: 'FF8C8C8C', bg: GRIS, h: 'center' });
+            bordeBlanco(r, 1, r, 5);
+            setH(r, 20);
+        });
+        ws.mergeCells(fT, 1, fT, 5); _xl(ws.getCell(fT, 1), { v: 'Total general · ' + cfg.total + ' · 100%', sz: 9, fc: 'FF7F7F7F', bg: WHITE, h: 'center' }); setH(fT, 14);
+        setH(8 + n, 6);
+        rellenar(oT, 1, oF, 5, WHITE);
+        titulo(oT, 1, 5, obsC ? obsC.titulo : 'Observaciones');
+        ws.mergeCells(oF, 1, oF, 5); _xl(ws.getCell(oF, 1), { v: 'Total general · ' + cfg.total + ' · 100%', sz: 9, fc: 'FF7F7F7F', bg: WHITE, h: 'center' }); setH(oF, 14);
+
+        // CENTRO: Estatus (torta) + barras de estatus
+        rellenar(6, 7, last, 13, WHITE);
+        titulo(6, 7, 13, dona ? dona.titulo : 'Estatus');
+
+        // DERECHA: Ubicaciones
+        if (ubiC) { rellenar(6, 15, last, 18, WHITE); titulo(6, 15, 18, ubiC.titulo); }
+
+        // Imágenes de los gráficos (posiciones calculadas con el alto real de las filas)
+        const poner = (spec, modo, w, h, col0, filaTop0, offPx) => {
+            const url = _rptImagenRef(spec, w, h, modo);
+            if (!url) return;
+            const id = wb.addImage({ base64: url, extension: 'png' });
+            ws.addImage(id, { tl: { col: col0, row: posY(filaTop0, offPx) }, ext: { width: w, height: h } });
+        };
+        if (obsC) poner(obsC, 'hor', 330, 172, 0.04, oT, 4);
+        const hPie = 200, hBar = Math.max(120, pxTotal - 29 - hPie - 14);
+        if (dona) poner(dona, 'pie', 466, hPie, 6.04, 5, 31);
+        if (barV) poner(barV, 'ver', 466, hBar, 6.04, 5, 31 + hPie + 6);
+        if (ubiC) poner(ubiC, 'hor', 262, Math.max(150, pxTotal - 29 - 12), 14.04, 5, 31);
+
+        ws.pageSetup = { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1, horizontalCentered: true, margins: { left: 0.3, right: 0.3, top: 0.3, bottom: 0.3, header: 0.1, footer: 0.1 } };
+    }
+
+    function _xlTablaSimple(ws, col, fila, titulo, items, total) {
+        ws.mergeCells(fila, col, fila, col + 2);
+        _xl(ws.getCell(fila, col), { v: titulo, b: true, bg: 'FFD9E1F2', borde: true });
+        fila++;
+        items.forEach(([k, n]) => {
+            _xl(ws.getCell(fila, col), { v: k, borde: true });
+            _xl(ws.getCell(fila, col + 1), { v: n, h: 'center', borde: true });
+            _xl(ws.getCell(fila, col + 2), { v: _rptPct(n, total), h: 'center', borde: true });
+            fila++;
+        });
+        _xl(ws.getCell(fila, col), { v: 'Total', b: true, bg: 'FFE2EFDA', borde: true });
+        _xl(ws.getCell(fila, col + 1), { v: total, b: true, h: 'center', bg: 'FFE2EFDA', borde: true });
+        _xl(ws.getCell(fila, col + 2), { v: '100%', b: true, h: 'center', bg: 'FFE2EFDA', borde: true });
+        return fila + 2;
+    }
+    function _xlResumen(wb, cfg) {
+        const ws = wb.addWorksheet('Resumen', { views: [{ showGridLines: false }] });
+        [22, 30, 24, 16, 3, 34, 12, 10].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+        let colTablas = 1;
+        if (cfg.pivot) {
+            _xl(ws.getCell(1, 1), { v: 'Fecha Inventario', b: true, bg: 'FFD9E1F2', borde: true });
+            ws.mergeCells(1, 2, 1, 3); _xl(ws.getCell(1, 2), { v: cfg.fInvTxt, borde: true });
+            ['Zona', 'Status', 'ESTADO - TMS', 'CANT.RASTREOS'].forEach((t, i) => _xl(ws.getCell(3, i + 1), { v: t, b: true, bg: 'FFD9E1F2', borde: true, h: i === 3 ? 'center' : 'left' }));
+            let r = 4;
+            cfg.pivot.forEach(z => {
+                _xl(ws.getCell(r, 1), { v: z.zona, b: true, bg: 'FFEEF3FB', borde: true });
+                _xl(ws.getCell(r, 2), { bg: 'FFEEF3FB', borde: true }); _xl(ws.getCell(r, 3), { bg: 'FFEEF3FB', borde: true });
+                _xl(ws.getCell(r, 4), { v: z.total, b: true, h: 'center', bg: 'FFEEF3FB', borde: true }); r++;
+                z.status.forEach(s => {
+                    _xl(ws.getCell(r, 1), { borde: true });
+                    _xl(ws.getCell(r, 2), { v: s.status, b: true, borde: true, indent: 1 }); _xl(ws.getCell(r, 3), { borde: true });
+                    _xl(ws.getCell(r, 4), { v: s.total, b: true, h: 'center', borde: true }); r++;
+                    s.tms.forEach(([t, n]) => {
+                        _xl(ws.getCell(r, 1), { borde: true }); _xl(ws.getCell(r, 2), { borde: true });
+                        _xl(ws.getCell(r, 3), { v: t, borde: true, indent: 1 }); _xl(ws.getCell(r, 4), { v: n, h: 'center', borde: true }); r++;
+                    });
+                });
+            });
+            ['Total general', '', ''].forEach((t, i) => _xl(ws.getCell(r, i + 1), { v: t, b: true, bg: 'FFC6E0B4', borde: true }));
+            _xl(ws.getCell(r, 4), { v: cfg.total, b: true, h: 'center', bg: 'FFC6E0B4', borde: true });
+            colTablas = 6;
+        }
+        let f = 1;
+        cfg.tablas.forEach(t => { f = _xlTablaSimple(ws, colTablas, f, t.titulo, t.items, cfg.total); });
+        if (!cfg.pivot) [30, 14, 12].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+    }
+    function _xlDatos(wb, columnas, filas) {
+        const ws = wb.addWorksheet('Datos', { views: [{ state: 'frozen', ySplit: 1 }] });
+        columnas.forEach((c, i) => {
+            const w = Math.min(45, Math.max(c.length + 4, ...filas.map(f => String(f[i] == null ? '' : f[i]).length + 2)));
+            ws.getColumn(i + 1).width = w;
+            _xl(ws.getCell(1, i + 1), { v: c, b: true, bg: 'FF70AD47', borde: true });
+        });
+        filas.forEach((f, ri) => f.forEach((v, ci) => { _xl(ws.getCell(ri + 2, ci + 1), { v: v == null ? '' : v, borde: true, sz: 10 }); }));
+        ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: columnas.length } };
+    }
+    // Respaldo si ExcelJS no carga: Excel simple (SheetJS) con Datos + Resumen
+    function _xlRespaldo(nombre, columnas, filas, tablas) {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([columnas].concat(filas)), 'Datos');
+        const aoa = [];
+        tablas.forEach(t => { aoa.push([t.titulo, 'Cantidad']); t.items.forEach(([k, n]) => aoa.push([k, n])); aoa.push([]); });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'Resumen');
+        XLSX.writeFile(wb, nombre);
+    }
+
+
+    // ===== Dashboard visual del reporte (HTML / CSS / SVG: se ve igual en pantalla e impresión) =====
+    const DB_PAL = ['#475569', '#d97706', '#2563eb', '#0f172a', '#0d9488', '#9333ea', '#be185d', '#65a30d'];
+    const DB_TMS = { 'CUARENTENA': ['#d97706', 'En revisión'], 'EN CUSTODIA': ['#64748b', 'Bajo resguardo'], 'FALLO DE ENTREGA': ['#2563eb', 'Requiere gestión'], 'REENVIO A CLIENTE': ['#dc2626', 'Retorno programado'], 'ENTREGADO': ['#16a34a', 'Completado'] };
+    function _dbP(n, t, dec) { if (!t) return '0%'; const v = n * 100 / t; return (dec ? v.toFixed(dec) : String(Math.round(v))) + '%'; }
+    function _dbE(x) { return _escHtmlRepro(String(x == null ? '' : x)); }
+    function _dbKpi(ic, label, valor, sub, pct, color, texto) {
+        return `<div class="db-kpi"><div class="db-kpi-t"><span>${_dbE(label)}</span><i>${ic}</i></div><div class="db-kpi-v${texto ? ' txt' : ''}">${_dbE(valor)}</div><div class="db-kpi-s">${_dbE(sub)}</div><div class="db-bar"><b style="width:${Math.max(0, Math.min(100, pct))}%; background:${color}"></b></div></div>`;
+    }
+    function _dbCard(titulo, sub, pill, cuerpo, pie) {
+        return `<div class="db-card"><div class="db-ch"><div><div class="db-ct">${_dbE(titulo)}</div><div class="db-cs">${_dbE(sub)}</div></div>${pill ? `<span class="db-pill">${_dbE(pill)}</span>` : ''}</div><div class="db-cb">${cuerpo}</div>${pie ? `<div class="db-cf">${pie}</div>` : ''}</div>`;
+    }
+    // filas con barra: o = { total, max, color(k,i), sub(k), dec, extra(k), clase(k), pctTexto(n) }
+    function _dbFilas(items, o) {
+        return items.map(([k, n], i) => {
+            const c = o.color(k, i), sub = o.sub ? o.sub(k) : '';
+            const w = o.max ? n * 100 / o.max : (o.total ? n * 100 / o.total : 0);
+            const pc = o.pctTexto ? o.pctTexto(n) : _dbP(n, o.total, o.dec);
+            return `<div class="db-r ${o.clase ? o.clase(k) : ''}"><div class="db-rt"><span class="db-rn"><i style="background:${c}"></i><span>${_dbE(k)}${o.extra ? o.extra(k) : ''}${sub ? `<small>${_dbE(sub)}</small>` : ''}</span></span><span class="db-rv"><b>${n}</b><em>${pc}</em></span></div><div class="db-bar"><b style="width:${Math.max(1.5, w).toFixed(1)}%; background:${c}"></b></div></div>`;
+        }).join('');
+    }
+    function _dbDonut(items, total, cols) {
+        const R = 42, C = 2 * Math.PI * R; let off = 0;
+        const seg = items.map(([k, n], i) => {
+            const len = C * n / total;
+            const sv = `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${cols[i]}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+            off += len; return sv;
+        }).join('');
+        return `<svg viewBox="0 0 120 120" class="db-donut"><circle cx="60" cy="60" r="${R}" fill="none" stroke="#e2e8f0" stroke-width="16"/>${seg}<text x="60" y="61" text-anchor="middle" class="db-dn">${total}</text><text x="60" y="75" text-anchor="middle" class="db-dl">TOTAL</text></svg>`;
+    }
+    function _dbDonutCard(titulo, sub, items, total, mayorTxt, menorTxt) {
+        const cols = items.map((_, i) => DB_PAL[i % DB_PAL.length]);
+        const leyenda = _dbFilas(items, { total, color: (k, i) => cols[i], pctTexto: n => '(' + _dbP(n, total) + ')' });
+        const cuerpo = `<div class="db-dona">${_dbDonut(items, total, cols)}<div class="db-ley">${leyenda}</div></div>` +
+            (items.length > 1 ? `<div class="db-mm"><div><small>${mayorTxt}</small><strong>${_dbE(items[0][0])} · ${items[0][1]}</strong></div><div><small>${menorTxt}</small><strong>${_dbE(items[items.length - 1][0])} · ${items[items.length - 1][1]}</strong></div></div>` : '');
+        return _dbCard(titulo, sub, '', cuerpo, '');
+    }
+    function _dbTmsCard(d) {
+        const items = d.tms, t = d.total;
+        const col = (k, i) => (DB_TMS[_rptNorm(k)] || [DB_PAL[(i + 3) % DB_PAL.length]])[0];
+        const cuerpo = _dbFilas(items, { total: t, color: col, sub: k => (DB_TMS[_rptNorm(k)] || ['', ''])[1], pctTexto: n => _dbP(n, t) });
+        return _dbCard('Estados TMS', `Distribución por estado operativo · ${t} folios`, items.length + ' estados', cuerpo, `<span>Suma verificada</span><b>${items.reduce((a, x) => a + x[1], 0)} folios · 100%</b>`);
+    }
+    function _dbBanner(html) { return `<div class="db-ban"><i>!</i><span>${html}</span></div>`; }
+
+    function _dbReprogHtml(d) {
+        const t = d.total;
+        const cuar = (d.tms.find(x => _rptNorm(x[0]) === 'CUARENTENA') || ['', 0])[1];
+        const sinF = d.obs.filter(x => /SIN FECHA/i.test(x[0])).reduce((a, x) => a + x[1], 0);
+        const zs = d.zonas.slice(0, 2);
+        const kpis = _dbKpi('📦', 'Total de rastreos', t, 'Base del reporte', 100, '#0f172a') +
+            zs.map(([k, n], i) => _dbKpi(i ? '↺' : '👁', k, n, _dbP(n, t) + ' del total', n * 100 / t, DB_PAL[i + 1] === '#d97706' ? '#64748b' : '#64748b')).join('') +
+            _dbKpi('🛡', 'Tasa de cuarentena', _dbP(cuar, t), cuar + ' rastros en cuarentena', cuar * 100 / t, '#d97706');
+        const ubiTop = d.ubis.filter(x => x[0] !== '(Sin ubicación)')[0];
+        const partes = [];
+        if (ubiTop) partes.push(`<b>${_dbE(ubiTop[0])}</b> concentra ${ubiTop[1]} rastros (${_dbP(ubiTop[1], t)})`);
+        if (sinF) partes.push(`${sinF} rastros no tienen fecha de reprogramación`);
+        const lectura = _dbBanner(`<b>Lectura clave:</b> ${partes.join(' y ')}${partes.length ? '. ' : ''}La cuarentena representa el ${_dbP(cuar, t)} del total.`);
+
+        // Observaciones en orden de lectura
+        const ordObs = [/SIN FECHA/i, /VENCIDA/i, /FUTURA/i, /CROSS\s*DOCK/i, /CANCELADO|ANULADO/i];
+        const idx = k => { const i = ordObs.findIndex(r => r.test(k)); return i < 0 ? 99 : i; };
+        const bonito = k => /SIN FECHA/i.test(k) ? 'Sin fecha de reprogramación' : /VENCIDA/i.test(k) ? 'Programación vencida' : /FUTURA/i.test(k) ? 'Programación futura' : /CROSS\s*DOCK/i.test(k) ? 'Entregado a Crossdock' : /CANCELADO|ANULADO/i.test(k) ? 'Cancelado / Anulado' : k;
+        const obs = d.obs.slice().sort((a, b) => idx(a[0]) - idx(b[0]) || b[1] - a[1]).map(([k, n]) => [bonito(k), n]);
+        const maxObs = Math.max(...obs.map(x => x[1]));
+        const obsHtml = _dbFilas(obs, {
+            total: t, max: maxObs, dec: 1,
+            color: k => /SIN FECHA/i.test(k) ? '#d97706' : '#475569',
+            extra: k => /SIN FECHA/i.test(k) ? '<u class="db-crit">CRÍTICO</u>' : '',
+            clase: k => /SIN FECHA/i.test(k) ? 'crit' : ''
+        });
+        // Ubicaciones: las de mayor volumen, ordenadas por código
+        const ubis = d.ubis.slice().sort((a, b) => b[1] - a[1]).slice(0, 12);
+        const maxU = ubis.length ? ubis[0][1] : 1;
+        const ubisOrd = ubis.slice().sort((a, b) => a[0].localeCompare(b[0], 'es', { numeric: true }));
+        const dom = ubis[0];
+        const ubiHtml = (dom ? `<div class="db-dom"><div><small>UBICACIÓN DOMINANTE</small><strong>${_dbE(dom[0])} · concentra ${dom[1]} rastros</strong></div><div class="db-dom-p"><b>${_dbP(dom[1], t)}</b><small>del total</small></div></div>` : '') +
+            _dbFilas(ubisOrd, { total: t, max: maxU, dec: 1, color: k => (dom && k === dom[0]) ? '#0f172a' : '#94a3b8', clase: k => (dom && k === dom[0]) ? 'dom' : '' });
+        const pieU = ubis.length > 1 ? `<span>Segunda ubicación · ${_dbE(ubis[1][0])} · ${ubis[1][1]}</span><b>Top 2 = ${_dbP(ubis[0][1] + ubis[1][1], t)} del total</b>` : '';
+
+        return `<div class="db-kpis">${kpis}</div>${lectura}
+            <div class="db-cols">
+                <div class="db-col">${_dbTmsCard(d)}${_dbCard('Observaciones', 'Motivos y situación de programación', '', obsHtml, '')}</div>
+                <div class="db-col">${_dbDonutCard('Estatus', 'Posición actual en almacén y proceso', d.status, t, 'MAYOR ESTATUS', 'MENOR ESTATUS')}${_dbCard('Ubicaciones', 'Concentración por código de ubicación', d.ubis.length + ' códigos', ubiHtml, pieU)}</div>
+            </div>`;
+    }
+    function _dbCrossdockHtml(d) {
+        const t = d.total;
+        const conF = d.kpis[1].v, sinF = d.kpis[2].v;
+        const kpis = _dbKpi('📦', 'Folios en Crossdock', t, 'Base del reporte', 100, '#0f172a') +
+            _dbKpi('📅', 'Con fecha de reprogramación', conF, _dbP(conF, t) + ' del total', conF * 100 / t, '#2563eb') +
+            _dbKpi('⏳', 'Sin fecha de reprogramación', sinF, _dbP(sinF, t) + ' del total', sinF * 100 / t, '#d97706') +
+            _dbKpi('👤', 'Responsable', d.kpis[3].v, 'Entrega a Crossdock', 100, '#64748b', true);
+        const lectura = _dbBanner(`<b>Lectura clave:</b> ${t} folios entregados a Crossdock${d.kpis[3].v !== '—' ? ' bajo la responsabilidad de <b>' + _dbE(d.kpis[3].v) + '</b>' : ''}${sinF ? `; ${sinF} no tienen fecha de reprogramación` : ''}.`);
+        const fechas = d.fechas;
+        const maxF = Math.max(...fechas.map(x => x[1]));
+        const fHtml = _dbFilas(fechas, { total: t, max: maxF, dec: 1, color: k => /SIN FECHA/i.test(k) ? '#d97706' : '#475569', extra: k => /SIN FECHA/i.test(k) ? '<u class="db-crit">CRÍTICO</u>' : '', clase: k => /SIN FECHA/i.test(k) ? 'crit' : '' });
+        return `<div class="db-kpis">${kpis}</div>${lectura}
+            <div class="db-cols">
+                <div class="db-col">${_dbTmsCard(d)}${_dbCard('Fecha de reprogramación', 'Folios por fecha programada', fechas.length + ' fechas', fHtml, '')}</div>
+                <div class="db-col">${_dbDonutCard('Extracción', 'Origen del pistoleo entregado a Crossdock', d.extr, t, 'MAYOR EXTRACCIÓN', 'MENOR EXTRACCIÓN')}</div>
+            </div>`;
+    }
+
+    // ===== Reportes (uno por tabla): vista previa imprimible + Excel =====
+    // Reporte de reprogramaciones = lo que se ve en la Tabla de reprogramación (con sus filtros).
+    // Reporte Crossdock = lo que se ve en la Tabla Crossdock. Sin gráficos ni estadísticas: solo el detalle ordenado.
+    let _rtbSpec = null;
+    function _reprogTodasV() {
+        const h = obtenerFilasReprogBase();
+        if (!h.length) return [];   // historial vacío = sin datos
+        const man = reprogManuales.slice().reverse().map(id => ({ key: id, codigo: '', zona: '', ubi: '', _manual: true }));
+        return man.concat(h).map(r => _reprogConstruirV(r).v);
+    }
+    function _rtbAhora() {
+        const a = new Date();
+        return {
+            fecha: a.toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }),
+            hora: a.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }),
+            iso: _hoyISOReprog()
+        };
+    }
+    function _rtbAgrupar(filas, claveFn, tituloFn) {
+        const m = new Map();
+        filas.forEach(f => { const k = claveFn(f); if (!m.has(k)) m.set(k, []); m.get(k).push(f); });
+        return Array.from(m.keys()).sort((a, b) => a.localeCompare(b, 'es', { numeric: true })).map(k => ({ titulo: tituloFn(k), filas: m.get(k) }));
+    }
+    function _rtbTextoFiltros() {
+        const t = [];
+        REPROG_COLS.forEach(c => { const f = reprogFiltro[c.key]; if (f) t.push(`${c.titulo}: ${[...f].map(v => v === '' ? '(Vacío)' : v).slice(0, 3).join(', ')}${f.size > 3 ? '…' : ''}`); });
+        const q = (document.getElementById('inpBuscarReprogramacion') || {}).value;
+        if (q && q.trim()) t.push(`Búsqueda: ${q.trim()}`);
+        return t.length ? t.join(' · ') : 'Ninguno (todos los folios)';
+    }
+
+    function abrirElegirReporte() {
+        try { pintarTablaReprogramacion(); pintarTablaCrossdock(); } catch (e) { console.error(e); }
+        const nr = (reprogFilasVisibles || []).length, nx = (crossdockFilasVisibles || []).length;
+        document.getElementById('elrNRepro').textContent = nr ? nr + ' folio(s) en la tabla' : 'Sin datos: el historial está vacío';
+        document.getElementById('elrNXd').textContent = nx ? nx + ' folio(s) entregados a Crossdock' : 'Sin folios entregados a Crossdock';
+        document.getElementById('elrBtnRepro').disabled = !nr;
+        document.getElementById('elrBtnXd').disabled = !nx;
+        const m = document.getElementById('modalElegirReporte');
+        if (m.parentNode !== document.body) document.body.appendChild(m);
+        m.style.display = 'flex';
+    }
+    function cerrarElegirReporte() { document.getElementById('modalElegirReporte').style.display = 'none'; }
+    function elegirReporte(t) {
+        cerrarElegirReporte();
+        if (t === 'repro') abrirReporteRepros(); else abrirReporteCrossdock();
+    }
+    function abrirReporteRepros() {
+        const filas = (reprogFilasVisibles || []).map(x => x.v);
+        if (!filas.length) return alert('No hay registros en la tabla para generar el reporte.');
+        const ah = _rtbAhora();
+        const grupos = _rtbAgrupar(filas, v => (String(v.zona || '').trim() || '(Sin zona)') + '\u0001' + (String(v.status || '').trim() || '(Sin status)'),
+            k => k.split('\u0001').join('  ›  '));
+        grupos.forEach(g => g.filas.sort((a, b) => String(a.estado).localeCompare(String(b.estado), 'es') || String(a.folio).localeCompare(String(b.folio))));
+        _rtbSpec = {
+            archivo: `Reporte_Reprogramaciones_${ah.iso.split('-').reverse().join('-')}`,
+            titulo: 'Reporte de reprogramaciones', subtitulo: 'Tabla de reprogramación',
+            meta: [['Usuario', usuarioActivo || '-'], ['Fecha', ah.fecha], ['Hora', ah.hora], ['Filtros aplicados', _rtbTextoFiltros()]],
+            columnas: ['Folio', 'Pistoleo', 'Ubicación', 'ESTADO - TMS', 'Fecha de Reprogramación', 'Observación'],
+            grupos: grupos.map(g => ({ titulo: g.titulo, filas: g.filas.map(v => [v.folio, v.pistoleo, v.ubi, v.estado, v.fecha, v.obs]) })),
+            total: filas.length, firmas: null, pie: `Reporte generado el ${ah.fecha} a las ${ah.hora} por ${usuarioActivo || '-'}`,
+            datos: { columnas: ['FOLIO', 'Pistoleo', 'Ubicación', 'ESTADO - TMS', 'Flujo', 'Zona', 'Status', 'Fecha Inventario', 'Fecha de Reprogramación', 'Observación'],
+                     filas: filas.map(v => [v.folio, v.pistoleo, v.ubi, v.estado, v.flujo, v.zona, v.status, v.fInv, v.fecha, v.obs]) },
+            landscape: true,
+            dash: _rptDatosReprog(filas), pivot: true
+        };
+        _rtbMostrar();
+    }
+    function abrirReporteCrossdock() {
+        const filas = crossdockFilasVisibles || [];
+        if (!filas.length) return alert('No hay registros en la tabla para generar el reporte.');
+        const ah = _rtbAhora();
+        const resp = _responsableXd() || '—';
+        const grupos = _rtbAgrupar(filas, f => String(f.extr || '').trim() || '(Sin extracción)', k => 'Extracción: ' + k);
+        grupos.forEach(g => g.filas.sort((a, b) => String(a.fRep).localeCompare(String(b.fRep)) || String(a.folio).localeCompare(String(b.folio))));
+        _rtbSpec = {
+            archivo: `Reporte_Crossdock_${ah.iso.split('-').reverse().join('-')}`,
+            titulo: 'Reporte de entrega a Crossdock', subtitulo: 'Tabla Crossdock',
+            meta: [['Responsable', resp], ['Fecha de registro', ah.fecha], ['Hora', ah.hora], ['Usuario', usuarioActivo || '-']],
+            columnas: ['Folio', 'Fecha de Reprogramación', 'TMS', 'Flujo'],
+            grupos: grupos.map(g => ({ titulo: g.titulo, filas: g.filas.map(f => [f.folio, f.fRep, f.tms, f.flujo]) })),
+            total: filas.length, firmas: ['Entrega · ' + resp, 'Recibe'], pie: `Reporte generado el ${ah.fecha} a las ${ah.hora} por ${usuarioActivo || '-'}`,
+            datos: { columnas: ['Fecha de Registro', 'Folio', 'Fecha de Reprogramación', 'Responsable', 'Extracción?', 'TMS', 'Flujo'],
+                     filas: filas.map(f => [f.fReg, f.folio, f.fRep, f.resp, f.extr, f.tms, f.flujo]) },
+            landscape: false,
+            dash: _rptDatosCrossdock(filas), pivot: false
+        };
+        _rtbMostrar();
+    }
+
+    function _rtbHtml(sp) {
+        const nc = sp.columnas.length + 1;
+        let n = 0, cuerpo = '';
+        sp.grupos.forEach(g => {
+            cuerpo += `<tr class="sub"><td colspan="${nc}">${_escHtmlRepro(g.titulo)} · ${g.filas.length} folio(s)</td></tr>`;
+            g.filas.forEach(f => {
+                n++;
+                cuerpo += `<tr><td class="i">${n}</td>` + f.map((c, i) => `<td${i === 0 ? ' class="c"' : ''}>${_escHtmlRepro(c)}</td>`).join('') + '</tr>';
+            });
+        });
+        cuerpo += `<tr class="tot"><td colspan="${nc}">TOTAL GENERAL · ${sp.total} folio(s)</td></tr>`;
+        const chk = document.getElementById('chkRtbDetalle');
+        const detalle = !!(chk && chk.checked);
+        const d = sp.dash;
+        const dash = d ? (sp.pivot ? _dbReprogHtml(d) + _rptHtmlPivot(d.pivot, d.total) : _dbCrossdockHtml(d)) : '';
+        const firmas = sp.firmas ? `<div class="rtb-firmas">${sp.firmas.map(t => `<div><span></span><small>${_escHtmlRepro(t)}</small></div>`).join('')}</div>` : '';
+        return `
+            <div class="rtb-head">
+                <img class="rtb-logo" src="${LOGO_REPORTE_SRC}" alt="Home Delivery Logistics">
+                <div class="rtb-ttl"><h1>${_escHtmlRepro(sp.titulo)}</h1><span>${_escHtmlRepro(sp.subtitulo)}</span></div>
+            </div>
+            <div class="rtb-meta">${sp.meta.map(([l, v]) => `<div><small>${_escHtmlRepro(l)}</small><strong>${_escHtmlRepro(v)}</strong></div>`).join('')}</div>
+            ${dash}
+            ${detalle ? `<div class="rtb-sec">Detalle de folios</div>
+            <table class="rtb-table">
+                <thead><tr><th class="i">#</th>${sp.columnas.map(c => `<th>${_escHtmlRepro(c)}</th>`).join('')}</tr></thead>
+                <tbody>${cuerpo}</tbody>
+            </table>` : ''}
+            ${firmas}
+            <div class="rtb-foot">${_escHtmlRepro(sp.pie)}</div>`;
+    }
+    function _rtbMostrar() {
+        _rptDestruir();
+        document.getElementById('rtbPaper').innerHTML = _rtbHtml(_rtbSpec);
+        const m = document.getElementById('modalReporteTabla');
+        if (m.parentNode !== document.body) document.body.appendChild(m);   // hijo directo de <body> para imprimir solo el reporte
+        m.style.display = 'flex';
+        const sc = m.querySelector('.rtb-scroll'); if (sc && !m._abierto) sc.scrollTop = 0;
+        m._abierto = true;
+    }
+    function cerrarReporteTabla() { const m = document.getElementById('modalReporteTabla'); m.style.display = 'none'; m._abierto = false; _rptDestruir(); }
+    function imprimirReporteTabla() {
+        if (!_rtbSpec) return;
+        const tit = document.title;
+        document.title = _rtbSpec.archivo;
+        document.body.classList.add('imprimiendo-rtb');
+        const limpiar = () => { document.body.classList.remove('imprimiendo-rtb'); document.title = tit; window.removeEventListener('afterprint', limpiar); };
+        window.addEventListener('afterprint', limpiar);
+        setTimeout(() => window.print(), 80);
+    }
+
+    // ----- Excel con formato de presentación (ExcelJS) -----
+    function _rtbCargarExcelJS() {
+        return new Promise((res, rej) => {
+            if (window.ExcelJS) return res(window.ExcelJS);
+            const sc = document.createElement('script');
+            sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'; sc.crossOrigin = 'anonymous';
+            sc.onload = () => window.ExcelJS ? res(window.ExcelJS) : rej(new Error('ExcelJS no disponible'));
+            sc.onerror = () => rej(new Error('No se pudo cargar ExcelJS'));
+            document.head.appendChild(sc);
+        });
+    }
+    function _rtbX(c, o) {
+        o = o || {};
+        if (o.v !== undefined) c.value = o.v;
+        c.font = { name: 'Calibri', size: o.sz || 11, bold: !!o.b, color: { argb: o.fc || 'FF0F172A' } };
+        if (o.bg) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: o.bg } };
+        c.alignment = { horizontal: o.h || 'left', vertical: 'middle', wrapText: !!o.wrap, indent: o.indent || 0 };
+        if (o.bb) c.border = { bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } } };
+        if (o.bt) c.border = { top: { style: 'thin', color: { argb: 'FF0F172A' } } };
+    }
+    async function descargarReporteTabla() {
+        const sp = _rtbSpec; if (!sp) return;
+        const nombre = sp.archivo + '.xlsx';
+        try {
+            const EJ = await _rtbCargarExcelJS();
+            const wb = new EJ.Workbook(); wb.creator = 'INV IL';
+            const nc = sp.columnas.length + 1;
+            if (sp.dash) {
+                const d = sp.dash;
+                _xlDashboard(wb, { titulo: sp.titulo, subtitulo: `Generado el ${_hoyISOReprog()} · ${sp.meta[0][0]}: ${sp.meta[0][1]}`, kpis: d.kpis, tms: d.tms, total: d.total, charts: d.charts });
+                const tablas = sp.pivot ? [{ titulo: 'Estados TMS', items: d.tms }, { titulo: 'Observaciones', items: d.obs }, { titulo: 'Status', items: d.status }, { titulo: 'Ubicaciones', items: d.ubis }, { titulo: 'Zona', items: d.zonas }]
+                                        : [{ titulo: 'Extracción', items: d.extr }, { titulo: 'Estados TMS', items: d.tms }, { titulo: 'Fecha de Reprogramación', items: d.fechas }];
+                _xlResumen(wb, { pivot: sp.pivot ? d.pivot : null, total: d.total, fInvTxt: 'Según filtros de la tabla', tablas });
+            }
+            const ws = wb.addWorksheet('Reporte', { views: [{ showGridLines: false }] });
+            ws.getColumn(1).width = 6;
+            sp.columnas.forEach((c, i) => {
+                let w = c.length + 6;
+                sp.grupos.forEach(g => g.filas.slice(0, 500).forEach(f => { const l = String(f[i] == null ? '' : f[i]).length + 3; if (l > w) w = l; }));
+                ws.getColumn(i + 2).width = Math.min(38, Math.max(14, w));
+            });
+            ws.mergeCells(1, 1, 2, nc); _rtbX(ws.getCell(1, 1), { v: sp.titulo.toUpperCase(), b: true, sz: 18, fc: 'FFFFFFFF', bg: 'FF0F172A', h: 'left', indent: 1 });
+            ws.mergeCells(3, 1, 3, nc); _rtbX(ws.getCell(3, 1), { v: sp.subtitulo, sz: 10, fc: 'FF64748B', h: 'left', indent: 1 });
+            let r = 5;
+            sp.meta.forEach(([l, v]) => {
+                ws.mergeCells(r, 1, r, 2); _rtbX(ws.getCell(r, 1), { v: l, b: true, sz: 10, bg: 'FFF1F5F9', fc: 'FF475569', indent: 1 });
+                ws.mergeCells(r, 3, r, nc); _rtbX(ws.getCell(r, 3), { v: v, sz: 11, wrap: true, indent: 1 });
+                r++;
+            });
+            r++;
+            const filaEnc = r;
+            ['#'].concat(sp.columnas).forEach((t, i) => _rtbX(ws.getCell(r, i + 1), { v: t, b: true, sz: 10, fc: 'FFFFFFFF', bg: 'FF0F172A', h: i === 0 ? 'center' : 'left' }));
+            ws.getRow(r).height = 22; r++;
+            let n = 0;
+            sp.grupos.forEach(g => {
+                ws.mergeCells(r, 1, r, nc);
+                _rtbX(ws.getCell(r, 1), { v: `${g.titulo} · ${g.filas.length} folio(s)`, b: true, bg: 'FFE2E8F0', indent: 1 }); r++;
+                g.filas.forEach(f => {
+                    n++;
+                    _rtbX(ws.getCell(r, 1), { v: n, h: 'center', fc: 'FF94A3B8', sz: 10, bb: true });
+                    f.forEach((c, i) => _rtbX(ws.getCell(r, i + 2), { v: c == null ? '' : String(c), sz: 10, bb: true, b: i === 0 }));
+                    r++;
+                });
+            });
+            ws.mergeCells(r, 1, r, nc); _rtbX(ws.getCell(r, 1), { v: `TOTAL GENERAL · ${sp.total} folio(s)`, b: true, fc: 'FFFFFFFF', bg: 'FF0F172A', indent: 1 }); r++;
+            if (sp.firmas) {
+                r += 3;
+                const mitad = Math.max(2, Math.floor(nc / 2));
+                const tramos = [[2, mitad - 1], [mitad + 1, nc]];
+                sp.firmas.forEach((t, i) => {
+                    const [a, b] = tramos[i] || tramos[1];
+                    if (b < a) return;
+                    ws.mergeCells(r, a, r, b); _rtbX(ws.getCell(r, a), { v: t, sz: 10, h: 'center', fc: 'FF475569', bt: true });
+                });
+                r++;
+            }
+            r += 2;
+            ws.mergeCells(r, 1, r, nc); _rtbX(ws.getCell(r, 1), { v: sp.pie, sz: 9, fc: 'FF94A3B8', h: 'center' });
+            ws.pageSetup = { paperSize: 9, orientation: sp.landscape ? 'landscape' : 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true, margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 } };
+            ws.pageSetup.printTitlesRow = `${filaEnc}:${filaEnc}`;
+            // Hoja de datos (para filtrar y trabajar la información)
+            const wd = wb.addWorksheet('Datos', { views: [{ state: 'frozen', ySplit: 1 }] });
+            sp.datos.columnas.forEach((c, i) => {
+                let w = c.length + 4;
+                for (let k = 0; k < sp.datos.filas.length && k < 1500; k++) { const l = String(sp.datos.filas[k][i] == null ? '' : sp.datos.filas[k][i]).length + 2; if (l > w) w = l; }
+                wd.getColumn(i + 1).width = Math.min(42, w);
+                _rtbX(wd.getCell(1, i + 1), { v: c, b: true, sz: 10, fc: 'FFFFFFFF', bg: 'FF0F172A' });
+            });
+            sp.datos.filas.forEach((f, ri) => f.forEach((v, ci) => _rtbX(wd.getCell(ri + 2, ci + 1), { v: v == null ? '' : v, sz: 10, bb: true })));
+            wd.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sp.datos.columnas.length } };
+            const buf = await wb.xlsx.writeBuffer();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+            a.download = nombre; document.body.appendChild(a); a.click();
+            setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+        } catch (err) {
+            console.error(err);
+            alert('No se pudo generar el Excel con formato (' + (err && err.message || err) + '). Se descargará una versión simple.');
+            const aoa = [[sp.titulo], [sp.subtitulo], []].concat(sp.meta.map(m => [m[0], m[1]]), [[]], [['#'].concat(sp.columnas)]);
+            let n = 0;
+            sp.grupos.forEach(g => { aoa.push([g.titulo + ' · ' + g.filas.length + ' folio(s)']); g.filas.forEach(f => { n++; aoa.push([n].concat(f)); }); });
+            aoa.push([], ['TOTAL GENERAL', sp.total + ' folio(s)']);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'Reporte');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([sp.datos.columnas].concat(sp.datos.filas)), 'Datos');
+            XLSX.writeFile(wb, nombre);
+        }
+    }
+
+    // ===== Tabla Crossdock =====
+    // Folio = FOLIO de la tabla de reprogramación, solo los de Observación = ENTREGADO A CROSSDOCK.
+    // Fecha de Registro = fecha actual; Fecha de Reprogramación y TMS = del TMS cargado;
+    // Responsable = el que se escribe en el modal (toda la columna); Flujo = Home Delivery por defecto.
+    // Extracción? = el Pistoleo del folio (PICKING CUARENTENA, PICKING REPROGRAMACIONES, SOLICITUD POST VENTA…) que dio como resultado ENTREGADO A CROSSDOCK.
+    function _responsableXd() {
+        try { return localStorage.getItem('crossdock_responsable') || ''; } catch (e) { return ''; }
+    }
+    function abrirModalResponsableXd() {
+        const i = document.getElementById('inpResponsableXd');
+        i.value = _responsableXd();
+        document.getElementById('modalResponsableXd').style.display = 'flex';
+        setTimeout(() => { i.focus(); i.select(); }, 50);
+    }
+    function cerrarModalResponsableXd() {
+        document.getElementById('modalResponsableXd').style.display = 'none';
+    }
+    function guardarResponsableXd() {
+        const nombre = document.getElementById('inpResponsableXd').value.trim();
+        if (!nombre) { alert('Escribe el nombre del responsable.'); return; }
+        try { localStorage.setItem('crossdock_responsable', nombre); } catch (e) {}
+        cerrarModalResponsableXd();
+        pintarTablaCrossdock();
+    }
+    function _filasCrossdock() {
+        const filasHist = obtenerFilasReprogBase();
+        if (!filasHist.length) return [];   // historial vacío = tabla vacía
+        const manuales = reprogManuales.slice().reverse().map(id => ({ key: id, codigo: '', zona: '', ubi: '', _manual: true }));
+        const hoy = _hoyISOReprog();
+        const resp = _responsableXd();
+        return manuales.concat(filasHist)
+            .map(r => { const c = _reprogConstruirV(r); c.v._stEd = (reprogEdits[c.id] || {}).status !== undefined; return c.v; })
+            .filter(v => /CROSS\s*DOCK/i.test(String(v.obs || '')) && v.folio)
+            .map(v => ({
+                fReg: hoy,
+                folio: v.folio,
+                fRep: v.fecha,
+                resp: resp,
+                extr: v._stEd && v.status ? v.status : v.pistoleo,   // si se editó el Status a mano, se ve aquí
+                tms: v.estado,
+                flujo: v.flujo || 'Home Delivery'
+            }));
+    }
+    let crossdockFilasVisibles = [];
+    function pintarTablaCrossdock() {
+        const tbody = document.getElementById('tbodyCrossdockRepros');
+        if (!tbody) return;
+        const inp = document.getElementById('inpBuscarCrossdock');
+        const terminos = (inp ? inp.value.trim().toUpperCase() : '').split(',').map(t => t.trim()).filter(Boolean);
+        const todas = _filasCrossdock();
+        const vis = todas.filter(f => terminos.every(t => Object.values(f).some(val => String(val).toUpperCase().includes(t))));
+        crossdockFilasVisibles = vis;
+        const lbl = document.getElementById('lblResponsableXd'); if (lbl) lbl.textContent = _responsableXd() || 'Asignar';
+        const lv = document.getElementById('lblXdVisibles'); if (lv) lv.textContent = vis.length;
+        const bx = document.getElementById('vrBtnVistaCrossdock'); if (bx) bx.textContent = 'Tabla Crossdock (' + todas.length + ')';
+        const lt = document.getElementById('lblXdTms');
+        if (lt) lt.textContent = Object.keys(tmsReprogMapa).length ? `· TMS cargado (${tmsReprogFechaCarga})` : '· Sin TMS cargado (cárgalo en "Tabla de reprogramación")';
+        tbody.innerHTML = vis.length ? vis.map(f => `<tr>
+            <td>${_escHtmlRepro(f.fReg)}</td>
+            <td class="vr-cod">${_escHtmlRepro(f.folio)}</td>
+            <td>${_escHtmlRepro(f.fRep)}</td>
+            <td>${_escHtmlRepro(f.resp)}</td>
+            <td class="vr-xd-si">${_escHtmlRepro(f.extr)}</td>
+            <td>${_escHtmlRepro(f.tms)}</td>
+            <td>${_escHtmlRepro(f.flujo)}</td>
+        </tr>`).join('') : '<tr><td colspan="7" class="vr-empty">Sin folios entregados a Crossdock.</td></tr>';
+    }
+    function descargarTablaCrossdock() {
+        const filas = crossdockFilasVisibles || [];
+        if (filas.length === 0) return alert('No hay registros en la tabla para descargar.');
+        const datos = filas.map(f => ({
+            "Fecha de Registro": f.fReg,
+            "Folio": f.folio,
+            "Fecha de Reprogramación": f.fRep,
+            "Responsable": f.resp,
+            "Extracción?": f.extr,
+            "TMS": f.tms,
+            "Flujo": f.flujo
+        }));
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Crossdock");
+        XLSX.writeFile(wb, `Tabla_Crossdock_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
+    }
+
+    function descargarTablaReprogramacion() {
+        const filas = reprogFilasVisibles || [];
+        if (filas.length === 0) return alert('No hay registros en la tabla para descargar.');
+        const datos = filas.map(({ v }) => ({
+            "FOLIO": v.folio,
+            "Pistoleo": v.pistoleo,
+            "Ubicación": v.ubi,
+            "ESTADO - TMS": v.estado,
+            "Flujo": v.flujo,
+            "Zona": v.zona,
+            "Status": v.status,
+            "Fecha Inventario": v.fInv,
+            "Fecha de Reprogramación": v.fecha,
+            "Observación": v.obs
+        }));
+        const ws = XLSX.utils.json_to_sheet(datos);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Reprogramacion");
+        XLSX.writeFile(wb, `Tabla_Reprogramacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`);
     }
 
     // Elimina UN escaneo del historial de Repros (nodo escaneos_repros/<key>).

@@ -2073,6 +2073,35 @@
             #panelResumenAvanceRutasDesk #listaAvanceRutasDash { max-height: 270px !important; flex: 0 1 auto; }
         }
 
+        /* === Celulares: todos los paneles a ancho completo, en una sola columna === */
+        @media (max-width: 700px) {
+            #zonaCentralDesk {
+                display: flex !important;
+                flex-direction: column;
+                grid-template-columns: none;
+                gap: 12px;
+                overflow-x: hidden;
+                padding-bottom: 24px;
+            }
+            #zonaCentralDesk > .desktop-panel,
+            #panelRankingDesk, #panelResumenAvanceRutasDesk, #panelAvanceReprosDesk {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                grid-column: auto !important;
+                flex: 0 0 auto !important;
+            }
+            /* Filtros del Avance: 2 por fila en vez de 5 apretados */
+            #panelResumenAvanceRutasDesk #filtrosGlobalRutasRow { grid-template-columns: 1fr 1fr !important; }
+            /* Dona arriba (compacta) y lista de rutas debajo a todo el ancho */
+            #panelResumenAvanceRutasDesk #filaDonaListaAvance { flex-direction: column; flex-wrap: nowrap !important; align-items: stretch !important; gap: 10px; }
+            #panelResumenAvanceRutasDesk #donaAvanceGlobalBox { position: static !important; flex-direction: row; justify-content: center; gap: 16px !important; width: 100%; box-sizing: border-box; }
+            #panelResumenAvanceRutasDesk #colListaAvanceRutas { flex: 1 1 auto; min-width: 0 !important; width: 100%; }
+            #panelResumenAvanceRutasDesk #listaAvanceRutasDash { max-height: 360px !important; }
+            /* Botones de cabecera: que bajen de línea y no se corten */
+            #zonaCentralDesk > .desktop-panel > .desktop-panel-title { gap: 8px; }
+        }
+
         /* Cabeceras de panel: no se desbordan, los botones bajan de línea */
         #zonaCentralDesk > .desktop-panel > .desktop-panel-title { flex-wrap: wrap; }
         #zonaCentralDesk > .desktop-panel > .desktop-panel-title > div { flex-wrap: wrap; }
